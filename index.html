@@ -1,15 +1,40 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Controle de Presença</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    h2 { color: #2c3e50; }
-    .funcionario { border: 1px solid #ccc; padding: 10px; margin-bottom: 15px; border-radius: 10px; }
-    label { display: block; margin-top: 8px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+      color: #2c3e50;
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+    }
+    #data {
+      text-align: center;
+      display: block;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .funcionario {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    select, input[type="radio"] {
+      margin-left: 8px;
+    }
     button {
       padding: 15px;
       font-size: 18px;
@@ -18,146 +43,143 @@
       border: none;
       border-radius: 10px;
       width: 100%;
-      margin-top: 10px;
+      cursor: pointer;
     }
-    #copiar {
-      background-color: #3498db;
-    }
-    textarea {
-      width: 100%;
-      height: 200px;
-      margin-top: 15px;
-      display: none;
+    button:hover {
+      background-color: #1ebe57;
     }
   </style>
 </head>
 <body>
-  <h2>Controle de Presença - Hoje: <span id="data"></span></h2>
 
-  <form id="form">
-    <div class="funcionario">
-      <strong>Fabiano Silva Santos</strong>
-      <label><input type="radio" name="Fabiano_status" value="Presente" required> Presente</label>
-      <label><input type="radio" name="Fabiano_status" value="Faltou" required> Faltou</label>
-      <label>Tipo:
-        <select name="Fabiano_tipo">
-          <option value="Funcionário">Funcionário</option>
-          <option value="Diarista">Diarista</option>
-        </select>
-      </label>
-      <label>Atestado? (se faltou)
-        <select name="Fabiano_atestado">
-          <option value="Não se aplica">Não se aplica</option>
-          <option value="Com atestado">Com atestado</option>
-          <option value="Sem atestado">Sem atestado</option>
-        </select>
-      </label>
-    </div>
+  <!-- Título principal centralizado -->
+  <h1><strong>Controle de Presença</strong></h1>
+  <!-- Mostra a data do dia -->
+  <span id="data"></span>
 
-    <div class="funcionario">
-      <strong>Kaylan Santos</strong>
-      <label><input type="radio" name="Kaylan_status" value="Presente" required> Presente</label>
-      <label><input type="radio" name="Kaylan_status" value="Faltou" required> Faltou</label>
-      <label>Tipo:
-        <select name="Kaylan_tipo">
-          <option value="Funcionário">Funcionário</option>
-          <option value="Diarista">Diarista</option>
-        </select>
-      </label>
-      <label>Atestado? (se faltou)
-        <select name="Kaylan_atestado">
-          <option value="Não se aplica">Não se aplica</option>
-          <option value="Com atestado">Com atestado</option>
-          <option value="Sem atestado">Sem atestado</option>
-        </select>
-      </label>
-    </div>
-
-    <div class="funcionario">
-      <strong>Gideilson de Jesus</strong>
-      <label><input type="radio" name="Gideilson_status" value="Presente" required> Presente</label>
-      <label><input type="radio" name="Gideilson_status" value="Faltou" required> Faltou</label>
-      <label>Tipo:
-        <select name="Gideilson_tipo">
-          <option value="Funcionário">Funcionário</option>
-          <option value="Diarista">Diarista</option>
-        </select>
-      </label>
-      <label>Atestado? (se faltou)
-        <select name="Gideilson_atestado">
-          <option value="Não se aplica">Não se aplica</option>
-          <option value="Com atestado">Com atestado</option>
-          <option value="Sem atestado">Sem atestado</option>
-        </select>
-      </label>
-    </div>
-
-    <div class="funcionario">
-      <strong>Pedro Lucas Santana de Oliveira</strong>
-      <label><input type="radio" name="Pedro_status" value="Presente" required> Presente</label>
-      <label><input type="radio" name="Pedro_status" value="Faltou" required> Faltou</label>
-      <label>Tipo:
-        <select name="Pedro_tipo">
-          <option value="Funcionário">Funcionário</option>
-          <option value="Diarista">Diarista</option>
-        </select>
-      </label>
-      <label>Atestado? (se faltou)
-        <select name="Pedro_atestado">
-          <option value="Não se aplica">Não se aplica</option>
-          <option value="Com atestado">Com atestado</option>
-          <option value="Sem atestado">Sem atestado</option>
-        </select>
-      </label>
-    </div>
-
-    <button type="submit">Abrir WhatsApp</button>
-    <button type="button" id="copiar">Copiar mensagem</button>
-  </form>
-
-  <textarea id="mensagem"></textarea>
+  <!-- Formulário onde serão inseridos os funcionários -->
+  <form id="form"></form>
 
   <script>
-    const hoje = new Date();
-    const dataFormatada = hoje.toLocaleDateString('pt-BR');
-    document.getElementById('data').textContent = dataFormatada;
+    // Lista de nomes dos funcionários
+    const funcionarios = [
+      "Fabiano Silva Santos",
+      "Gideilson de Jesus",
+      "Pedro Lucas Santana de Oliveira",
+      "Anderson da Silva",
+      "Filipe Mendonça Silva",
+      "Juan Mendonça de Oliveira",
+      "Roni Mendonça da Silva",
+      "Sidirley dos Santos",
+      "Valdinei Ferreira Santos",
+      "Leandro Pilger do Nascimento",
+      "Renato Mendonça da Silva"
+    ];
 
-    function gerarMensagem() {
-      const funcionarios = [
-        { nome: 'Fabiano Silva Santos', campo: 'Fabiano' },
-        { nome: 'Kaylan Santos', campo: 'Kaylan' },
-        { nome: 'Gideilson de Jesus', campo: 'Gideilson' },
-        { nome: 'Pedro Lucas Santana de Oliveira', campo: 'Pedro' },
-      ];
+    // Função para transformar o nome em um identificador seguro (ex: "Pedro Lucas" → "pedro_lucas")
+    const slugify = (text) => text.toLowerCase().replace(/\s+/g, "_").replace(/[^\w_]/g, "");
 
-      let mensagem = `📋 *Controle de Presença – ${dataFormatada}*\n`;
+    const form = document.getElementById("form");
 
-      funcionarios.forEach(f => {
-        const status = document.querySelector(`input[name="${f.campo}_status"]:checked`).value;
-        const tipo = document.querySelector(`select[name="${f.campo}_tipo"]`).value;
-        const atestado = document.querySelector(`select[name="${f.campo}_atestado"]`).value;
+    // Para cada funcionário, cria um bloco com os campos
+    funcionarios.forEach((nome) => {
+      const campo = slugify(nome);
+      const div = document.createElement("div");
+      div.className = "funcionario";
 
-        mensagem += `\n👤 *${f.nome}*\n- Status: ${status}\n- Tipo: ${tipo}\n- Atestado: ${atestado}\n`;
-      });
+      div.innerHTML = `
+        <strong>${nome}</strong>
+        <label>
+          <input type="radio" name="${campo}_status" value="Presente" required />
+          Presente
+        </label>
+        <label>
+          <input type="radio" name="${campo}_status" value="Faltou" required />
+          Faltou
+        </label>
+        <label>
+          Tipo:
+          <select name="${campo}_tipo">
+            <option value="Funcionário">Funcionário</option>
+            <option value="Diarista">Diarista</option>
+          </select>
+        </label>
+        <label>
+          Obra:
+          <select name="${campo}_obra">
+            <option value="IFES">IFES</option>
+            <option value="SEDU">SEDU</option>
+          </select>
+        </label>
+        <label style="display:none" id="${campo}_atestado_label">
+          Atestado?
+          <select name="${campo}_atestado">
+            <option value="Com atestado">Com atestado</option>
+            <option value="Sem atestado">Sem atestado</option>
+          </select>
+        </label>
+      `;
 
-      return mensagem;
-    }
-
-    document.getElementById('form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const msg = gerarMensagem().replace(/\n/g, '%0A');
-      const link = `https://wa.me/5527997792023?text=${msg}`;
-      window.location.href = link;
+      form.appendChild(div);
     });
 
-    document.getElementById('copiar').addEventListener('click', function() {
-      const mensagem = gerarMensagem().replace(/\n/g, '\n');
-      const textarea = document.getElementById('mensagem');
-      textarea.value = mensagem;
-      textarea.style.display = 'block';
-      textarea.select();
-      document.execCommand('copy');
-      alert('Mensagem copiada para a área de transferência!');
+    // Adiciona o botão de envio
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.textContent = "Enviar via WhatsApp";
+    form.appendChild(btn);
+
+    // Mostra a data atual no topo
+    const dataSpan = document.getElementById("data");
+    const hoje = new Date();
+    const dataFormatada = hoje.toLocaleDateString("pt-BR");
+    dataSpan.textContent = "Data: " + dataFormatada;
+
+    // Escuta mudanças nas opções de presença para mostrar ou esconder o campo atestado
+    form.addEventListener("change", (e) => {
+      if (e.target.name.endsWith("_status")) {
+        const campo = e.target.name.replace("_status", "");
+        const labelAtestado = document.getElementById(`${campo}_atestado_label`);
+
+        if (e.target.value === "Faltou") {
+          labelAtestado.style.display = "block"; // Mostra o campo atestado
+        } else {
+          labelAtestado.style.display = "none"; // Esconde o campo atestado
+        }
+      }
+    });
+
+    // Ao enviar o formulário, monta a mensagem e abre o WhatsApp
+    form.addEventListener("submit", (e) => {
+      e.preventDefault(); // Evita o recarregamento da página
+
+      let mensagem = `📋 *Controle de Presença – ${dataFormatada}*%0A`;
+
+      funcionarios.forEach((nome) => {
+        const campo = slugify(nome);
+
+        const statusInput = form.querySelector(`input[name="${campo}_status"]:checked`);
+        const tipoSelect = form.querySelector(`select[name="${campo}_tipo"]`);
+        const obraSelect = form.querySelector(`select[name="${campo}_obra"]`);
+        const atestadoLabel = document.getElementById(`${campo}_atestado_label`);
+        const atestadoSelect = form.querySelector(`select[name="${campo}_atestado"]`);
+
+        const status = statusInput ? statusInput.value : "Não informado";
+        const tipo = tipoSelect.value;
+        const obra = obraSelect.value;
+
+        let atestado = "Não se aplica";
+        if (status === "Faltou" && atestadoLabel.style.display === "block") {
+          atestado = atestadoSelect.value;
+        }
+
+        // Monta a parte da mensagem de cada funcionário
+        mensagem += `%0A👤 *${nome}*%0A- Status: ${status}%0A- Tipo: ${tipo}%0A- Obra: ${obra}%0A- Atestado: ${atestado}%0A`;
+      });
+
+      const numero = "5527997792023"; // Número do WhatsApp
+      const url = `https://wa.me/${numero}?text=${mensagem}`;
+      window.open(url, "_blank"); // Abre o WhatsApp com a mensagem preenchida
     });
   </script>
 </body>

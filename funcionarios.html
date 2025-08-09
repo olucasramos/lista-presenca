@@ -1,7 +1,44 @@
-<!-- SDK compat do Firebase (modo simples para este projeto) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Funcionários</title>
+</head>
+<body>
+  <h1>Funcionários</h1>
 
-<!-- nosso arquivo de configuração e funções (criar em js/firebase-config.js) -->
-<script src="js/firebase-config.js"></script>
+  <input type="text" id="nomeFuncionario" placeholder="Nome do funcionário">
+  <button id="addFuncionario">Adicionar</button>
 
+  <ul id="listaFuncionarios"></ul>
+
+  <script type="module">
+    import { db } from './firebase.js';
+    import { collection, addDoc, getDocs } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const nomeInput = document.getElementById('nomeFuncionario');
+    const btnAdd = document.getElementById('addFuncionario');
+    const lista = document.getElementById('listaFuncionarios');
+
+    async function carregarFuncionarios() {
+      lista.innerHTML = '';
+      const snap = await getDocs(collection(db, 'funcionarios'));
+      snap.forEach(doc => {
+        let li = document.createElement('li');
+        li.textContent = doc.data().nome;
+        lista.appendChild(li);
+      });
+    }
+
+    btnAdd.addEventListener('click', async () => {
+      if (!nomeInput.value) return alert('Digite um nome!');
+      await addDoc(collection(db, 'funcionarios'), { nome: nomeInput.value });
+      nomeInput.value = '';
+      carregarFuncionarios();
+    });
+
+    carregarFuncionarios();
+  </script>
+</body>
+</html>

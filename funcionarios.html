@@ -267,6 +267,14 @@
     </div>
 
     <div id="diaristaCampos" style="display:none;">
+      <label for="funcaoDiarista">Função</label>
+      <select id="funcaoDiarista">
+        <option value="" disabled selected>Selecione a função</option>
+        <option value="Diarista Limpeza">Diarista Limpeza</option>
+        <option value="Diarista Construção">Diarista Construção</option>
+        <option value="Diarista Geral">Diarista Geral</option>
+      </select>
+
       <label for="cpf">CPF</label>
       <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" />
 
@@ -313,6 +321,7 @@
     const funcaoOutroInput = document.getElementById('funcaoOutro');
     const listaFuncionarios = document.getElementById('listaFuncionarios');
     const tipoPixSelect = document.getElementById('tipoPix');
+    const funcaoDiaristaSelect = document.getElementById('funcaoDiarista');
 
     let funcionarios = {};
     let editandoId = null;
@@ -381,28 +390,32 @@
         dadosFuncionario.obra = obra;
       } else {
         // diarista
+        const funcaoDiarista = funcaoDiaristaSelect.value;
         const cpf = form.cpf.value.trim();
         const tipoPix = tipoPixSelect.value;
         const chavePix = form.chavePix.value.trim();
         const banco = form.banco.value.trim();
-        const valorDiaria = form.valorDiaria.value.trim();
+        const valorDiariaStr = form.valorDiaria.value.trim();
         const obraDiarista = form.obraDiarista.value.trim();
 
-        if (!nome || !cpf || !tipoPix || !valorDiaria || !obraDiarista) {
-          alert('Por favor, preencha os campos obrigatórios do diarista.');
+        if (!nome || !funcaoDiarista || !cpf || !tipoPix || !valorDiariaStr || !obraDiarista) {
+          alert('Por favor, preencha todos os campos obrigatórios do diarista.');
           return;
         }
 
-        if (isNaN(valorDiaria) || Number(valorDiaria) < 0) {
+        // Valida se valorDiaria é número válido e positivo
+        const valorDiaria = parseFloat(valorDiariaStr.replace(',', '.'));
+        if (isNaN(valorDiaria) || valorDiaria < 0) {
           alert('Valor da diária deve ser um número válido e positivo.');
           return;
         }
 
+        dadosFuncionario.funcao = funcaoDiarista;
         dadosFuncionario.cpf = cpf;
         dadosFuncionario.tipoPix = tipoPix;
         dadosFuncionario.chavePix = chavePix;
         dadosFuncionario.banco = banco;
-        dadosFuncionario.valorDiaria = parseFloat(valorDiaria);
+        dadosFuncionario.valorDiaria = valorDiaria;
         dadosFuncionario.obra = obraDiarista;
       }
 
@@ -457,69 +470,48 @@
         if (f.tipo.toLowerCase() === 'funcionario') {
           info += `Função: ${f.funcao}\nObra: ${f.obra}`;
         } else if (f.tipo.toLowerCase() === 'diarista') {
-          info += `CPF: ${f.cpf}\nTipo PIX: ${f.tipoPix}\nChave PIX: ${f.chavePix}\nBanco: ${f.banco}\nValor da diária: R$ ${Number(f.valorDiaria).toFixed(2)}\nObra: ${f.obra}`;
+          info += `Função: ${f.funcao}\nCPF: ${f.cpf}\nChave PIX: ${f.chavePix}\nTipo PIX: ${f.tipoPix}\nBanco: ${f.banco}\nValor da diária: R$ ${Number(f.valorDiaria).toFixed(2)}\nObra: ${f.obra}`;
         }
 
         const card = document.createElement('div');
-        card.className = 'funcionario-card';
+        card.classList.add('funcionario-card');
         card.innerHTML = `
           <div class="funcionario-nome">${f.nome}</div>
-          <div class="funcionario-info">${info.replace(/\n/g, '<br>')}</div>
+          <pre class="funcionario-info">${info}</pre>
           <div class="btn-actions">
             <button class="btn-editar" data-id="${id}">Editar</button>
             <button class="btn-excluir" data-id="${id}">Excluir</button>
           </div>
         `;
-        listaFuncionarios.appendChild(card);
-      }
 
-      document.querySelectorAll('.btn-excluir').forEach(btn => {
-        btn.onclick = async () => {
-          if (prompt('Digite a senha para confirmar exclusão:') !== '1234') {
-            alert('Senha incorreta.');
-            return;
-          }
-          const id = btn.getAttribute('data-id');
-          try {
-            await remove(ref(db, `funcionarios/${id}`));
-            alert('Funcionário excluído com sucesso!');
-            carregarFuncionarios();
-          } catch (error) {
-            console.error('Erro ao excluir funcionário:', error);
-            alert('Erro ao excluir funcionário. Veja o console para detalhes.');
-          }
-        };
-      });
-
-      document.querySelectorAll('.btn-editar').forEach(btn => {
-        btn.onclick = () => {
-          const id = btn.getAttribute('data-id');
-          const f = funcionarios[id];
+        const btnEditar = card.querySelector('.btn-editar');
+        btnEditar.onclick = () => {
           editandoId = id;
           form.nome.value = f.nome;
           if (f.tipo.toLowerCase() === 'funcionario') {
             form.querySelector('input[name="tipo"][value="funcionario"]').checked = true;
             mostrarCamposPorTipo();
 
-            // Verifica se a função existe entre as opções
-            const opcoesFuncao = Array.from(funcaoSelect.options).map(opt => opt.value);
-            if (opcoesFuncao.includes(f.funcao)) {
-              funcaoSelect.value = f.funcao;
-              funcaoOutroGroup.style.display = 'none';
-              funcaoOutroInput.value = '';
-              funcaoOutroInput.required = false;
-            } else {
-              funcaoSelect.value = 'Outro';
+            funcaoSelect.value = ['Ajudante Prático', 'Oficial', 'Oficial Pleno', 'Oficial Polivalente', 'Encarregado'].includes(f.funcao)
+              ? f.funcao
+              : 'Outro';
+
+            if (funcaoSelect.value === 'Outro') {
               funcaoOutroGroup.style.display = 'block';
               funcaoOutroInput.value = f.funcao;
               funcaoOutroInput.required = true;
+            } else {
+              funcaoOutroGroup.style.display = 'none';
+              funcaoOutroInput.value = '';
+              funcaoOutroInput.required = false;
             }
-
-            form.obra.value = f.obra;
+            form.obra.value = f.obra || '';
           } else {
             form.querySelector('input[name="tipo"][value="diarista"]').checked = true;
             mostrarCamposPorTipo();
-            form.cpf.value = f.cpf;
+
+            funcaoDiaristaSelect.value = f.funcao || '';
+            form.cpf.value = f.cpf || '';
             tipoPixSelect.value = f.tipoPix || '';
             form.chavePix.value = f.chavePix || '';
             form.banco.value = f.banco || '';
@@ -528,16 +520,39 @@
           }
           window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-      });
+
+        const btnExcluir = card.querySelector('.btn-excluir');
+        btnExcluir.onclick = async () => {
+          if (confirm(`Deseja realmente excluir "${f.nome}"?`)) {
+            try {
+              await remove(ref(db, `funcionarios/${id}`));
+              alert('Funcionário excluído com sucesso!');
+              if (editandoId === id) {
+                editandoId = null;
+                form.reset();
+                funcaoOutroGroup.style.display = 'none';
+                mostrarCamposPorTipo();
+              }
+              carregarFuncionarios();
+            } catch (error) {
+              console.error('Erro ao excluir funcionário:', error);
+              alert('Erro ao excluir funcionário.');
+            }
+          }
+        };
+
+        listaFuncionarios.appendChild(card);
+      }
     }
 
-    function capitalize(str) {
-      if (!str) return '';
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    function capitalize(text) {
+      if (!text) return '';
+      return text.charAt(0).toUpperCase() + text.slice(1);
     }
 
     mostrarCamposPorTipo();
     carregarFuncionarios();
   </script>
+
 </body>
 </html>

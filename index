@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Principal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Painel de Controle</h1>
+    </header>
+
+    <main>
+        <div class="menu">
+            <a href="chamada.html" class="btn">📋 Realizar Chamada</a>
+            <a href="relatorios.html" class="btn">📊 Exibir Relatórios</a>
+            <a href="funcionarios.html" class="btn">👤 Adicionar Funcionários</a>
+            <a href="obras.html" class="btn">🏗️ Cadastrar Obra</a>
+        </div>
+    </main>
+</body>
+</html>

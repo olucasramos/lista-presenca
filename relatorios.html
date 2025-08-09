@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Relatórios</title>
 <style>
+  /* ... (mesmo CSS anterior, não alterado para economia) ... */
   * {
     box-sizing: border-box;
   }
@@ -312,7 +313,6 @@
           if (!faltas[idFunc]) continue;
           const presenca = presencasDia[idFunc];
           if (presenca.status === 'falta') {
-            // Colocar info se tem atestado (para funcionários)
             let infoAtestado = '';
             if (funcionarios[idFunc].tipo === 'funcionario') {
               infoAtestado = presenca.atestado ? ' (Com atestado)' : ' (Sem atestado)';
@@ -487,16 +487,16 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
       return;
     }
     const textoEncoded = encodeURIComponent(textoRelatorioAtual);
-    const numeroWhats = '+5527997792023';
-    const url = `https://wa.me/${numeroWhats.replace(/\D/g,'')}?text=${textoEncoded}`;
+    // Sem número fixo, apenas abre a tela para escolher contato no WhatsApp Web/app
+    const url = `https://wa.me/?text=${textoEncoded}`;
     window.open(url, '_blank');
   }
 
   function formatarDataDMY(data) {
     const dt = new Date(data);
     if (isNaN(dt)) return data;
-    const d = dt.getDate().toString().padStart(2,'0');
-    const m = (dt.getMonth()+1).toString().padStart(2,'0');
+    const d = dt.getDate().toString().padStart(2, '0');
+    const m = (dt.getMonth() + 1).toString().padStart(2, '0');
     const a = dt.getFullYear();
     return `${d}/${m}/${a}`;
   }

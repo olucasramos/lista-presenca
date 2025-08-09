@@ -1,123 +1,175 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatórios</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatórios</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Firebase -->
+  <script type="module" src="firebase.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f6f8fa;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      font-size: 1.2rem;
+    }
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .secondary {
+      background-color: #007bff;
+    }
+    .danger {
+      background-color: #dc3545;
+    }
+    .resultado {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+  </style>
 </head>
 <body>
-    <h1>📊 Relatórios</h1>
 
-    <section>
-        <h2>Relatório de Diaristas</h2>
-        <label>Data Inicial: <input type="date" id="dataInicioD"></label>
-        <label>Data Final: <input type="date" id="dataFimD"></label>
-        <button id="gerarDiaristas" class="btn">Gerar Relatório</button>
-        <div id="resultadoDiaristas"></div>
-    </section>
+<header>📊 Relatórios</header>
 
-    <section>
-        <h2>Relatório de Faltas</h2>
-        <label>Tipo:
-            <select id="tipoFaltas">
-                <option value="todos">Todos</option>
-                <option value="funcionario">Funcionários</option>
-                <option value="diarista">Diaristas</option>
-            </select>
-        </label>
-        <label>Data Inicial: <input type="date" id="dataInicioF"></label>
-        <label>Data Final: <input type="date" id="dataFimF"></label>
-        <button id="gerarFaltas" class="btn">Gerar Relatório</button>
-        <div id="resultadoFaltas"></div>
-    </section>
+<main>
+  <label for="tipoRelatorio">Tipo de Relatório</label>
+  <select id="tipoRelatorio">
+    <option value="diaristas">Diaristas</option>
+    <option value="faltas">Faltas</option>
+  </select>
 
-    <a href="index.html" class="btn btn-voltar">⬅ Voltar</a>
+  <label for="dataInicio">Data Início</label>
+  <input type="date" id="dataInicio">
 
-    <script type="module">
-        import { db, ref, get } from './firebase.js';
+  <label for="dataFim">Data Fim</label>
+  <input type="date" id="dataFim">
 
-        // Função auxiliar para filtrar datas
-        function estaNoPeriodo(data, inicio, fim) {
-            const d = new Date(data.split('/').reverse().join('-'));
-            return d >= new Date(inicio) && d <= new Date(fim);
+  <button onclick="gerarRelatorio()">📄 Gerar Relatório</button>
+
+  <div id="resultado" class="resultado" style="display:none;"></div>
+
+  <button class="secondary" onclick="gerarPDF()">📄 Gerar PDF</button>
+  <button class="danger" onclick="enviarWhatsApp()">📲 Enviar WhatsApp</button>
+
+  <br><br>
+  <a href="index.html"><button class="secondary">⬅ Voltar</button></a>
+</main>
+
+<script type="module">
+  import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+  import { app } from "./firebase.js";
+
+  const db = getDatabase(app);
+
+  let textoRelatorio = "";
+
+  window.gerarRelatorio = async function() {
+    const tipo = document.getElementById('tipoRelatorio').value;
+    const dataInicio = document.getElementById('dataInicio').value;
+    const dataFim = document.getElementById('dataFim').value;
+
+    if (!dataInicio || !dataFim) {
+      alert("Selecione o período.");
+      return;
+    }
+
+    const dbRef = ref(db);
+    const snapshot = await get(child(dbRef, 'chamadas'));
+
+    if (!snapshot.exists()) {
+      alert("Nenhum dado encontrado.");
+      return;
+    }
+
+    const dados = snapshot.val();
+    let resultadoHTML = `<h3>Relatório: ${tipo}</h3>`;
+    textoRelatorio = `Relatório: ${tipo}\nPeríodo: ${dataInicio} a ${dataFim}\n\n`;
+
+    for (let data in dados) {
+      if (data >= dataInicio && data <= dataFim) {
+        for (let nome in dados[data]) {
+          const info = dados[data][nome];
+          if (tipo === "diaristas" && info.tipo === "diarista" && info.presente) {
+            resultadoHTML += `<p>${nome} - Presente (${data}) - R$ ${info.valorDia}</p>`;
+            textoRelatorio += `${nome} - Presente (${data}) - R$ ${info.valorDia}\n`;
+          }
+          if (tipo === "faltas" && !info.presente) {
+            resultadoHTML += `<p>${nome} - Faltou (${data})</p>`;
+            textoRelatorio += `${nome} - Faltou (${data})\n`;
+          }
         }
+      }
+    }
 
-        // Relatório de Diaristas
-        document.getElementById("gerarDiaristas").addEventListener("click", async () => {
-            const inicio = document.getElementById("dataInicioD").value;
-            const fim = document.getElementById("dataFimD").value;
-            if (!inicio || !fim) return alert("Selecione o período!");
+    document.getElementById('resultado').innerHTML = resultadoHTML;
+    document.getElementById('resultado').style.display = "block";
+  }
 
-            const funcionariosSnap = await get(ref(db, 'funcionarios'));
-            const chamadasSnap = await get(ref(db, 'chamadas'));
-            if (!funcionariosSnap.exists() || !chamadasSnap.exists()) {
-                return alert("Não há dados suficientes.");
-            }
+  window.gerarPDF = function() {
+    if (!textoRelatorio) {
+      alert("Gere um relatório primeiro.");
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text(textoRelatorio, 10, 10);
+    doc.save("relatorio.pdf");
+  }
 
-            const funcionarios = funcionariosSnap.val();
-            const chamadas = chamadasSnap.val();
-            let relatorio = {};
+  window.enviarWhatsApp = function() {
+    if (!textoRelatorio) {
+      alert("Gere um relatório primeiro.");
+      return;
+    }
+    const msg = encodeURIComponent(textoRelatorio);
+    window.open(`https://wa.me/5527997792023?text=${msg}`, "_blank");
+  }
+</script>
 
-            for (let data in chamadas) {
-                if (estaNoPeriodo(data, inicio, fim)) {
-                    for (let id in chamadas[data]) {
-                        const f = funcionarios[id];
-                        if (f && f.tipo === 'diarista' && chamadas[data][id].status === 'presente') {
-                            if (!relatorio[id]) relatorio[id] = { nome: f.nome, dias: 0, diaria: parseFloat(f.valorDiaria || 0) };
-                            relatorio[id].dias++;
-                        }
-                    }
-                }
-            }
-
-            let html = "<ul>";
-            for (let id in relatorio) {
-                const r = relatorio[id];
-                html += `<li>${r.nome}: ${r.dias} dias × R$ ${r.diaria.toFixed(2)} = <strong>R$ ${(r.dias * r.diaria).toFixed(2)}</strong></li>`;
-            }
-            html += "</ul>";
-            document.getElementById("resultadoDiaristas").innerHTML = html || "<p>Nenhum registro encontrado.</p>";
-        });
-
-        // Relatório de Faltas
-        document.getElementById("gerarFaltas").addEventListener("click", async () => {
-            const inicio = document.getElementById("dataInicioF").value;
-            const fim = document.getElementById("dataFimF").value;
-            const tipoFiltro = document.getElementById("tipoFaltas").value;
-
-            if (!inicio || !fim) return alert("Selecione o período!");
-
-            const funcionariosSnap = await get(ref(db, 'funcionarios'));
-            const chamadasSnap = await get(ref(db, 'chamadas'));
-            if (!funcionariosSnap.exists() || !chamadasSnap.exists()) {
-                return alert("Não há dados suficientes.");
-            }
-
-            const funcionarios = funcionariosSnap.val();
-            const chamadas = chamadasSnap.val();
-            let relatorio = {};
-
-            for (let data in chamadas) {
-                if (estaNoPeriodo(data, inicio, fim)) {
-                    for (let id in chamadas[data]) {
-                        const f = funcionarios[id];
-                        if (f && (tipoFiltro === 'todos' || f.tipo === tipoFiltro) && chamadas[data][id].status === 'falta') {
-                            if (!relatorio[id]) relatorio[id] = { nome: f.nome, faltas: [] };
-                            relatorio[id].faltas.push(data);
-                        }
-                    }
-                }
-            }
-
-            let html = "<ul>";
-            for (let id in relatorio) {
-                const r = relatorio[id];
-                html += `<li>${r.nome}: ${r.faltas.length} faltas (${r.faltas.join(', ')})</li>`;
-            }
-            html += "</ul>";
-            document.getElementById("resultadoFaltas").innerHTML = html || "<p>Nenhum registro encontrado.</p>";
-        });
-    </script>
 </body>
 </html>

@@ -1,23 +1,65 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Principal</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Controle de Presença</title>
 </head>
 <body>
-    <header>
-        <h1>Painel de Controle</h1>
-    </header>
+  <h1>Registrar Presença</h1>
 
-    <main>
-        <div class="menu">
-            <a href="chamada.html" class="btn">📋 Realizar Chamada</a>
-            <a href="relatorios.html" class="btn">📊 Exibir Relatórios</a>
-            <a href="funcionarios.html" class="btn">👤 Adicionar Funcionários</a>
-            <a href="obras.html" class="btn">🏗️ Cadastrar Obra</a>
-        </div>
-    </main>
+  <label>Funcionário:</label>
+  <select id="funcionario"></select>
+  <br><br>
+
+  <label>Obra:</label>
+  <select id="obra"></select>
+  <br><br>
+
+  <button id="registrar">Registrar Presença</button>
+
+  <script type="module">
+    import { db } from './firebase.js';
+    import { collection, getDocs, addDoc, serverTimestamp } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const selFuncionario = document.getElementById('funcionario');
+    const selObra = document.getElementById('obra');
+    const btnRegistrar = document.getElementById('registrar');
+
+    async function carregarSelects() {
+      const funcionariosSnap = await getDocs(collection(db, 'funcionarios'));
+      funcionariosSnap.forEach(doc => {
+        let opt = document.createElement('option');
+        opt.value = doc.id;
+        opt.textContent = doc.data().nome;
+        selFuncionario.appendChild(opt);
+      });
+
+      const obrasSnap = await getDocs(collection(db, 'obras'));
+      obrasSnap.forEach(doc => {
+        let opt = document.createElement('option');
+        opt.value = doc.id;
+        opt.textContent = doc.data().nome;
+        selObra.appendChild(opt);
+      });
+    }
+
+    btnRegistrar.addEventListener('click', async () => {
+      if (!selFuncionario.value || !selObra.value) {
+        alert('Selecione funcionário e obra!');
+        return;
+      }
+
+      await addDoc(collection(db, 'presencas'), {
+        funcionarioId: selFuncionario.value,
+        obraId: selObra.value,
+        dataHora: serverTimestamp()
+      });
+
+      alert('Presença registrada!');
+    });
+
+    carregarSelects();
+  </script>
 </body>
 </html>

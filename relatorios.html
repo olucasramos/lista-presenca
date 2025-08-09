@@ -1,175 +1,201 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatórios</title>
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- Firebase -->
-  <script type="module" src="firebase.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relatórios Corrigidos</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f6f8fa;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    header {
-      background-color: #007BFF;
-      color: white;
-      padding: 15px;
-      font-size: 1.2rem;
-    }
-    main {
-      padding: 20px;
+      margin: 20px;
       max-width: 800px;
-      margin: auto;
+      margin-left: auto;
+      margin-right: auto;
+      background: #f4f4f9;
+      color: #333;
     }
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
-    }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+    label, select, input, button {
+      font-size: 1rem;
+      margin: 0.5em 0;
     }
     button {
-      background-color: #28a745;
-      color: white;
+      padding: 0.6em 1.2em;
+      margin-right: 10px;
+      border-radius: 6px;
       border: none;
-      padding: 12px 20px;
-      font-size: 1rem;
-      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
       cursor: pointer;
-      margin: 5px;
     }
     button:hover {
-      opacity: 0.9;
+      background-color: #0056b3;
     }
-    .secondary {
-      background-color: #007bff;
-    }
-    .danger {
-      background-color: #dc3545;
-    }
-    .resultado {
+    #resultado {
+      margin-top: 1.5em;
       background: white;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      text-align: left;
+      padding: 1em;
+      border-radius: 6px;
+      min-height: 80px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
 
-<header>📊 Relatórios</header>
+  <h1>Relatórios</h1>
 
-<main>
-  <label for="tipoRelatorio">Tipo de Relatório</label>
+  <label for="tipoRelatorio">Tipo de Relatório:</label>
   <select id="tipoRelatorio">
-    <option value="diaristas">Diaristas</option>
-    <option value="faltas">Faltas</option>
+    <option value="diaristas">Relatório de Diaristas</option>
+    <option value="faltas">Relatório de Faltas</option>
   </select>
 
-  <label for="dataInicio">Data Início</label>
-  <input type="date" id="dataInicio">
+  <br />
 
-  <label for="dataFim">Data Fim</label>
-  <input type="date" id="dataFim">
+  <label for="dataInicio">Data Início:</label>
+  <input type="date" id="dataInicio" />
 
-  <button onclick="gerarRelatorio()">📄 Gerar Relatório</button>
+  <br />
 
-  <div id="resultado" class="resultado" style="display:none;"></div>
+  <label for="dataFim">Data Fim:</label>
+  <input type="date" id="dataFim" />
 
-  <button class="secondary" onclick="gerarPDF()">📄 Gerar PDF</button>
-  <button class="danger" onclick="enviarWhatsApp()">📲 Enviar WhatsApp</button>
+  <br />
 
-  <br><br>
-  <a href="index.html"><button class="secondary">⬅ Voltar</button></a>
-</main>
+  <button id="btnGerarRelatorio">Gerar Relatório</button>
+  <button id="btnPDF">Gerar PDF</button>
+  <button id="btnWhatsApp">Enviar WhatsApp</button>
 
-<script type="module">
-  import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-  import { app } from "./firebase.js";
+  <div id="resultado">Aqui aparecerá o relatório.</div>
 
-  const db = getDatabase(app);
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module">
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+    import { app } from "./firebase.js";
 
-  let textoRelatorio = "";
+    const db = getDatabase(app);
 
-  window.gerarRelatorio = async function() {
-    const tipo = document.getElementById('tipoRelatorio').value;
-    const dataInicio = document.getElementById('dataInicio').value;
-    const dataFim = document.getElementById('dataFim').value;
+    let textoRelatorio = "";
 
-    if (!dataInicio || !dataFim) {
-      alert("Selecione o período.");
-      return;
+    function dataNoPeriodo(dataStr, inicioStr, fimStr) {
+      const d = new Date(dataStr);
+      const inicio = new Date(inicioStr);
+      const fim = new Date(fimStr);
+      return d >= inicio && d <= fim;
     }
 
-    const dbRef = ref(db);
-    const snapshot = await get(child(dbRef, 'chamadas'));
+    async function gerarRelatorio() {
+      const tipo = document.getElementById('tipoRelatorio').value;
+      const dataInicio = document.getElementById('dataInicio').value;
+      const dataFim = document.getElementById('dataFim').value;
 
-    if (!snapshot.exists()) {
-      alert("Nenhum dado encontrado.");
-      return;
-    }
+      if (!dataInicio || !dataFim) {
+        alert('Por favor, selecione as datas de início e fim.');
+        return;
+      }
 
-    const dados = snapshot.val();
-    let resultadoHTML = `<h3>Relatório: ${tipo}</h3>`;
-    textoRelatorio = `Relatório: ${tipo}\nPeríodo: ${dataInicio} a ${dataFim}\n\n`;
+      const snapshotFunc = await get(ref(db, 'funcionarios'));
+      const snapshotChamadas = await get(ref(db, 'chamadas'));
 
-    for (let data in dados) {
-      if (data >= dataInicio && data <= dataFim) {
-        for (let nome in dados[data]) {
-          const info = dados[data][nome];
-          if (tipo === "diaristas" && info.tipo === "diarista" && info.presente) {
-            resultadoHTML += `<p>${nome} - Presente (${data}) - R$ ${info.valorDia}</p>`;
-            textoRelatorio += `${nome} - Presente (${data}) - R$ ${info.valorDia}\n`;
-          }
-          if (tipo === "faltas" && !info.presente) {
-            resultadoHTML += `<p>${nome} - Faltou (${data})</p>`;
-            textoRelatorio += `${nome} - Faltou (${data})\n`;
+      if (!snapshotFunc.exists() || !snapshotChamadas.exists()) {
+        document.getElementById('resultado').innerText = 'Não há dados suficientes para gerar o relatório.';
+        return;
+      }
+
+      const funcionarios = snapshotFunc.val();
+      const chamadas = snapshotChamadas.val();
+
+      let relatorio = {};
+      textoRelatorio = '';
+
+      if (tipo === 'diaristas') {
+        textoRelatorio += `Relatório de Diaristas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
+        // Calcular presenças e valores
+        for (const data in chamadas) {
+          if (dataNoPeriodo(data, dataInicio, dataFim)) {
+            for (const idFunc in chamadas[data]) {
+              const status = chamadas[data][idFunc].status;
+              if (status === 'presente') {
+                const f = funcionarios[idFunc];
+                if (f && f.tipo === 'diarista') {
+                  if (!relatorio[idFunc]) {
+                    relatorio[idFunc] = { nome: f.nome, dias: 0, diaria: parseFloat(f.valorDiaria) || 0 };
+                  }
+                  relatorio[idFunc].dias++;
+                }
+              }
+            }
           }
         }
+
+        let texto = '';
+        for (const id in relatorio) {
+          const r = relatorio[id];
+          texto += `${r.nome}: ${r.dias} dias x R$ ${r.diaria.toFixed(2)} = R$ ${(r.dias*r.diaria).toFixed(2)}\n`;
+        }
+
+        textoRelatorio += texto || 'Nenhum diarista encontrado no período.';
+        document.getElementById('resultado').innerText = textoRelatorio;
+      } 
+      else if (tipo === 'faltas') {
+        textoRelatorio += `Relatório de Faltas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
+        const tipoFiltro = 'todos'; // Se quiser pode adicionar filtro aqui
+
+        for (const data in chamadas) {
+          if (dataNoPeriodo(data, dataInicio, dataFim)) {
+            for (const idFunc in chamadas[data]) {
+              const status = chamadas[data][idFunc].status;
+              if (status === 'falta') {
+                const f = funcionarios[idFunc];
+                if (f && (tipoFiltro === 'todos' || f.tipo === tipoFiltro)) {
+                  if (!relatorio[idFunc]) {
+                    relatorio[idFunc] = { nome: f.nome, faltas: [] };
+                  }
+                  relatorio[idFunc].faltas.push(data);
+                }
+              }
+            }
+          }
+        }
+
+        let texto = '';
+        for (const id in relatorio) {
+          const r = relatorio[id];
+          texto += `${r.nome}: ${r.faltas.length} faltas (${r.faltas.join(', ')})\n`;
+        }
+
+        textoRelatorio += texto || 'Nenhuma falta registrada no período.';
+        document.getElementById('resultado').innerText = textoRelatorio;
       }
     }
 
-    document.getElementById('resultado').innerHTML = resultadoHTML;
-    document.getElementById('resultado').style.display = "block";
-  }
+    document.getElementById('btnGerarRelatorio').addEventListener('click', gerarRelatorio);
 
-  window.gerarPDF = function() {
-    if (!textoRelatorio) {
-      alert("Gere um relatório primeiro.");
-      return;
-    }
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text(textoRelatorio, 10, 10);
-    doc.save("relatorio.pdf");
-  }
+    document.getElementById('btnPDF').addEventListener('click', () => {
+      if (!textoRelatorio) {
+        alert('Gere o relatório antes de criar o PDF.');
+        return;
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const lines = textoRelatorio.split('\n');
+      let y = 10;
+      lines.forEach(line => {
+        doc.text(line, 10, y);
+        y += 10;
+      });
+      doc.save('relatorio.pdf');
+    });
 
-  window.enviarWhatsApp = function() {
-    if (!textoRelatorio) {
-      alert("Gere um relatório primeiro.");
-      return;
-    }
-    const msg = encodeURIComponent(textoRelatorio);
-    window.open(`https://wa.me/5527997792023?text=${msg}`, "_blank");
-  }
-</script>
+    document.getElementById('btnWhatsApp').addEventListener('click', () => {
+      if (!textoRelatorio) {
+        alert('Gere o relatório antes de enviar pelo WhatsApp.');
+        return;
+      }
+      const textoUrl = encodeURIComponent(textoRelatorio);
+      window.open(`https://wa.me/5527997792023?text=${textoUrl}`, '_blank');
+    });
+  </script>
 
 </body>
 </html>

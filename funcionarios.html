@@ -58,7 +58,7 @@
       background-color: rgba(21, 67, 96, 0.85);
       border-radius: 12px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       width: 100%;
       max-width: 400px;
       box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
@@ -197,6 +197,21 @@
       box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
       max-width: 100%;
     }
+    #listaFuncionariosConsultados {
+      width: 100%;
+      max-width: 400px;
+      background-color: rgba(21, 67, 96, 0.75);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(21, 67, 96, 0.6);
+      font-size: 0.9rem;
+      color: #cce6ff;
+      user-select: none;
+      min-height: 32px;
+      line-height: 1.3;
+      font-weight: 600;
+    }
     @media (max-width: 420px) {
       h1 {
         font-size: 2rem;
@@ -289,6 +304,9 @@
     <button type="submit" class="btn-salvar">Salvar Funcionário</button>
   </form>
 
+  <!-- Nova div para lista de funcionários consultados -->
+  <div id="listaFuncionariosConsultados">Nenhum funcionário salvo ainda.</div>
+
   <div class="funcionario-lista" id="listaFuncionarios"></div>
 
   <footer>
@@ -306,9 +324,22 @@
     const funcaoOutroGroup = document.getElementById('funcaoOutroGroup');
     const funcaoOutroInput = document.getElementById('funcaoOutro');
     const listaFuncionarios = document.getElementById('listaFuncionarios');
+    const listaFuncionariosConsultados = document.getElementById('listaFuncionariosConsultados');
 
     let funcionarios = {};
     let editandoId = null;
+
+    // Set para armazenar nomes já salvos
+    const nomesSalvosSet = new Set();
+
+    function atualizarListaConsultados() {
+      const nomes = Array.from(nomesSalvosSet).sort((a, b) => a.localeCompare(b));
+      if (nomes.length === 0) {
+        listaFuncionariosConsultados.textContent = 'Nenhum funcionário salvo ainda.';
+      } else {
+        listaFuncionariosConsultados.textContent = 'Funcionários salvos: ' + nomes.join(', ');
+      }
+    }
 
     function formatarCPF(cpf) {
       // Formata CPF no formato NNN.NNN.NNN-NN
@@ -401,12 +432,18 @@
           editandoId = null;
         } else {
           const novoRef = ref(db, 'funcionarios');
-          const idNovo = (await get(novoRef)).exists()
-            ? Object.keys((await get(novoRef)).val()).length + 1
+          const snapshot = await get(novoRef);
+          const idNovo = snapshot.exists()
+            ? Object.keys(snapshot.val()).length + 1
             : 1;
           await set(ref(db, `funcionarios/${idNovo}`), dadosFuncionario);
           alert('Funcionário cadastrado com sucesso!');
         }
+
+        // Atualiza o set e a lista visual
+        nomesSalvosSet.add(nome);
+        atualizarListaConsultados();
+
         form.reset();
         funcaoOutroGroup.style.display = 'none';
         mostrarCamposPorTipo();
@@ -423,6 +460,12 @@
         if (snapshot.exists()) {
           funcionarios = snapshot.val();
           montarLista();
+
+          // Atualiza a lista de nomes salvos (caso tenha funcionários no banco)
+          Object.values(funcionarios).forEach(f => {
+            if (f.nome) nomesSalvosSet.add(f.nome);
+          });
+          atualizarListaConsultados();
         } else {
           listaFuncionarios.innerHTML = '<p>Nenhum funcionário encontrado.</p>';
         }
@@ -466,6 +509,11 @@
           try {
             await remove(ref(db, `funcionarios/${id}`));
             alert('Funcionário excluído com sucesso!');
+            // Remove do set também
+            if(funcionarios[id] && funcionarios[id].nome){
+              nomesSalvosSet.delete(funcionarios[id].nome);
+              atualizarListaConsultados();
+            }
             carregarFuncionarios();
           } catch (error) {
             console.error('Erro ao excluir funcionário:', error);

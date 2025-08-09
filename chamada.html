@@ -1,68 +1,174 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chamada</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chamada - Controle de Presenças</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Cabeçalho fixo */
+    header {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      font-size: 1.2rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 70px auto 20px auto;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #data-hoje {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .funcionario {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+    .funcionario > div {
+      flex: 1 1 150px;
+      margin-right: 10px;
+      min-width: 100px;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    select, input[type="checkbox"] {
+      padding: 6px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      min-width: 90px;
+    }
+    button, a.btn {
+      display: inline-block;
+      margin: 10px 5px 0 0;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      background-color: #28a745;
+      transition: background-color 0.3s ease;
+    }
+    button:hover, a.btn:hover {
+      background-color: #218838;
+    }
+    a.btn-voltar {
+      background-color: #007bff;
+    }
+    a.btn-voltar:hover {
+      background-color: #0069d9;
+    }
+  </style>
 </head>
 <body>
-    <h1>📋 Chamada</h1>
+  <header>📋 Chamada - Controle de Presenças</header>
+  <main>
     <div id="data-hoje"></div>
-    <div id="lista-funcionarios"></div>
-    <button id="btn-salvar" class="btn">💾 Salvar Chamada</button>
-    <a href="index.html" class="btn btn-voltar">⬅ Voltar</a>
 
-    <script type="module">
-       import { db, ref, get, set, update } from './firebase.js?v=1';
+    <div id="lista-funcionarios">Carregando funcionários...</div>
 
-        const listaDiv = document.getElementById("lista-funcionarios");
-        const dataHoje = new Date().toLocaleDateString('pt-BR');
-        document.getElementById("data-hoje").innerText = `Data: ${dataHoje}`;
+    <button id="btn-salvar">💾 Salvar Chamada</button>
 
-        // Buscar funcionários
-        get(ref(db, 'funcionarios')).then(snapshot => {
-            if (snapshot.exists()) {
-                const funcionarios = snapshot.val();
-                for (let id in funcionarios) {
-                    let f = funcionarios[id];
-                    let div = document.createElement("div");
-                    div.innerHTML = `
-                        <strong>${f.nome}</strong> (${f.tipo})
-                        <select id="status-${id}">
-                            <option value="presente">Presente</option>
-                            <option value="falta">Falta</option>
-                        </select>
-                        ${f.tipo === 'funcionario' ? 
-                        `<label><input type="checkbox" id="atestado-${id}"> Atestado</label>` : ''}
-                        <hr>
-                    `;
-                    listaDiv.appendChild(div);
-                }
-            } else {
-                listaDiv.innerHTML = "<p>Nenhum funcionário cadastrado.</p>";
-            }
+    <div style="margin-top:20px;">
+      <a href="index.html" class="btn btn-voltar">⬅ Voltar</a>
+      <a href="funcionarios.html" class="btn btn-voltar">👷 Funcionários</a>
+      <a href="relatorios.html" class="btn btn-voltar">📊 Relatórios</a>
+    </div>
+  </main>
+
+  <script type="module">
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+    import { app } from "./firebase.js";
+
+    const db = getDatabase(app);
+    const listaDiv = document.getElementById("lista-funcionarios");
+    const dataHoje = new Date().toLocaleDateString('pt-BR');
+    document.getElementById("data-hoje").innerText = `Data: ${dataHoje}`;
+
+    // Função para formatar data em YYYY-MM-DD para usar no Firebase path
+    function formatarDataFirebase(data) {
+      const [dia, mes, ano] = data.split('/');
+      return `${ano}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;
+    }
+
+    // Carregar funcionários e montar lista
+    async function carregarFuncionarios() {
+      listaDiv.innerHTML = "Carregando...";
+      const snapshot = await get(ref(db, 'funcionarios'));
+      if (!snapshot.exists()) {
+        listaDiv.innerHTML = "<p>Nenhum funcionário cadastrado.</p>";
+        return;
+      }
+      const funcionarios = snapshot.val();
+      listaDiv.innerHTML = "";
+      for (const id in funcionarios) {
+        const f = funcionarios[id];
+        // Criar div por funcionário
+        const div = document.createElement("div");
+        div.className = "funcionario";
+
+        div.innerHTML = `
+          <div><strong>${f.nome}</strong> (${f.tipo})</div>
+          <div>
+            <select id="status-${id}">
+              <option value="presente">Presente</option>
+              <option value="falta">Falta</option>
+            </select>
+          </div>
+          <div>
+            ${f.tipo === "funcionario" ? `
+              <label><input type="checkbox" id="atestado-${id}"> Atestado</label>
+            ` : ''}
+          </div>
+        `;
+
+        listaDiv.appendChild(div);
+      }
+    }
+
+    carregarFuncionarios();
+
+    document.getElementById("btn-salvar").addEventListener("click", async () => {
+      const snapshot = await get(ref(db, 'funcionarios'));
+      if (!snapshot.exists()) {
+        alert("Nenhum funcionário para salvar chamada.");
+        return;
+      }
+      const funcionarios = snapshot.val();
+      const dataFirebase = new Date().toISOString().slice(0,10); // yyyy-mm-dd
+
+      for (const id in funcionarios) {
+        const statusEl = document.getElementById(`status-${id}`);
+        const atestadoEl = document.getElementById(`atestado-${id}`);
+
+        const status = statusEl ? statusEl.value : "presente";
+        const atestado = atestadoEl ? atestadoEl.checked : false;
+
+        await set(ref(db, `chamadas/${dataFirebase}/${id}`), {
+          status: status,
+          atestado: atestado
         });
-
-        document.getElementById("btn-salvar").addEventListener("click", () => {
-            get(ref(db, 'funcionarios')).then(snapshot => {
-                if (snapshot.exists()) {
-                    const funcionarios = snapshot.val();
-                    for (let id in funcionarios) {
-                        let status = document.getElementById(`status-${id}`).value;
-                        let atestado = funcionarios[id].tipo === 'funcionario'
-                            ? document.getElementById(`atestado-${id}`).checked
-                            : false;
-
-                        set(ref(db, `chamadas/${dataHoje}/${id}`), {
-                            status: status,
-                            atestado: atestado
-                        });
-                    }
-                    alert("Chamada salva com sucesso!");
-                }
-            });
-        });
-    </script>
+      }
+      alert("Chamada salva com sucesso!");
+    });
+  </script>
 </body>
 </html>

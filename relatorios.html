@@ -1,201 +1,565 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Relatórios</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 20px auto;
-    max-width: 800px;
-    background: #f4f4f9;
-    color: #333;
-  }
-  label, select, input, button {
-    font-size: 1rem;
-    margin: 0.5em 0;
-  }
-  button {
-    padding: 0.6em 1.2em;
-    margin-right: 10px;
-    border-radius: 6px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #0056b3;
-  }
-  #resultado {
-    margin-top: 1.5em;
-    background: white;
-    padding: 1em;
-    border-radius: 6px;
-    min-height: 80px;
-    white-space: pre-wrap;
-  }
-  a.btn-voltar {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 6px;
-    text-decoration: none;
-  }
-  a.btn-voltar:hover {
-    background-color: #0056b3;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relatórios</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #2980b9, #6dd5fa);
+      color: #fff;
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px 15px 60px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 10px auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      user-select: none;
+    }
+    a.btn-voltar {
+      cursor: pointer;
+      background-color: #154360;
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+    }
+    a.btn-voltar:hover {
+      background-color: #0e2a48;
+      box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
+    }
+    h1 {
+      font-size: 2.4rem;
+      margin: 0 0 18px 0;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      user-select: none;
+      line-height: 1.2;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+    form {
+      background-color: rgba(21, 67, 96, 0.85);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+      user-select: none;
+    }
+    form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    form select, form input[type="date"] {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    button.btn-acao {
+      background-color: #2980b9;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      border: none;
+      box-shadow: 0 5px 12px rgba(41, 128, 185, 0.7);
+      cursor: pointer;
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+      display: block;
+      margin: 10px auto 0 auto;
+      max-width: 280px;
+    }
+    button.btn-acao:hover {
+      background-color: #1c5d8e;
+      box-shadow: 0 7px 18px rgba(28, 93, 142, 0.9);
+    }
+    #resultado {
+      background-color: rgba(21, 67, 96, 0.85);
+      border-radius: 12px;
+      padding: 18px 20px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+      user-select: text;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(21, 67, 96, 0.9);
+      color: #ddd;
+      text-align: center;
+      font-size: 0.85rem;
+      padding: 8px 0;
+      user-select: none;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+      max-width: 100%;
+    }
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 2rem;
+      }
+      form {
+        padding: 16px 20px;
+      }
+      button.btn-acao {
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<h1>Relatórios</h1>
+  <header>
+    <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+  </header>
 
-<label for="tipoRelatorio">Tipo de Relatório:</label>
-<select id="tipoRelatorio">
-  <option value="diaristas">Relatório de Diaristas</option>
-  <option value="faltas">Relatório de Faltas</option>
-</select>
+  <h1>Relatórios</h1>
 
-<br />
+  <form id="formRelatorios">
+    <label for="tipoRelatorio">Tipo de Relatório</label>
+    <select id="tipoRelatorio" required>
+      <option value="" disabled selected>Selecione o relatório</option>
+      <option value="faltas">Relatório de Faltas</option>
+      <option value="listaFuncionarios">Lista de Funcionários</option>
+      <option value="pagamentoDiaristas">Pagamento Diaristas</option>
+      <option value="excluirChamada">Excluir Chamada por Data</option>
+    </select>
 
-<label for="dataInicio">Data Início:</label>
-<input type="date" id="dataInicio" />
+    <div id="filtroTipoDiv" style="display:none;">
+      <label for="filtroTipo">Tipo</label>
+      <select id="filtroTipo">
+        <option value="todos">Todos</option>
+        <option value="funcionario">Funcionário</option>
+        <option value="diarista">Diarista</option>
+      </select>
+    </div>
 
-<br />
+    <div id="filtroFuncionarioDiv" style="display:none;">
+      <label for="filtroFuncionario">Funcionário</label>
+      <select id="filtroFuncionario">
+        <option value="todos">Todos</option>
+      </select>
+    </div>
 
-<label for="dataFim">Data Fim:</label>
-<input type="date" id="dataFim" />
+    <div id="filtroDataInicioDiv" style="display:none;">
+      <label for="dataInicio">Data Início</label>
+      <input type="date" id="dataInicio" />
+    </div>
 
-<br />
+    <div id="filtroDataFimDiv" style="display:none;">
+      <label for="dataFim">Data Fim</label>
+      <input type="date" id="dataFim" />
+    </div>
 
-<button id="btnGerarRelatorio">Gerar Relatório</button>
-<button id="btnWhatsApp">Enviar WhatsApp</button>
+    <div id="filtroDataExclusaoDiv" style="display:none;">
+      <label for="dataExclusao">Data da Chamada a Excluir</label>
+      <input type="date" id="dataExclusao" />
+    </div>
 
-<div id="resultado">Aqui aparecerá o relatório.</div>
+    <button type="submit" class="btn-acao">Gerar Relatório / Excluir</button>
+  </form>
 
-<a href="index.html" class="btn-voltar">⬅ Voltar</a>
+  <pre id="resultado" tabindex="0" aria-label="Resultado do relatório"></pre>
+
+  <footer>
+    Desenvolvido por Lucas Ramos Aragão
+  </footer>
 
 <script type="module">
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-import { app } from "./firebase.js";
+  import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+  import { app } from "./firebase.js";
 
-const db = getDatabase(app);
-let textoRelatorio = "";
+  const db = getDatabase(app);
 
-function dataNoPeriodo(dataStr, inicioStr, fimStr) {
-  const d = new Date(dataStr);
-  const inicio = new Date(inicioStr);
-  const fim = new Date(fimStr);
-  return d >= inicio && d <= fim;
-}
+  const tipoRelatorio = document.getElementById('tipoRelatorio');
+  const filtroTipoDiv = document.getElementById('filtroTipoDiv');
+  const filtroTipo = document.getElementById('filtroTipo');
+  const filtroFuncionarioDiv = document.getElementById('filtroFuncionarioDiv');
+  const filtroFuncionario = document.getElementById('filtroFuncionario');
+  const dataInicioDiv = document.getElementById('filtroDataInicioDiv');
+  const dataInicio = document.getElementById('dataInicio');
+  const dataFimDiv = document.getElementById('filtroDataFimDiv');
+  const dataFim = document.getElementById('dataFim');
+  const dataExclusaoDiv = document.getElementById('filtroDataExclusaoDiv');
+  const dataExclusao = document.getElementById('dataExclusao');
+  const resultado = document.getElementById('resultado');
+  const formRelatorios = document.getElementById('formRelatorios');
 
-async function gerarRelatorio() {
-  const tipo = document.getElementById('tipoRelatorio').value;
-  const dataInicio = document.getElementById('dataInicio').value;
-  const dataFim = document.getElementById('dataFim').value;
+  let funcionariosCache = {};
 
-  if (!dataInicio || !dataFim) {
-    alert('Por favor, selecione as datas de início e fim.');
-    return;
+  tipoRelatorio.addEventListener('change', () => {
+    limparFiltros();
+    resultado.textContent = '';
+
+    const tipo = tipoRelatorio.value;
+
+    filtroTipoDiv.style.display = 'none';
+    filtroFuncionarioDiv.style.display = 'none';
+    dataInicioDiv.style.display = 'none';
+    dataFimDiv.style.display = 'none';
+    dataExclusaoDiv.style.display = 'none';
+
+    if (tipo === 'faltas') {
+      filtroTipoDiv.style.display = 'block';
+      dataInicioDiv.style.display = 'block';
+      dataFimDiv.style.display = 'block';
+    } else if (tipo === 'listaFuncionarios') {
+      filtroFuncionarioDiv.style.display = 'block';
+    } else if (tipo === 'pagamentoDiaristas') {
+      filtroTipoDiv.style.display = 'none';
+      filtroFuncionarioDiv.style.display = 'block';
+      dataInicioDiv.style.display = 'block';
+      dataFimDiv.style.display = 'block';
+    } else if (tipo === 'excluirChamada') {
+      dataExclusaoDiv.style.display = 'block';
+    }
+    if(tipo === 'pagamentoDiaristas' || tipo === 'listaFuncionarios'){
+      carregarFuncionarios();
+    }
+  });
+
+  filtroTipo.addEventListener('change', () => {
+    if (tipoRelatorio.value === 'listaFuncionarios' || tipoRelatorio.value === 'pagamentoDiaristas') return;
+    if(filtroTipo.value === 'todos') {
+      filtroFuncionarioDiv.style.display = 'none';
+      filtroFuncionario.innerHTML = '<option value="todos">Todos</option>';
+    } else {
+      carregarFuncionarios(filtroTipo.value);
+      filtroFuncionarioDiv.style.display = 'block';
+    }
+  });
+
+  async function carregarFuncionarios(tipoFiltro) {
+    try {
+      const snapshot = await get(ref(db, 'funcionarios'));
+      if (snapshot.exists()) {
+        funcionariosCache = snapshot.val();
+        atualizarFiltroFuncionarios(tipoFiltro);
+      } else {
+        funcionariosCache = {};
+        filtroFuncionario.innerHTML = '<option value="todos">Nenhum funcionário</option>';
+      }
+    } catch (error) {
+      console.error('Erro ao carregar funcionários:', error);
+      filtroFuncionario.innerHTML = '<option value="todos">Erro ao carregar</option>';
+    }
   }
 
-  try {
-    const snapshotFunc = await get(ref(db, 'funcionarios'));
-    const snapshotChamadas = await get(ref(db, 'chamadas'));
+  function atualizarFiltroFuncionarios(tipoFiltro) {
+    filtroFuncionario.innerHTML = '<option value="todos">Todos</option>';
+    Object.entries(funcionariosCache).forEach(([id, f]) => {
+      if (!tipoFiltro || tipoFiltro === 'todos' || f.tipo === tipoFiltro) {
+        filtroFuncionario.innerHTML += `<option value="${id}">${f.nome}</option>`;
+      }
+    });
+  }
 
-    if (!snapshotFunc.exists() || !snapshotChamadas.exists()) {
-      document.getElementById('resultado').innerText = 'Não há dados suficientes para gerar o relatório.';
+  formRelatorios.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    resultado.textContent = '';
+
+    const tipo = tipoRelatorio.value;
+    const tipoFiltro = filtroTipo.value;
+    const funcionarioId = filtroFuncionario.value;
+    const inicio = dataInicio.value;
+    const fim = dataFim.value;
+    const excluirData = dataExclusao.value;
+
+    if (!tipo) {
+      alert('Selecione um tipo de relatório');
       return;
     }
 
-    const funcionarios = snapshotFunc.val();
-    const chamadas = snapshotChamadas.val();
+    if (tipo === 'faltas') {
+      if (!inicio || !fim) {
+        alert('Selecione as datas de início e fim');
+        return;
+      }
+      gerarRelatorioFaltas(tipoFiltro, inicio, fim);
+    } else if (tipo === 'listaFuncionarios') {
+      gerarRelatorioListaFuncionarios(funcionarioId);
+    } else if (tipo === 'pagamentoDiaristas') {
+      if (!inicio || !fim) {
+        alert('Selecione as datas de início e fim');
+        return;
+      }
+      if(funcionarioId === 'todos'){
+        gerarRelatorioPagamentoDiaristasGeral(inicio, fim);
+      } else {
+        gerarRelatorioPagamentoDiaristaIndividual(funcionarioId, inicio, fim);
+      }
+    } else if (tipo === 'excluirChamada') {
+      if (!excluirData) {
+        alert('Selecione a data para exclusão');
+        return;
+      }
+      confirmarExcluirChamada(excluirData);
+    }
+  });
 
-    console.log('Funcionários:', funcionarios);
-    console.log('Chamadas:', chamadas);
+  async function gerarRelatorioFaltas(tipoFiltro, dataInicioStr, dataFimStr) {
+    try {
+      const chamadasSnap = await get(ref(db, 'chamadas'));
+      const funcionariosSnap = await get(ref(db, 'funcionarios'));
+      if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
+        resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+        return;
+      }
+      const chamadas = chamadasSnap.val();
+      const funcionarios = funcionariosSnap.val();
 
-    let relatorio = {};
-    textoRelatorio = '';
+      // Filtrar datas dentro do período
+      const dataInicio = new Date(dataInicioStr);
+      const dataFim = new Date(dataFimStr);
+      if(dataFim < dataInicio){
+        alert('Data fim não pode ser menor que data início.');
+        return;
+      }
 
-    if (tipo === 'diaristas') {
-      textoRelatorio += `Relatório de Diaristas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
+      // Montar um objeto para contar faltas e dias faltados
+      let faltas = {};
 
-      for (const data in chamadas) {
-        if (dataNoPeriodo(data, dataInicio, dataFim)) {
-          for (const idFunc in chamadas[data]) {
-            const status = chamadas[data][idFunc].status || chamadas[data][idFunc];
-            if (status === 'presente') {
-              const f = funcionarios[idFunc];
-              if (f && f.tipo === 'diarista') {
-                if (!relatorio[idFunc]) {
-                  relatorio[idFunc] = { nome: f.nome, dias: 0, diaria: parseFloat(f.valorDiaria) || 0 };
-                }
-                relatorio[idFunc].dias++;
-              }
-            }
+      for (const id in funcionarios) {
+        const f = funcionarios[id];
+        if(tipoFiltro !== 'todos' && f.tipo !== tipoFiltro) continue;
+        faltas[id] = { nome: f.nome, tipo: f.tipo, diasFaltados: [] };
+      }
+
+      for (const dataChamada in chamadas) {
+        const dt = new Date(dataChamada);
+        if(dt < dataInicio || dt > dataFim) continue;
+
+        const presencasDia = chamadas[dataChamada];
+        for (const idFunc in presencasDia) {
+          if (!faltas[idFunc]) continue;
+          const presenca = presencasDia[idFunc];
+          if(presenca.status === 'falta'){
+            faltas[idFunc].diasFaltados.push(dataChamada);
           }
         }
       }
 
+      // Construir o texto do relatório
+      let texto = `Relatório de Faltas (${dataInicioStr} até ${dataFimStr})\n\n`;
+      for(const id in faltas){
+        const f = faltas[id];
+        texto += `${f.nome} (${capitalize(f.tipo)}): ${f.diasFaltados.length} faltas\n`;
+        if(f.diasFaltados.length > 0){
+          texto += `Dias: ${f.diasFaltados.join(', ')}\n`;
+        }
+        texto += '\n';
+      }
+      resultado.textContent = texto.trim();
+    } catch (error) {
+      console.error('Erro ao gerar relatório de faltas:', error);
+      resultado.textContent = 'Erro ao gerar relatório de faltas.';
+    }
+  }
+
+  async function gerarRelatorioListaFuncionarios(funcionarioId) {
+    try {
+      const funcionariosSnap = await get(ref(db, 'funcionarios'));
+      if (!funcionariosSnap.exists()) {
+        resultado.textContent = 'Nenhum funcionário cadastrado.';
+        return;
+      }
+      const funcionarios = funcionariosSnap.val();
       let texto = '';
-      for (const id in relatorio) {
-        const r = relatorio[id];
-        texto += `${r.nome}: ${r.dias} dias x R$ ${r.diaria.toFixed(2)} = R$ ${(r.dias * r.diaria).toFixed(2)}\n`;
+
+      if(funcionarioId === 'todos'){
+        texto = 'Lista completa de Funcionários:\n\n';
+        for(const id in funcionarios){
+          texto += formatarFuncionario(funcionarios[id]) + '\n\n';
+        }
+      } else {
+        const f = funcionarios[funcionarioId];
+        if(!f){
+          resultado.textContent = 'Funcionário não encontrado.';
+          return;
+        }
+        texto = 'Informações do Funcionário:\n\n' + formatarFuncionario(f);
+      }
+      resultado.textContent = texto.trim();
+    } catch (error) {
+      console.error('Erro ao gerar lista de funcionários:', error);
+      resultado.textContent = 'Erro ao gerar lista de funcionários.';
+    }
+  }
+
+  function formatarFuncionario(f) {
+    const funcaoDisplay = (f.funcao === 'Outro' && f.funcaoOutro) ? f.funcaoOutro : f.funcao;
+    return `Nome: ${f.nome}
+Tipo: ${capitalize(f.tipo)}
+Função: ${funcaoDisplay}
+Obra: ${f.obra}
+${f.tipo === 'diarista' ? `CPF: ${formatCPF(f.cpf)}
+Valor diária: R$ ${f.valorDiaria}` : ''}`;
+  }
+
+  function capitalize(str) {
+    if(!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function formatCPF(cpf) {
+    if(!cpf) return '-';
+    let v = cpf.replace(/\D/g, '');
+    v = v.padStart(11, '0');
+    return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  }
+
+  async function gerarRelatorioPagamentoDiaristasGeral(dataInicioStr, dataFimStr) {
+    try {
+      const chamadasSnap = await get(ref(db, 'chamadas'));
+      const funcionariosSnap = await get(ref(db, 'funcionarios'));
+      if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
+        resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+        return;
+      }
+      const chamadas = chamadasSnap.val();
+      const funcionarios = funcionariosSnap.val();
+
+      const dataInicio = new Date(dataInicioStr);
+      const dataFim = new Date(dataFimStr);
+      if(dataFim < dataInicio){
+        alert('Data fim não pode ser menor que data início.');
+        return;
       }
 
-      textoRelatorio += texto || 'Nenhum diarista encontrado no período.';
-      document.getElementById('resultado').innerText = textoRelatorio;
-    }
-    else if (tipo === 'faltas') {
-      textoRelatorio += `Relatório de Faltas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
+      let texto = `Relatório de Pagamento de Diaristas (${dataInicioStr} até ${dataFimStr})\n\n`;
 
-      for (const data in chamadas) {
-        if (dataNoPeriodo(data, dataInicio, dataFim)) {
-          for (const idFunc in chamadas[data]) {
-            const status = chamadas[data][idFunc].status || chamadas[data][idFunc];
-            if (status === 'falta') {
-              const f = funcionarios[idFunc];
-              if (f) {
-                if (!relatorio[idFunc]) {
-                  relatorio[idFunc] = { nome: f.nome, faltas: [] };
-                }
-                relatorio[idFunc].faltas.push(data);
-              }
-            }
+      // Percorrer todos os diaristas
+      for(const id in funcionarios){
+        const f = funcionarios[id];
+        if(f.tipo !== 'diarista') continue;
+
+        let diasPresentes = 0;
+        for(const dataChamada in chamadas){
+          const dt = new Date(dataChamada);
+          if(dt < dataInicio || dt > dataFim) continue;
+          const presencasDia = chamadas[dataChamada];
+          if(presencasDia[id] && presencasDia[id].status === 'presente'){
+            diasPresentes++;
           }
+        }
+
+        if(diasPresentes === 0) continue;
+
+        const total = parseFloat(f.valorDiaria) * diasPresentes;
+
+        texto += `${f.nome} - Dias trabalhados: ${diasPresentes}, Valor diária: R$ ${parseFloat(f.valorDiaria).toFixed(2)}, Total: R$ ${total.toFixed(2)}\n`;
+        texto += `Banco: ${f.banco || '-'}, Chave PIX: ${f.tipoChavePix || '-'} - ${f.chavePix || '-'}\n\n`;
+      }
+
+      resultado.textContent = texto.trim();
+
+    } catch (error) {
+      console.error('Erro ao gerar relatório de pagamento diaristas:', error);
+      resultado.textContent = 'Erro ao gerar relatório de pagamento diaristas.';
+    }
+  }
+
+  async function gerarRelatorioPagamentoDiaristaIndividual(funcionarioId, dataInicioStr, dataFimStr) {
+    try {
+      const chamadasSnap = await get(ref(db, 'chamadas'));
+      const funcionariosSnap = await get(ref(db, `funcionarios/${funcionarioId}`));
+      if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
+        resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+        return;
+      }
+      const chamadas = chamadasSnap.val();
+      const f = funcionariosSnap.val();
+
+      const dataInicio = new Date(dataInicioStr);
+      const dataFim = new Date(dataFimStr);
+      if(dataFim < dataInicio){
+        alert('Data fim não pode ser menor que data início.');
+        return;
+      }
+
+      let diasPresentes = 0;
+      for(const dataChamada in chamadas){
+        const dt = new Date(dataChamada);
+        if(dt < dataInicio || dt > dataFim) continue;
+        const presencasDia = chamadas[dataChamada];
+        if(presencasDia[funcionarioId] && presencasDia[funcionarioId].status === 'presente'){
+          diasPresentes++;
         }
       }
 
-      let texto = '';
-      for (const id in relatorio) {
-        const r = relatorio[id];
-        texto += `${r.nome}: ${r.faltas.length} faltas (${r.faltas.join(', ')})\n`;
+      if(diasPresentes === 0){
+        resultado.textContent = `Nenhum dia trabalhado no período selecionado para ${f.nome}`;
+        return;
       }
 
-      textoRelatorio += texto || 'Nenhuma falta registrada no período.';
-      document.getElementById('resultado').innerText = textoRelatorio;
+      const total = parseFloat(f.valorDiaria) * diasPresentes;
+
+      let texto = `Relatório de Pagamento do Diarista: ${f.nome}\n\nDias trabalhados: ${diasPresentes}\nValor diária: R$ ${parseFloat(f.valorDiaria).toFixed(2)}\nTotal: R$ ${total.toFixed(2)}\n\nBanco: ${f.banco || '-'}\nChave PIX: ${f.tipoChavePix || '-'} - ${f.chavePix || '-'}`;
+
+      resultado.textContent = texto;
+
+    } catch (error) {
+      console.error('Erro ao gerar relatório de pagamento diarista:', error);
+      resultado.textContent = 'Erro ao gerar relatório de pagamento diarista.';
     }
-
-  } catch (error) {
-    console.error("Erro ao buscar dados do Firebase:", error);
-    alert("Erro ao buscar dados. Veja o console para mais detalhes.");
   }
-}
 
-document.getElementById('btnGerarRelatorio').addEventListener('click', gerarRelatorio);
-
-document.getElementById('btnWhatsApp').addEventListener('click', () => {
-  if (!textoRelatorio) {
-    alert('Gere o relatório antes de enviar pelo WhatsApp.');
-    return;
+  function confirmarExcluirChamada(dataExcluir) {
+    const senha = prompt('Digite a senha para confirmar exclusão da chamada:');
+    if (senha !== '1234') {
+      alert('Senha incorreta. Exclusão cancelada.');
+      return;
+    }
+    excluirChamada(dataExcluir);
   }
-  const textoUrl = encodeURIComponent(textoRelatorio);
-  window.open(`https://wa.me/5527997792023?text=${textoUrl}`, '_blank');
-});
+
+  async function excluirChamada(dataExcluir) {
+    try {
+      const dataPath = dataExcluir;
+      const snapshot = await get(ref(db, `chamadas/${dataPath}`));
+      if (!snapshot.exists()) {
+        alert('Não há chamada cadastrada para essa data.');
+        return;
+      }
+      await remove(ref(db, `chamadas/${dataPath}`));
+      alert(`Chamada do dia ${dataExcluir} excluída com sucesso.`);
+      resultado.textContent = '';
+    } catch (error) {
+      console.error('Erro ao excluir chamada:', error);
+      alert('Erro ao excluir chamada. Veja o console para detalhes.');
+    }
+  }
+
 </script>
 
 </body>

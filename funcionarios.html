@@ -58,7 +58,7 @@
       background-color: rgba(21, 67, 96, 0.85);
       border-radius: 12px;
       padding: 20px;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
       width: 100%;
       max-width: 400px;
       box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
@@ -197,21 +197,6 @@
       box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
       max-width: 100%;
     }
-    #listaFuncionariosConsultados {
-      width: 100%;
-      max-width: 400px;
-      background-color: rgba(21, 67, 96, 0.75);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 10px rgba(21, 67, 96, 0.6);
-      font-size: 0.9rem;
-      color: #cce6ff;
-      user-select: none;
-      min-height: 32px;
-      line-height: 1.3;
-      font-weight: 600;
-    }
     @media (max-width: 420px) {
       h1 {
         font-size: 2rem;
@@ -304,9 +289,6 @@
     <button type="submit" class="btn-salvar">Salvar Funcionário</button>
   </form>
 
-  <!-- Nova div para lista de funcionários consultados -->
-  <div id="listaFuncionariosConsultados">Nenhum funcionário salvo ainda.</div>
-
   <div class="funcionario-lista" id="listaFuncionarios"></div>
 
   <footer>
@@ -314,7 +296,7 @@
   </footer>
 
   <script type="module">
-    import { db, ref, set, get, child, update, remove } from "./firebase.js";
+    import { db, ref, set, get, update, remove } from "./firebase.js";
 
     const form = document.getElementById('formFuncionario');
     const tipoRadios = document.getElementsByName('tipo');
@@ -324,22 +306,9 @@
     const funcaoOutroGroup = document.getElementById('funcaoOutroGroup');
     const funcaoOutroInput = document.getElementById('funcaoOutro');
     const listaFuncionarios = document.getElementById('listaFuncionarios');
-    const listaFuncionariosConsultados = document.getElementById('listaFuncionariosConsultados');
 
     let funcionarios = {};
     let editandoId = null;
-
-    // Set para armazenar nomes já salvos
-    const nomesSalvosSet = new Set();
-
-    function atualizarListaConsultados() {
-      const nomes = Array.from(nomesSalvosSet).sort((a, b) => a.localeCompare(b));
-      if (nomes.length === 0) {
-        listaFuncionariosConsultados.textContent = 'Nenhum funcionário salvo ainda.';
-      } else {
-        listaFuncionariosConsultados.textContent = 'Funcionários salvos: ' + nomes.join(', ');
-      }
-    }
 
     function formatarCPF(cpf) {
       // Formata CPF no formato NNN.NNN.NNN-NN
@@ -439,11 +408,6 @@
           await set(ref(db, `funcionarios/${idNovo}`), dadosFuncionario);
           alert('Funcionário cadastrado com sucesso!');
         }
-
-        // Atualiza o set e a lista visual
-        nomesSalvosSet.add(nome);
-        atualizarListaConsultados();
-
         form.reset();
         funcaoOutroGroup.style.display = 'none';
         mostrarCamposPorTipo();
@@ -460,12 +424,6 @@
         if (snapshot.exists()) {
           funcionarios = snapshot.val();
           montarLista();
-
-          // Atualiza a lista de nomes salvos (caso tenha funcionários no banco)
-          Object.values(funcionarios).forEach(f => {
-            if (f.nome) nomesSalvosSet.add(f.nome);
-          });
-          atualizarListaConsultados();
         } else {
           listaFuncionarios.innerHTML = '<p>Nenhum funcionário encontrado.</p>';
         }
@@ -477,8 +435,12 @@
 
     function montarLista() {
       listaFuncionarios.innerHTML = '';
-      for (const id in funcionarios) {
-        const f = funcionarios[id];
+
+      // Ordena o array de funcionários pelo nome (ordem alfabética)
+      const funcionariosOrdenados = Object.entries(funcionarios)
+        .sort(([, a], [, b]) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+
+      for (const [id, f] of funcionariosOrdenados) {
         let info = `Tipo: ${capitalize(f.tipo)}\n`;
         if (f.tipo.toLowerCase() === 'funcionario') {
           info += `Função: ${f.funcao}\nObra: ${f.obra}`;
@@ -509,11 +471,6 @@
           try {
             await remove(ref(db, `funcionarios/${id}`));
             alert('Funcionário excluído com sucesso!');
-            // Remove do set também
-            if(funcionarios[id] && funcionarios[id].nome){
-              nomesSalvosSet.delete(funcionarios[id].nome);
-              atualizarListaConsultados();
-            }
             carregarFuncionarios();
           } catch (error) {
             console.error('Erro ao excluir funcionário:', error);
@@ -526,49 +483,48 @@
         btn.onclick = () => {
           const id = btn.getAttribute('data-id');
           const f = funcionarios[id];
-          if (!f) return;
-
           editandoId = id;
-          form.nome.value = f.nome || '';
+          form.nome.value = f.nome;
           if (f.tipo.toLowerCase() === 'funcionario') {
-            form.tipo.value = 'funcionario';
-            funcaoSelect.value = f.funcao || '';
-            if (['Ajudante Prático','Oficial','Oficial Pleno','Oficial Polivalente','Encarregado'].includes(f.funcao)) {
-              funcaoOutroGroup.style.display = 'none';
-              funcaoOutroInput.required = false;
-            } else {
-              funcaoSelect.value = 'Outro';
-              funcaoOutroGroup.style.display = 'block';
-              funcaoOutroInput.value = f.funcao || '';
-              funcaoOutroInput.required = true;
-            }
-            funcionarioCampos.style.display = 'block';
-            diaristaCampos.style.display = 'none';
-            form.obra.value = f.obra || '';
-          } else {
-            form.tipo.value = 'diarista';
-            funcionarioCampos.style.display = 'none';
-            diaristaCampos.style.display = 'block';
+            form.querySelector('input[name="tipo"][value="funcionario"]').checked = true;
+            mostrarCamposPorTipo();
+            funcaoSelect.value = f.funcao in funcaoSelect.options
+              ? f.funcao
+              : 'Outro';
 
-            form.cpf.value = f.cpf || '';
+            if (funcaoSelect.value === 'Outro') {
+              funcaoOutroGroup.style.display = 'block';
+              funcaoOutroInput.value = f.funcao;
+              funcaoOutroInput.required = true;
+            } else {
+              funcaoOutroGroup.style.display = 'none';
+              funcaoOutroInput.value = '';
+              funcaoOutroInput.required = false;
+            }
+
+            form.obra.value = f.obra;
+          } else {
+            form.querySelector('input[name="tipo"][value="diarista"]').checked = true;
+            mostrarCamposPorTipo();
+            form.cpf.value = f.cpf;
             form.tipoPix.value = f.tipoPix || '';
             form.chavePix.value = f.chavePix || '';
             form.banco.value = f.banco || '';
             form.valorDiaria.value = f.valorDiaria || '';
             form.obraDiarista.value = f.obra || '';
           }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         };
       });
     }
 
-    function capitalize(text) {
-      if (!text) return '';
-      return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    function capitalize(str) {
+      if (!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
 
     mostrarCamposPorTipo();
     carregarFuncionarios();
-
   </script>
 </body>
 </html>

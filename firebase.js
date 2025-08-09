@@ -17,5 +17,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Exporta funções e variáveis para uso em outros arquivos
-export { db, ref, set, get, child, update, remove };
+// Exporta funções e variáveis para uso em outros arquivos, incluindo 'app'
+export { app, db, ref, set, get, child, update, remove };

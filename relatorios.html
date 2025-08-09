@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Relatórios Corrigidos</title>
+  <title>Relatórios Simplificados</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -63,12 +63,10 @@
   <br />
 
   <button id="btnGerarRelatorio">Gerar Relatório</button>
-  <button id="btnPDF">Gerar PDF</button>
   <button id="btnWhatsApp">Enviar WhatsApp</button>
 
   <div id="resultado">Aqui aparecerá o relatório.</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script type="module">
     import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
     import { app } from "./firebase.js";
@@ -110,7 +108,6 @@
 
       if (tipo === 'diaristas') {
         textoRelatorio += `Relatório de Diaristas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
-        // Calcular presenças e valores
         for (const data in chamadas) {
           if (dataNoPeriodo(data, dataInicio, dataFim)) {
             for (const idFunc in chamadas[data]) {
@@ -139,7 +136,7 @@
       } 
       else if (tipo === 'faltas') {
         textoRelatorio += `Relatório de Faltas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
-        const tipoFiltro = 'todos'; // Se quiser pode adicionar filtro aqui
+        const tipoFiltro = 'todos';
 
         for (const data in chamadas) {
           if (dataNoPeriodo(data, dataInicio, dataFim)) {
@@ -170,22 +167,6 @@
     }
 
     document.getElementById('btnGerarRelatorio').addEventListener('click', gerarRelatorio);
-
-    document.getElementById('btnPDF').addEventListener('click', () => {
-      if (!textoRelatorio) {
-        alert('Gere o relatório antes de criar o PDF.');
-        return;
-      }
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const lines = textoRelatorio.split('\n');
-      let y = 10;
-      lines.forEach(line => {
-        doc.text(line, 10, y);
-        y += 10;
-      });
-      doc.save('relatorio.pdf');
-    });
 
     document.getElementById('btnWhatsApp').addEventListener('click', () => {
       if (!textoRelatorio) {

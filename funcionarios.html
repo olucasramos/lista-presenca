@@ -35,7 +35,7 @@
     <a href="index.html" class="btn btn-voltar">⬅ Voltar</a>
 
     <script type="module">
-        import { db, ref, set, get, remove } from './firebase.js';
+        import { db, ref, get, set, update } from './firebase.js?v=1';
 
         const tipoSelect = document.getElementById("tipo");
         tipoSelect.addEventListener("change", () => {

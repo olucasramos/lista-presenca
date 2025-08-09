@@ -54,14 +54,21 @@
       max-width: 400px;
       width: 100%;
     }
-    #dataAtual {
+    #dataSelecionada {
+      display: block;
       font-size: 1.1rem;
-      margin-bottom: 20px;
+      margin: 0 auto 20px auto;
       font-weight: 600;
       text-align: center;
       user-select: none;
       max-width: 400px;
       width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      color: #154360;
     }
     .funcionario-card {
       background-color: rgba(21, 67, 96, 0.85);
@@ -179,7 +186,7 @@
   </header>
 
   <h1>Chamada</h1>
-  <div id="dataAtual"></div>
+  <input type="date" id="dataSelecionada" />
 
   <div id="listaFuncionarios"></div>
 
@@ -195,10 +202,19 @@
 
     const db = getDatabase(app);
     const listaFuncionarios = document.getElementById("listaFuncionarios");
-    const dataAtualDiv = document.getElementById("dataAtual");
+    const dataSelecionadaInput = document.getElementById("dataSelecionada");
     const btnSalvar = document.getElementById("btnSalvar");
 
     let funcionarios = {};
+
+    // Define data inicial do datepicker para hoje
+    function definirDataHoje() {
+      const hoje = new Date();
+      const yyyy = hoje.getFullYear();
+      const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+      const dd = String(hoje.getDate()).padStart(2, '0');
+      dataSelecionadaInput.value = `${yyyy}-${mm}-${dd}`;
+    }
 
     function formatarDataBR(data) {
       const d = new Date(data);
@@ -207,9 +223,6 @@
       const ano = d.getFullYear();
       return `${dia}/${mes}/${ano}`;
     }
-
-    const dataHoje = new Date();
-    dataAtualDiv.textContent = `Data: ${formatarDataBR(dataHoje)}`;
 
     async function carregarFuncionarios() {
       try {
@@ -292,7 +305,11 @@
     }
 
     async function salvarChamada() {
-      const dataFirebase = `${dataHoje.getFullYear()}-${String(dataHoje.getMonth() + 1).padStart(2, '0')}-${String(dataHoje.getDate()).padStart(2, '0')}`;
+      const dataSelecionada = dataSelecionadaInput.value;
+      if (!dataSelecionada) {
+        alert('Por favor, selecione uma data.');
+        return;
+      }
       const chamadasDoDia = {};
       for (const id in funcionarios) {
         const statusRadios = document.getElementsByName(`status_${id}`);
@@ -304,7 +321,7 @@
           }
         }
         const func = funcionarios[id];
-        let atestado = null; // null quando não for funcionário ou não aplicável
+        let atestado = null;
 
         if (func.tipo.toLowerCase() === 'funcionario' && statusSelecionado === 'falta') {
           const radiosAtestado = document.getElementsByName(`atestado_${id}`);
@@ -328,7 +345,7 @@
         };
       }
       try {
-        await set(ref(db, `chamadas/${dataFirebase}`), chamadasDoDia);
+        await set(ref(db, `chamadas/${dataSelecionada}`), chamadasDoDia);
         alert('Chamada salva com sucesso!');
       } catch (error) {
         console.error('Erro ao salvar chamada:', error);
@@ -338,6 +355,7 @@
 
     btnSalvar.addEventListener('click', salvarChamada);
 
+    definirDataHoje();
     carregarFuncionarios();
   </script>
 </body>

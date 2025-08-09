@@ -210,35 +210,27 @@
 
   const db = getDatabase(app);
 
-  // Elementos Relatório Faltas
   const faltasTipo = document.getElementById('faltasTipo');
   const faltasDataInicio = document.getElementById('faltasDataInicio');
   const faltasDataFim = document.getElementById('faltasDataFim');
   const btnGerarFaltas = document.getElementById('btnGerarFaltas');
 
-  // Elementos Dados Funcionário
   const listaFuncionario = document.getElementById('listaFuncionario');
   const btnGerarLista = document.getElementById('btnGerarLista');
 
-  // Elementos Pagamento Diarista
   const pagamentoDataInicio = document.getElementById('pagamentoDataInicio');
   const pagamentoDataFim = document.getElementById('pagamentoDataFim');
   const btnGerarPagamento = document.getElementById('btnGerarPagamento');
 
-  // Elementos Exclusão
   const excluirData = document.getElementById('excluirData');
   const btnExcluirChamada = document.getElementById('btnExcluirChamada');
 
-  // Resultado e Envio WhatsApp
   const resultado = document.getElementById('resultado');
   const btnEnviarWhats = document.getElementById('btnEnviarWhats');
 
-  // Cache funcionários
   let funcionariosCache = {};
-  // Armazenar texto atual do relatório para envio
   let textoRelatorioAtual = '';
 
-  // Carregar funcionários para dropdown
   async function carregarFuncionarios() {
     try {
       const snapshot = await get(ref(db, 'funcionarios'));
@@ -262,7 +254,6 @@
     });
   }
 
-  // Função para formatar CPF
   function formatCPF(cpf) {
     if (!cpf) return '-';
     let v = cpf.replace(/\D/g, '');
@@ -270,18 +261,15 @@
     return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   }
 
-  // Capitaliza a primeira letra
   function capitalize(str) {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  // Scrollar para resultado
   function scrollParaResultado() {
     resultado.scrollIntoView({ behavior: 'smooth' });
   }
 
-  // Gerar Relatório de Faltas
   async function gerarRelatorioFaltas() {
     const tipoFiltro = faltasTipo.value;
     const inicio = faltasDataInicio.value;
@@ -324,7 +312,12 @@
           if (!faltas[idFunc]) continue;
           const presenca = presencasDia[idFunc];
           if (presenca.status === 'falta') {
-            faltas[idFunc].diasFaltados.push(formatarDataDMY(dataChamada));
+            // Colocar info se tem atestado (para funcionários)
+            let infoAtestado = '';
+            if (funcionarios[idFunc].tipo === 'funcionario') {
+              infoAtestado = presenca.atestado ? ' (Com atestado)' : ' (Sem atestado)';
+            }
+            faltas[idFunc].diasFaltados.push(`${formatarDataDMY(dataChamada)}${infoAtestado}`);
           }
         }
       }
@@ -349,7 +342,6 @@
     }
   }
 
-  // Gerar Relatório Dados do Funcionário
   async function gerarRelatorioDadosFuncionario() {
     const funcionarioId = listaFuncionario.value;
     resultado.textContent = '';
@@ -398,7 +390,6 @@ CPF: *${formatCPF(f.cpf)}*
 Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
   }
 
-  // Gerar Relatório de Pagamento Diarista
   async function gerarRelatorioPagamentoDiarista() {
     const inicio = pagamentoDataInicio.value;
     const fim = pagamentoDataFim.value;
@@ -425,7 +416,6 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
 
       let texto = `💰 *Relatório de Pagamento Diaristas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
 
-      // Filtrar apenas diaristas
       const diaristas = Object.entries(funcionarios).filter(([, f]) => f.tipo === 'diarista');
 
       if (diaristas.length === 0) {
@@ -468,7 +458,6 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
     }
   }
 
-  // Excluir chamada por data
   async function excluirChamada() {
     const dataExcluir = excluirData.value;
     if (!dataExcluir) {
@@ -484,7 +473,6 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
       await remove(ref(db, `chamadas/${dataExcluir}`));
       alert(`Chamada do dia ${formatarDataDMY(dataExcluir)} excluída com sucesso.`);
       excluirData.value = '';
-      // Limpar resultado e texto
       resultado.textContent = '';
       textoRelatorioAtual = '';
     } catch (error) {
@@ -493,20 +481,17 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
     }
   }
 
-  // Enviar texto por WhatsApp
   function enviarWhatsApp() {
     if (!textoRelatorioAtual) {
       alert('Gere um relatório antes de enviar por WhatsApp.');
       return;
     }
     const textoEncoded = encodeURIComponent(textoRelatorioAtual);
-    // Número do WhatsApp fixo, como solicitado
     const numeroWhats = '+5527997792023';
     const url = `https://wa.me/${numeroWhats.replace(/\D/g,'')}?text=${textoEncoded}`;
     window.open(url, '_blank');
   }
 
-  // Formatar data AAAA-MM-DD para DD/MM/AAAA
   function formatarDataDMY(data) {
     const dt = new Date(data);
     if (isNaN(dt)) return data;
@@ -516,14 +501,12 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
     return `${d}/${m}/${a}`;
   }
 
-  // EVENTOS
   btnGerarFaltas.addEventListener('click', gerarRelatorioFaltas);
   btnGerarLista.addEventListener('click', gerarRelatorioDadosFuncionario);
   btnGerarPagamento.addEventListener('click', gerarRelatorioPagamentoDiarista);
   btnExcluirChamada.addEventListener('click', excluirChamada);
   btnEnviarWhats.addEventListener('click', enviarWhatsApp);
 
-  // Inicializar
   carregarFuncionarios();
 </script>
 

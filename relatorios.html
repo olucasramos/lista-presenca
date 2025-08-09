@@ -14,7 +14,7 @@
     color: #fff;
     margin: 0;
     min-height: 100vh;
-    padding: 20px 15px 60px 15px;
+    padding: 20px 15px 80px 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -97,9 +97,9 @@
     cursor: pointer;
     transition: background-color 0.25s ease, box-shadow 0.25s ease;
     user-select: none;
-    display: inline-block;
-    margin: 0 8px 0 0;
-    min-width: 120px;
+    display: block;
+    margin: 0 auto 10px auto;
+    min-width: 160px;
   }
   button.btn-acao:hover {
     background-color: #1c5d8e;
@@ -118,6 +118,7 @@
     font-size: 0.95rem;
     user-select: text;
     margin-bottom: 24px;
+    scroll-margin-top: 60px;
   }
   footer {
     position: fixed;
@@ -141,7 +142,7 @@
       padding: 16px 20px;
     }
     button.btn-acao {
-      min-width: 100px;
+      min-width: 140px;
       margin-bottom: 10px;
     }
   }
@@ -156,7 +157,7 @@
 <h1>Relatórios</h1>
 
 <section id="faltasSection">
-  <h2>Relatório de Faltas</h2>
+  <h2>📋 Relatório de Faltas</h2>
   <label for="faltasTipo">Tipo</label>
   <select id="faltasTipo">
     <option value="todos">Todos</option>
@@ -167,34 +168,37 @@
   <input type="date" id="faltasDataInicio" />
   <label for="faltasDataFim">Data Fim</label>
   <input type="date" id="faltasDataFim" />
-  <div>
-    <button id="btnGerarFaltas" class="btn-acao">Gerar Relatório</button>
-    <button id="btnWhatsappFaltas" class="btn-acao" style="background-color:#25D366;">Enviar WhatsApp</button>
-  </div>
+  <button id="btnGerarFaltas" class="btn-acao">Gerar Relatório</button>
 </section>
 
-<section id="listaFuncionariosSection">
-  <h2>Lista de Funcionários</h2>
+<section id="dadosFuncionarioSection">
+  <h2>🧑 Dados do Funcionário</h2>
   <label for="listaFuncionario">Funcionário</label>
   <select id="listaFuncionario">
     <option value="todos">Todos</option>
   </select>
-  <div>
-    <button id="btnGerarLista" class="btn-acao">Gerar Relatório</button>
-    <button id="btnWhatsappLista" class="btn-acao" style="background-color:#25D366;">Enviar WhatsApp</button>
-  </div>
+  <button id="btnGerarLista" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="pagamentoDiaristaSection">
+  <h2>💰 Relatório de Pagamento Diarista</h2>
+  <label for="pagamentoDataInicio">Data Início</label>
+  <input type="date" id="pagamentoDataInicio" />
+  <label for="pagamentoDataFim">Data Fim</label>
+  <input type="date" id="pagamentoDataFim" />
+  <button id="btnGerarPagamento" class="btn-acao">Gerar Relatório</button>
 </section>
 
 <section id="excluirChamadaSection">
-  <h2>Excluir Chamada por Data</h2>
+  <h2>❌ Excluir Chamada por Data</h2>
   <label for="excluirData">Data da Chamada</label>
   <input type="date" id="excluirData" />
-  <div>
-    <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada</button>
-  </div>
+  <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada</button>
 </section>
 
 <pre id="resultado" tabindex="0" aria-label="Resultado do relatório"></pre>
+
+<button id="btnEnviarWhats" class="btn-acao" style="background-color:#25D366; margin-bottom:40px;">📲 Enviar relatório por WhatsApp</button>
 
 <footer>
   Desenvolvido por Lucas Ramos Aragão
@@ -206,28 +210,35 @@
 
   const db = getDatabase(app);
 
-  // ELEMENTOS Relatório de Faltas
+  // Elementos Relatório Faltas
   const faltasTipo = document.getElementById('faltasTipo');
   const faltasDataInicio = document.getElementById('faltasDataInicio');
   const faltasDataFim = document.getElementById('faltasDataFim');
   const btnGerarFaltas = document.getElementById('btnGerarFaltas');
-  const btnWhatsappFaltas = document.getElementById('btnWhatsappFaltas');
 
-  // ELEMENTOS Lista Funcionarios
+  // Elementos Dados Funcionário
   const listaFuncionario = document.getElementById('listaFuncionario');
   const btnGerarLista = document.getElementById('btnGerarLista');
-  const btnWhatsappLista = document.getElementById('btnWhatsappLista');
 
-  // ELEMENTOS Exclusão
+  // Elementos Pagamento Diarista
+  const pagamentoDataInicio = document.getElementById('pagamentoDataInicio');
+  const pagamentoDataFim = document.getElementById('pagamentoDataFim');
+  const btnGerarPagamento = document.getElementById('btnGerarPagamento');
+
+  // Elementos Exclusão
   const excluirData = document.getElementById('excluirData');
   const btnExcluirChamada = document.getElementById('btnExcluirChamada');
 
+  // Resultado e Envio WhatsApp
   const resultado = document.getElementById('resultado');
+  const btnEnviarWhats = document.getElementById('btnEnviarWhats');
 
-  // CACHE FUNCIONÁRIOS
+  // Cache funcionários
   let funcionariosCache = {};
+  // Armazenar texto atual do relatório para envio
+  let textoRelatorioAtual = '';
 
-  // CARREGAR FUNCIONÁRIOS NA LISTA DE FUNCIONÁRIOS
+  // Carregar funcionários para dropdown
   async function carregarFuncionarios() {
     try {
       const snapshot = await get(ref(db, 'funcionarios'));
@@ -251,34 +262,39 @@
     });
   }
 
-  // FUNÇÃO PARA FORMATAÇÃO CPF
+  // Função para formatar CPF
   function formatCPF(cpf) {
-    if(!cpf) return '-';
+    if (!cpf) return '-';
     let v = cpf.replace(/\D/g, '');
     v = v.padStart(11, '0');
     return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   }
 
-  // FUNÇÃO PARA CAPITALIZAR PRIMEIRA LETRA
+  // Capitaliza a primeira letra
   function capitalize(str) {
-    if(!str) return '';
+    if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  // GERAR RELATÓRIO DE FALTAS
+  // Scrollar para resultado
+  function scrollParaResultado() {
+    resultado.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Gerar Relatório de Faltas
   async function gerarRelatorioFaltas() {
     const tipoFiltro = faltasTipo.value;
     const inicio = faltasDataInicio.value;
     const fim = faltasDataFim.value;
 
     resultado.textContent = '';
-    if(!inicio || !fim){
+    if (!inicio || !fim) {
       alert('Selecione a data de início e fim');
-      return;
+      return null;
     }
-    if(new Date(fim) < new Date(inicio)){
+    if (new Date(fim) < new Date(inicio)) {
       alert('Data fim não pode ser menor que data início.');
-      return;
+      return null;
     }
 
     try {
@@ -286,7 +302,7 @@
       const funcionariosSnap = await get(ref(db, 'funcionarios'));
       if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
         resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
-        return;
+        return null;
       }
       const chamadas = chamadasSnap.val();
       const funcionarios = funcionariosSnap.val();
@@ -295,43 +311,46 @@
 
       for (const id in funcionarios) {
         const f = funcionarios[id];
-        if(tipoFiltro !== 'todos' && f.tipo !== tipoFiltro) continue;
+        if (tipoFiltro !== 'todos' && f.tipo !== tipoFiltro) continue;
         faltas[id] = { nome: f.nome, tipo: f.tipo, diasFaltados: [] };
       }
 
       for (const dataChamada in chamadas) {
         const dt = new Date(dataChamada);
-        if(dt < new Date(inicio) || dt > new Date(fim)) continue;
+        if (dt < new Date(inicio) || dt > new Date(fim)) continue;
 
         const presencasDia = chamadas[dataChamada];
         for (const idFunc in presencasDia) {
           if (!faltas[idFunc]) continue;
           const presenca = presencasDia[idFunc];
-          if(presenca.status === 'falta'){
-            faltas[idFunc].diasFaltados.push(dataChamada);
+          if (presenca.status === 'falta') {
+            faltas[idFunc].diasFaltados.push(formatarDataDMY(dataChamada));
           }
         }
       }
 
-      let texto = `Relatório de Faltas (${inicio} até ${fim})\n\n`;
-      for(const id in faltas){
+      let texto = `📋 *Relatório de Faltas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+      for (const id in faltas) {
         const f = faltas[id];
-        texto += `${f.nome} (${capitalize(f.tipo)}): ${f.diasFaltados.length} faltas\n`;
-        if(f.diasFaltados.length > 0){
-          texto += `Dias: ${f.diasFaltados.join(', ')}\n`;
+        texto += `👤 *${f.nome}* (${capitalize(f.tipo)}) - *${f.diasFaltados.length} faltas*\n`;
+        if (f.diasFaltados.length > 0) {
+          texto += `🗓️ Dias: ${f.diasFaltados.join(', ')}\n`;
         }
         texto += '\n';
       }
       resultado.textContent = texto.trim();
+      textoRelatorioAtual = texto.trim();
+      scrollParaResultado();
       return texto.trim();
     } catch (error) {
       console.error('Erro ao gerar relatório de faltas:', error);
       resultado.textContent = 'Erro ao gerar relatório de faltas.';
+      return null;
     }
   }
 
-  // GERAR LISTA DE FUNCIONÁRIOS
-  async function gerarRelatorioLista() {
+  // Gerar Relatório Dados do Funcionário
+  async function gerarRelatorioDadosFuncionario() {
     const funcionarioId = listaFuncionario.value;
     resultado.textContent = '';
 
@@ -339,103 +358,172 @@
       const funcionariosSnap = await get(ref(db, 'funcionarios'));
       if (!funcionariosSnap.exists()) {
         resultado.textContent = 'Nenhum funcionário cadastrado.';
-        return;
+        return null;
       }
       const funcionarios = funcionariosSnap.val();
 
       let texto = '';
 
-      if(funcionarioId === 'todos'){
-        texto = 'Lista completa de Funcionários:\n\n';
-        for(const id in funcionarios){
+      if (funcionarioId === 'todos') {
+        texto = '🧑 *Lista completa de Funcionários:*\n\n';
+        for (const id in funcionarios) {
           texto += formatarFuncionario(funcionarios[id]) + '\n\n';
         }
       } else {
         const f = funcionarios[funcionarioId];
-        if(!f){
+        if (!f) {
           resultado.textContent = 'Funcionário não encontrado.';
-          return;
+          return null;
         }
-        texto = 'Informações do Funcionário:\n\n' + formatarFuncionario(f);
+        texto = '🧑 *Informações do Funcionário:*\n\n' + formatarFuncionario(f);
       }
       resultado.textContent = texto.trim();
+      textoRelatorioAtual = texto.trim();
+      scrollParaResultado();
       return texto.trim();
     } catch (error) {
       console.error('Erro ao gerar lista de funcionários:', error);
       resultado.textContent = 'Erro ao gerar lista de funcionários.';
+      return null;
     }
   }
 
   function formatarFuncionario(f) {
     const funcaoDisplay = (f.funcao === 'Outro' && f.funcaoOutro) ? f.funcaoOutro : f.funcao;
-    return `Nome: ${f.nome}
-Tipo: ${capitalize(f.tipo)}
-Função: ${funcaoDisplay}
-Obra: ${f.obra}
-${f.tipo === 'diarista' ? `CPF: ${formatCPF(f.cpf)}
-Valor diária: R$ ${f.valorDiaria}` : ''}`;
+    return `👤 Nome: *${f.nome}*
+Tipo: *${capitalize(f.tipo)}*
+Função: *${funcaoDisplay}*
+Obra: *${f.obra}*` + (f.tipo === 'diarista' ? `
+CPF: *${formatCPF(f.cpf)}*
+Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
   }
 
-  // ENVIAR TEXTO POR WHATSAPP
-  function enviarWhatsApp(texto) {
-    if(!texto || texto.trim() === ''){
-      alert('Gere o relatório antes de enviar.');
-      return;
+  // Gerar Relatório de Pagamento Diarista
+  async function gerarRelatorioPagamentoDiarista() {
+    const inicio = pagamentoDataInicio.value;
+    const fim = pagamentoDataFim.value;
+
+    resultado.textContent = '';
+    if (!inicio || !fim) {
+      alert('Selecione a data de início e fim');
+      return null;
     }
-    const numero = '+5527997792023';
-    const url = `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(texto)}`;
-    window.open(url, '_blank');
+    if (new Date(fim) < new Date(inicio)) {
+      alert('Data fim não pode ser menor que data início.');
+      return null;
+    }
+
+    try {
+      const chamadasSnap = await get(ref(db, 'chamadas'));
+      const funcionariosSnap = await get(ref(db, 'funcionarios'));
+      if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
+        resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+        return null;
+      }
+      const chamadas = chamadasSnap.val();
+      const funcionarios = funcionariosSnap.val();
+
+      let texto = `💰 *Relatório de Pagamento Diaristas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+
+      // Filtrar apenas diaristas
+      const diaristas = Object.entries(funcionarios).filter(([, f]) => f.tipo === 'diarista');
+
+      if (diaristas.length === 0) {
+        resultado.textContent = 'Nenhum diarista cadastrado.';
+        textoRelatorioAtual = '';
+        return null;
+      }
+
+      for (const [id, f] of diaristas) {
+        let diasPresentes = 0;
+        let datasPresentes = [];
+
+        for (const dataChamada in chamadas) {
+          const dt = new Date(dataChamada);
+          if (dt < new Date(inicio) || dt > new Date(fim)) continue;
+
+          const presencasDia = chamadas[dataChamada];
+          if (presencasDia[id] && presencasDia[id].status === 'presente') {
+            diasPresentes++;
+            datasPresentes.push(formatarDataDMY(dataChamada));
+          }
+        }
+
+        if (diasPresentes === 0) continue;
+
+        const valorDiaria = parseFloat(f.valorDiaria) || 0;
+        const total = valorDiaria * diasPresentes;
+
+        texto += `👤 *${f.nome}*\nDias trabalhados: *${diasPresentes}* (${datasPresentes.join(', ')})\nValor diária: *R$ ${valorDiaria.toFixed(2)}*\n*Total a pagar: R$ ${total.toFixed(2)}*\nBanco: ${f.banco || '-'}\nChave PIX: ${f.tipoChavePix || '-'} - ${f.chavePix || '-'}\n\n`;
+      }
+
+      resultado.textContent = texto.trim();
+      textoRelatorioAtual = texto.trim();
+      scrollParaResultado();
+      return texto.trim();
+    } catch (error) {
+      console.error('Erro ao gerar relatório de pagamento diarista:', error);
+      resultado.textContent = 'Erro ao gerar relatório de pagamento diarista.';
+      return null;
+    }
   }
 
-  // EXCLUIR CHAMADA POR DATA
+  // Excluir chamada por data
   async function excluirChamada() {
     const dataExcluir = excluirData.value;
-    if(!dataExcluir){
-      alert('Selecione a data para exclusão.');
+    if (!dataExcluir) {
+      alert('Selecione a data da chamada a ser excluída.');
       return;
     }
-    const senha = prompt('Digite a senha para confirmar exclusão da chamada:');
+    const senha = prompt('Digite a senha para confirmar exclusão:');
     if (senha !== '1234') {
-      alert('Senha incorreta. Exclusão cancelada.');
+      alert('Senha incorreta.');
       return;
     }
     try {
-      const snapshot = await get(ref(db, `chamadas/${dataExcluir}`));
-      if (!snapshot.exists()) {
-        alert('Não há chamada cadastrada para essa data.');
-        return;
-      }
       await remove(ref(db, `chamadas/${dataExcluir}`));
-      alert(`Chamada do dia ${dataExcluir} excluída com sucesso.`);
+      alert(`Chamada do dia ${formatarDataDMY(dataExcluir)} excluída com sucesso.`);
+      excluirData.value = '';
+      // Limpar resultado e texto
       resultado.textContent = '';
+      textoRelatorioAtual = '';
     } catch (error) {
       console.error('Erro ao excluir chamada:', error);
-      alert('Erro ao excluir chamada. Veja o console para detalhes.');
+      alert('Erro ao excluir chamada.');
     }
   }
 
+  // Enviar texto por WhatsApp
+  function enviarWhatsApp() {
+    if (!textoRelatorioAtual) {
+      alert('Gere um relatório antes de enviar por WhatsApp.');
+      return;
+    }
+    const textoEncoded = encodeURIComponent(textoRelatorioAtual);
+    // Número do WhatsApp fixo, como solicitado
+    const numeroWhats = '+5527997792023';
+    const url = `https://wa.me/${numeroWhats.replace(/\D/g,'')}?text=${textoEncoded}`;
+    window.open(url, '_blank');
+  }
+
+  // Formatar data AAAA-MM-DD para DD/MM/AAAA
+  function formatarDataDMY(data) {
+    const dt = new Date(data);
+    if (isNaN(dt)) return data;
+    const d = dt.getDate().toString().padStart(2,'0');
+    const m = (dt.getMonth()+1).toString().padStart(2,'0');
+    const a = dt.getFullYear();
+    return `${d}/${m}/${a}`;
+  }
+
   // EVENTOS
-  btnGerarFaltas.addEventListener('click', async () => {
-    await gerarRelatorioFaltas();
-  });
-
-  btnWhatsappFaltas.addEventListener('click', async () => {
-    const texto = await gerarRelatorioFaltas();
-    enviarWhatsApp(texto);
-  });
-
-  btnGerarLista.addEventListener('click', async () => {
-    await gerarRelatorioLista();
-  });
-
-  btnWhatsappLista.addEventListener('click', async () => {
-    const texto = await gerarRelatorioLista();
-    enviarWhatsApp(texto);
-  });
-
+  btnGerarFaltas.addEventListener('click', gerarRelatorioFaltas);
+  btnGerarLista.addEventListener('click', gerarRelatorioDadosFuncionario);
+  btnGerarPagamento.addEventListener('click', gerarRelatorioPagamentoDiarista);
   btnExcluirChamada.addEventListener('click', excluirChamada);
+  btnEnviarWhats.addEventListener('click', enviarWhatsApp);
 
-  // Carregar funcionários ao iniciar
+  // Inicializar
   carregarFuncionarios();
 </script>
 

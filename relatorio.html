@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório de Presenças</title>
+</head>
+<body>
+  <h1>Relatório de Presenças</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Funcionário</th>
+        <th>Obra</th>
+        <th>Data/Hora</th>
+      </tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+  </table>
+
+  <script type="module">
+    import { db } from './firebase.js';
+    import { collection, getDocs, doc, getDoc } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const tabela = document.getElementById('tabela');
+
+    async function carregarRelatorio() {
+      const presencasSnap = await getDocs(collection(db, 'presencas'));
+      for (const presenca of presencasSnap.docs) {
+        const data = presenca.data();
+        
+        const funcDoc = await getDoc(doc(db, 'funcionarios', data.funcionarioId));
+        const obraDoc = await getDoc(doc(db, 'obras', data.obraId));
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${funcDoc.exists() ? funcDoc.data().nome : 'Desconhecido'}</td>
+          <td>${obraDoc.exists() ? obraDoc.data().nome : 'Desconhecida'}</td>
+          <td>${data.dataHora?.toDate().toLocaleString('pt-BR') || ''}</td>
+        `;
+        tabela.appendChild(tr);
+      }
+    }
+
+    carregarRelatorio();
+  </script>
+</body>
+</html>

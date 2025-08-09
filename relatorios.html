@@ -2,13 +2,122 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatórios</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>📊 Relatórios</h1>
-    <p>Aqui implementaremos os filtros e geração de relatórios na Etapa 3.</p>
+
+    <section>
+        <h2>Relatório de Diaristas</h2>
+        <label>Data Inicial: <input type="date" id="dataInicioD"></label>
+        <label>Data Final: <input type="date" id="dataFimD"></label>
+        <button id="gerarDiaristas" class="btn">Gerar Relatório</button>
+        <div id="resultadoDiaristas"></div>
+    </section>
+
+    <section>
+        <h2>Relatório de Faltas</h2>
+        <label>Tipo:
+            <select id="tipoFaltas">
+                <option value="todos">Todos</option>
+                <option value="funcionario">Funcionários</option>
+                <option value="diarista">Diaristas</option>
+            </select>
+        </label>
+        <label>Data Inicial: <input type="date" id="dataInicioF"></label>
+        <label>Data Final: <input type="date" id="dataFimF"></label>
+        <button id="gerarFaltas" class="btn">Gerar Relatório</button>
+        <div id="resultadoFaltas"></div>
+    </section>
+
     <a href="index.html" class="btn btn-voltar">⬅ Voltar</a>
+
+    <script type="module">
+        import { db, ref, get } from './firebase.js';
+
+        // Função auxiliar para filtrar datas
+        function estaNoPeriodo(data, inicio, fim) {
+            const d = new Date(data.split('/').reverse().join('-'));
+            return d >= new Date(inicio) && d <= new Date(fim);
+        }
+
+        // Relatório de Diaristas
+        document.getElementById("gerarDiaristas").addEventListener("click", async () => {
+            const inicio = document.getElementById("dataInicioD").value;
+            const fim = document.getElementById("dataFimD").value;
+            if (!inicio || !fim) return alert("Selecione o período!");
+
+            const funcionariosSnap = await get(ref(db, 'funcionarios'));
+            const chamadasSnap = await get(ref(db, 'chamadas'));
+            if (!funcionariosSnap.exists() || !chamadasSnap.exists()) {
+                return alert("Não há dados suficientes.");
+            }
+
+            const funcionarios = funcionariosSnap.val();
+            const chamadas = chamadasSnap.val();
+            let relatorio = {};
+
+            for (let data in chamadas) {
+                if (estaNoPeriodo(data, inicio, fim)) {
+                    for (let id in chamadas[data]) {
+                        const f = funcionarios[id];
+                        if (f && f.tipo === 'diarista' && chamadas[data][id].status === 'presente') {
+                            if (!relatorio[id]) relatorio[id] = { nome: f.nome, dias: 0, diaria: parseFloat(f.valorDiaria || 0) };
+                            relatorio[id].dias++;
+                        }
+                    }
+                }
+            }
+
+            let html = "<ul>";
+            for (let id in relatorio) {
+                const r = relatorio[id];
+                html += `<li>${r.nome}: ${r.dias} dias × R$ ${r.diaria.toFixed(2)} = <strong>R$ ${(r.dias * r.diaria).toFixed(2)}</strong></li>`;
+            }
+            html += "</ul>";
+            document.getElementById("resultadoDiaristas").innerHTML = html || "<p>Nenhum registro encontrado.</p>";
+        });
+
+        // Relatório de Faltas
+        document.getElementById("gerarFaltas").addEventListener("click", async () => {
+            const inicio = document.getElementById("dataInicioF").value;
+            const fim = document.getElementById("dataFimF").value;
+            const tipoFiltro = document.getElementById("tipoFaltas").value;
+
+            if (!inicio || !fim) return alert("Selecione o período!");
+
+            const funcionariosSnap = await get(ref(db, 'funcionarios'));
+            const chamadasSnap = await get(ref(db, 'chamadas'));
+            if (!funcionariosSnap.exists() || !chamadasSnap.exists()) {
+                return alert("Não há dados suficientes.");
+            }
+
+            const funcionarios = funcionariosSnap.val();
+            const chamadas = chamadasSnap.val();
+            let relatorio = {};
+
+            for (let data in chamadas) {
+                if (estaNoPeriodo(data, inicio, fim)) {
+                    for (let id in chamadas[data]) {
+                        const f = funcionarios[id];
+                        if (f && (tipoFiltro === 'todos' || f.tipo === tipoFiltro) && chamadas[data][id].status === 'falta') {
+                            if (!relatorio[id]) relatorio[id] = { nome: f.nome, faltas: [] };
+                            relatorio[id].faltas.push(data);
+                        }
+                    }
+                }
+            }
+
+            let html = "<ul>";
+            for (let id in relatorio) {
+                const r = relatorio[id];
+                html += `<li>${r.nome}: ${r.faltas.length} faltas (${r.faltas.join(', ')})</li>`;
+            }
+            html += "</ul>";
+            document.getElementById("resultadoFaltas").innerHTML = html || "<p>Nenhum registro encontrado.</p>";
+        });
+    </script>
 </body>
 </html>

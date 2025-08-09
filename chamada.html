@@ -1,393 +1,344 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Chamada</title>
-<style>
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #2980b9, #6dd5fa);
-    color: #fff;
-    margin: 0;
-    padding: 20px 15px 80px 15px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  header {
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-  }
-  a.btn-voltar {
-    cursor: pointer;
-    background-color: #154360;
-    color: white;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 12px;
-    font-weight: 600;
-    box-shadow: 0 4px 10px rgba(21,67,96,0.7);
-    transition: background-color 0.25s ease, box-shadow 0.25s ease;
-  }
-  a.btn-voltar:hover {
-    background-color: #0e2a48;
-    box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
-  }
-  h1 {
-    font-size: 2.4rem;
-    margin: 0 0 18px 0;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    line-height: 1.2;
-    text-align: center;
-    max-width: 400px;
-    width: 100%;
-  }
-  .data-container {
-    background-color: rgba(21, 67, 96, 0.85);
-    border-radius: 12px;
-    padding: 12px 20px;
-    margin-bottom: 20px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 600;
-    font-size: 1.1rem;
-  }
-  input[type="date"] {
-    background-color: white;
-    color: #154360;
-    border-radius: 8px;
-    border: none;
-    padding: 8px 14px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 3px 7px rgba(0,0,0,0.15);
-  }
-  .funcionario-lista {
-    max-width: 400px;
-    width: 100%;
-  }
-  .funcionario-card {
-    background-color: rgba(21, 67, 96, 0.85);
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-bottom: 14px;
-    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
-    user-select: none;
-  }
-  .funcionario-card h3 {
-    margin: 0 0 8px 0;
-    font-weight: 700;
-    font-size: 1.2rem;
-    user-select: text;
-  }
-  .opcoes-presenca {
-    display: flex;
-    gap: 10px;
-    margin-top: 6px;
-    user-select: none;
-  }
-  .opcoes-presenca label {
-    background-color: #2980b9;
-    border-radius: 10px;
-    padding: 6px 12px;
-    cursor: pointer;
-    user-select: none;
-    font-weight: 600;
-    transition: background-color 0.25s ease;
-  }
-  .opcoes-presenca input[type="radio"] {
-    display: none;
-  }
-  .opcoes-presenca input[type="radio"]:checked + label {
-    background-color: #1c5d8e;
-  }
-  .atestado-container {
-    margin-top: 6px;
-    padding-left: 18px;
-  }
-  .btn-salvar {
-    display: block;
-    margin: 20px auto 0 auto;
-    background-color: #2ecc71;
-    color: white;
-    font-weight: 700;
-    padding: 12px 28px;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 6px 14px rgba(46, 204, 113, 0.7);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    max-width: 400px;
-    width: 100%;
-  }
-  .btn-salvar:hover {
-    background-color: #27ae60;
-  }
-  footer {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 400px;
-    background-color: rgba(21, 67, 96, 0.85);
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    font-weight: 600;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 0.9rem;
-    box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
-    user-select: none;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chamada</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #2980b9, #6dd5fa);
+      color: #fff;
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px 15px 60px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 12px auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      user-select: none;
+    }
+    a.btn-voltar {
+      cursor: pointer;
+      background-color: #154360;
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+    }
+    a.btn-voltar:hover {
+      background-color: #0e2a48;
+      box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
+    }
+    h1 {
+      font-size: 2.4rem;
+      margin: 0 0 20px 0;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      user-select: none;
+      line-height: 1.2;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+    #dataAtual {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+      text-align: center;
+      user-select: none;
+      max-width: 400px;
+      width: 100%;
+    }
+    .funcionario-card {
+      background-color: rgba(21, 67, 96, 0.85);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+      user-select: none;
+    }
+    .funcionario-nome {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .funcionario-tipo {
+      font-size: 1rem;
+      font-style: italic;
+      margin-bottom: 12px;
+      text-transform: capitalize;
+    }
+    .opcoes {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+    .opcoes label {
+      cursor: pointer;
+      user-select: none;
+    }
+    input[type="radio"], input[type="checkbox"] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .atestado-group {
+      margin-left: 28px;
+      margin-top: 6px;
+      display: none;
+      gap: 12px;
+    }
+    .atestado-group label {
+      font-weight: normal;
+    }
+    .btn-salvar {
+      background-color: #4caf50; /* verde suave */
+      padding: 15px 28px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+      border: none;
+      box-shadow: 0 5px 12px rgba(76, 175, 80, 0.7);
+      cursor: pointer;
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+      display: block;
+      margin: 20px auto 30px auto;
+      max-width: 280px;
+    }
+    .btn-salvar:hover {
+      background-color: #388e3c;
+      box-shadow: 0 7px 18px rgba(56, 142, 60, 0.9);
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(21, 67, 96, 0.9);
+      color: #ddd;
+      text-align: center;
+      font-size: 0.85rem;
+      padding: 8px 0;
+      user-select: none;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+      max-width: 100%;
+    }
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 2rem;
+      }
+      .btn-salvar {
+        font-size: 1.1rem;
+        padding: 14px 22px;
+        max-width: 100%;
+      }
+      .funcionario-card {
+        max-width: 100%;
+        padding: 14px 16px;
+      }
+      .funcionario-nome {
+        font-size: 1.1rem;
+      }
+      .opcoes {
+        font-size: 0.95rem;
+        gap: 12px;
+      }
+      input[type="radio"], input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <a href="index.html" class="btn-voltar">⬅ Voltar</a>
-</header>
+  <header>
+    <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+  </header>
 
-<h1>Chamada</h1>
+  <h1>Chamada</h1>
+  <div id="dataAtual"></div>
 
-<div class="data-container">
-  <label for="dataChamada" style="margin-right: 12px;">Data:</label>
-  <input type="date" id="dataChamada" />
-</div>
+  <div id="listaFuncionarios"></div>
 
-<div class="funcionario-lista" id="listaFuncionarios">
-  <!-- Funcionários serão listados aqui -->
-</div>
+  <button class="btn-salvar" id="btnSalvar">Salvar Chamada</button>
 
-<button class="btn-salvar" id="btnSalvar">Salvar Chamada</button>
+  <footer>
+    Desenvolvido por Lucas Ramos Aragão
+  </footer>
 
-<footer>
-  Desenvolvido por Lucas Ramos Aragão
-</footer>
+  <script type="module">
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+    import { app } from "./firebase.js";
 
-<script type="module">
-  import { db, ref, set, get, child } from './firebase.js';
+    const db = getDatabase(app);
+    const listaFuncionarios = document.getElementById("listaFuncionarios");
+    const dataAtualDiv = document.getElementById("dataAtual");
+    const btnSalvar = document.getElementById("btnSalvar");
 
-  const dataChamadaInput = document.getElementById('dataChamada');
-  const listaFuncionariosDiv = document.getElementById('listaFuncionarios');
-  const btnSalvar = document.getElementById('btnSalvar');
+    let funcionarios = {};
 
-  // Função para formatar data para DD/MM/AAAA
-  function formatarDataBr(dateStr) {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;
-  }
+    function formatarDataBR(data) {
+      const d = new Date(data);
+      const dia = String(d.getDate()).padStart(2, '0');
+      const mes = String(d.getMonth() + 1).padStart(2, '0');
+      const ano = d.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    }
 
-  // Define a data padrão como hoje no input date
-  function setDataHoje() {
-    const hoje = new Date();
-    const yyyy = hoje.getFullYear();
-    const mm = String(hoje.getMonth() + 1).padStart(2, '0');
-    const dd = String(hoje.getDate()).padStart(2, '0');
-    dataChamadaInput.value = `${yyyy}-${mm}-${dd}`;
-  }
+    const dataHoje = new Date();
+    dataAtualDiv.textContent = `Data: ${formatarDataBR(dataHoje)}`;
 
-  // Carrega funcionários e exibe cards para chamada
-  async function carregarFuncionarios() {
-    listaFuncionariosDiv.innerHTML = 'Carregando...';
-    try {
-      const snapshot = await get(ref(db, 'funcionarios'));
-      if (!snapshot.exists()) {
-        listaFuncionariosDiv.innerHTML = 'Nenhum funcionário cadastrado.';
-        return;
+    async function carregarFuncionarios() {
+      try {
+        const snapshot = await get(ref(db, 'funcionarios'));
+        if (snapshot.exists()) {
+          funcionarios = snapshot.val();
+          montarCards();
+          adicionarEventosStatus();
+        } else {
+          listaFuncionarios.innerHTML = '<p>Nenhum funcionário encontrado.</p>';
+        }
+      } catch (error) {
+        console.error('Erro ao carregar funcionários:', error);
+        listaFuncionarios.innerHTML = '<p>Erro ao carregar funcionários.</p>';
       }
-      const funcionarios = snapshot.val();
-      listaFuncionariosDiv.innerHTML = '';
+    }
 
-      Object.entries(funcionarios).forEach(([id, f]) => {
+    function montarCards() {
+      listaFuncionarios.innerHTML = '';
+      for (const id in funcionarios) {
+        const f = funcionarios[id];
+        let tipoComAcento = '';
+        if (f.tipo.toLowerCase() === 'funcionario') tipoComAcento = 'Funcionário';
+        else if (f.tipo.toLowerCase() === 'diarista') tipoComAcento = 'Diarista';
+        else tipoComAcento = f.tipo.charAt(0).toUpperCase() + f.tipo.slice(1);
+
         const card = document.createElement('div');
         card.classList.add('funcionario-card');
+        card.innerHTML = `
+          <div class="funcionario-nome">${f.nome}</div>
+          <div class="funcionario-tipo">${tipoComAcento}</div>
+          <div class="opcoes">
+            <label>
+              <input type="radio" name="status_${id}" value="presente" checked>
+              Presente
+            </label>
+            <label>
+              <input type="radio" name="status_${id}" value="falta">
+              Falta
+            </label>
+          </div>
+          <div class="atestado-group" id="atestado-group-${id}">
+            <label>
+              <input type="radio" name="atestado_${id}" value="com" >
+              Com atestado
+            </label>
+            <label>
+              <input type="radio" name="atestado_${id}" value="sem" >
+              Sem atestado
+            </label>
+          </div>
+        `;
+        listaFuncionarios.appendChild(card);
+      }
+    }
 
-        const nome = document.createElement('h3');
-        nome.textContent = f.nome;
-        card.appendChild(nome);
-
-        const opcoes = document.createElement('div');
-        opcoes.classList.add('opcoes-presenca');
-
-        // Presente
-        const presenteId = `presente-${id}`;
-        const presenteInput = document.createElement('input');
-        presenteInput.type = 'radio';
-        presenteInput.name = `presenca-${id}`;
-        presenteInput.id = presenteId;
-        presenteInput.value = 'presente';
-
-        const presenteLabel = document.createElement('label');
-        presenteLabel.htmlFor = presenteId;
-        presenteLabel.textContent = 'Presente';
-
-        // Falta
-        const faltaId = `falta-${id}`;
-        const faltaInput = document.createElement('input');
-        faltaInput.type = 'radio';
-        faltaInput.name = `presenca-${id}`;
-        faltaInput.id = faltaId;
-        faltaInput.value = 'falta';
-
-        const faltaLabel = document.createElement('label');
-        faltaLabel.htmlFor = faltaId;
-        faltaLabel.textContent = 'Faltou';
-
-        opcoes.appendChild(presenteInput);
-        opcoes.appendChild(presenteLabel);
-        opcoes.appendChild(faltaInput);
-        opcoes.appendChild(faltaLabel);
-
-        card.appendChild(opcoes);
-
-        // Se funcionário, adicionar opção atestado que aparece só se marcou falta
-        if (f.tipo === 'funcionario') {
-          const atestadoDiv = document.createElement('div');
-          atestadoDiv.classList.add('atestado-container');
-          atestadoDiv.style.display = 'none';
-
-          const atestadoSimId = `atestado-sim-${id}`;
-          const atestadoNaoId = `atestado-nao-${id}`;
-
-          const labelAtestado = document.createElement('label');
-          labelAtestado.textContent = 'Atestado:';
-
-          const atestadoSimInput = document.createElement('input');
-          atestadoSimInput.type = 'radio';
-          atestadoSimInput.name = `atestado-${id}`;
-          atestadoSimInput.id = atestadoSimId;
-          atestadoSimInput.value = 'com atestado';
-
-          const atestadoSimLabel = document.createElement('label');
-          atestadoSimLabel.htmlFor = atestadoSimId;
-          atestadoSimLabel.textContent = 'Com atestado';
-
-          const atestadoNaoInput = document.createElement('input');
-          atestadoNaoInput.type = 'radio';
-          atestadoNaoInput.name = `atestado-${id}`;
-          atestadoNaoInput.id = atestadoNaoId;
-          atestadoNaoInput.value = 'sem atestado';
-
-          const atestadoNaoLabel = document.createElement('label');
-          atestadoNaoLabel.htmlFor = atestadoNaoId;
-          atestadoNaoLabel.textContent = 'Sem atestado';
-
-          atestadoDiv.appendChild(labelAtestado);
-          atestadoDiv.appendChild(atestadoSimInput);
-          atestadoDiv.appendChild(atestadoSimLabel);
-          atestadoDiv.appendChild(atestadoNaoInput);
-          atestadoDiv.appendChild(atestadoNaoLabel);
-
-          card.appendChild(atestadoDiv);
-
-          // Mostrar/ocultar atestado quando marca falta
-          faltaInput.addEventListener('change', () => {
-            atestadoDiv.style.display = 'block';
+    function adicionarEventosStatus() {
+      for (const id in funcionarios) {
+        const func = funcionarios[id];
+        if (func.tipo.toLowerCase() === 'funcionario') {
+          const radiosFalta = document.getElementsByName(`status_${id}`);
+          radiosFalta.forEach(radio => {
+            radio.addEventListener('change', () => {
+              const atestadoGroup = document.getElementById(`atestado-group-${id}`);
+              if (radio.value === 'falta' && radio.checked) {
+                atestadoGroup.style.display = 'flex';
+              } else {
+                atestadoGroup.style.display = 'none';
+                // Limpar seleção anterior
+                const radiosAtestado = document.getElementsByName(`atestado_${id}`);
+                radiosAtestado.forEach(radioAtestado => radioAtestado.checked = false);
+              }
+            });
           });
-          presenteInput.addEventListener('change', () => {
-            atestadoDiv.style.display = 'none';
-            // Limpa seleção de atestado
-            const radios = atestadoDiv.querySelectorAll('input[type="radio"]');
-            radios.forEach(r => r.checked = false);
-          });
+          // Inicialmente esconder o grupo
+          const atestadoGroupInit = document.getElementById(`atestado-group-${id}`);
+          atestadoGroupInit.style.display = 'none';
+        }
+      }
+    }
+
+    async function salvarChamada() {
+      const dataFirebase = `${dataHoje.getFullYear()}-${String(dataHoje.getMonth() + 1).padStart(2, '0')}-${String(dataHoje.getDate()).padStart(2, '0')}`;
+      const chamadasDoDia = {};
+      for (const id in funcionarios) {
+        const statusRadios = document.getElementsByName(`status_${id}`);
+        let statusSelecionado = 'presente';
+        for (const radio of statusRadios) {
+          if (radio.checked) {
+            statusSelecionado = radio.value;
+            break;
+          }
+        }
+        const func = funcionarios[id];
+        let atestado = null; // null quando não for funcionário ou não aplicável
+
+        if (func.tipo.toLowerCase() === 'funcionario' && statusSelecionado === 'falta') {
+          const radiosAtestado = document.getElementsByName(`atestado_${id}`);
+          let atestadoSelecionado = null;
+          for (const radioAtestado of radiosAtestado) {
+            if (radioAtestado.checked) {
+              atestadoSelecionado = radioAtestado.value;
+              break;
+            }
+          }
+          if (!atestadoSelecionado) {
+            alert(`Por favor, selecione "Com atestado" ou "Sem atestado" para o funcionário ${func.nome} que está ausente.`);
+            return;
+          }
+          atestado = (atestadoSelecionado === 'com');
         }
 
-        listaFuncionariosDiv.appendChild(card);
-      });
-    } catch (error) {
-      listaFuncionariosDiv.innerHTML = 'Erro ao carregar funcionários.';
-      console.error(error);
-    }
-  }
-
-  btnSalvar.addEventListener('click', async () => {
-    const dataSelecionada = dataChamadaInput.value;
-    if (!dataSelecionada) {
-      alert('Por favor, selecione uma data.');
-      return;
-    }
-
-    const snapshot = await get(ref(db, 'funcionarios'));
-    if (!snapshot.exists()) {
-      alert('Nenhum funcionário cadastrado.');
-      return;
-    }
-
-    const funcionarios = snapshot.val();
-    const updates = {};
-
-    let erroAtestado = false;
-
-    Object.entries(funcionarios).forEach(([id, f]) => {
-      const presencaRadios = document.getElementsByName(`presenca-${id}`);
-      let presencaSelecionada = null;
-      presencaRadios.forEach(r => {
-        if (r.checked) presencaSelecionada = r.value;
-      });
-
-      if (!presencaSelecionada) {
-        // Se não marcou, considera ausente sem atestado para funcionário
-        presencaSelecionada = 'presente'; // ou talvez avisar que falta seleção?
-      }
-
-      if (f.tipo === 'funcionario' && presencaSelecionada === 'falta') {
-        const atestadoRadios = document.getElementsByName(`atestado-${id}`);
-        let atestadoSelecionado = null;
-        atestadoRadios.forEach(r => {
-          if (r.checked) atestadoSelecionado = r.value;
-        });
-        if (!atestadoSelecionado) {
-          erroAtestado = true;
-        }
-        updates[`chamada/${dataSelecionada}/${id}`] = {
-          nome: f.nome,
-          tipo: f.tipo,
-          presenca: presencaSelecionada,
-          atestado: atestadoSelecionado || ''
-        };
-      } else {
-        updates[`chamada/${dataSelecionada}/${id}`] = {
-          nome: f.nome,
-          tipo: f.tipo,
-          presenca: presencaSelecionada
+        chamadasDoDia[id] = {
+          status: statusSelecionado,
+          atestado: atestado
         };
       }
-    });
-
-    if (erroAtestado) {
-      alert('Funcionário marcado como falta deve informar se apresentou atestado ou não.');
-      return;
+      try {
+        await set(ref(db, `chamadas/${dataFirebase}`), chamadasDoDia);
+        alert('Chamada salva com sucesso!');
+      } catch (error) {
+        console.error('Erro ao salvar chamada:', error);
+        alert('Erro ao salvar chamada. Veja o console para detalhes.');
+      }
     }
 
-    try {
-      await set(ref(db), updates);
-      alert('Chamada salva com sucesso!');
-    } catch (error) {
-      alert('Erro ao salvar chamada.');
-      console.error(error);
-    }
-  });
+    btnSalvar.addEventListener('click', salvarChamada);
 
-  // Inicializa
-  setDataHoje();
-  carregarFuncionarios();
-</script>
-
+    carregarFuncionarios();
+  </script>
 </body>
 </html>

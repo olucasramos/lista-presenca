@@ -69,6 +69,7 @@
       outline: none;
       cursor: pointer;
       color: #154360;
+      /* Centralizar com margin auto já suficiente, mas se quiser pode usar flexbox */
     }
     .funcionario-card {
       background-color: rgba(21, 67, 96, 0.85);
@@ -242,8 +243,12 @@
 
     function montarCards() {
       listaFuncionarios.innerHTML = '';
-      for (const id in funcionarios) {
-        const f = funcionarios[id];
+
+      // Ordena os funcionários pelo nome em ordem alfabética
+      const funcionariosOrdenados = Object.entries(funcionarios)
+        .sort(([, a], [, b]) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+
+      for (const [id, f] of funcionariosOrdenados) {
         let tipoComAcento = '';
         if (f.tipo.toLowerCase() === 'funcionario') tipoComAcento = 'Funcionário';
         else if (f.tipo.toLowerCase() === 'diarista') tipoComAcento = 'Diarista';

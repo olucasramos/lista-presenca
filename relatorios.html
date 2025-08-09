@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Relatórios</title>
 <style>
-  /* ... (mesmo CSS anterior, não alterado para economia) ... */
   * {
     box-sizing: border-box;
   }
@@ -191,10 +190,12 @@
 </section>
 
 <section id="excluirChamadaSection">
-  <h2>❌ Excluir Chamada por Data</h2>
-  <label for="excluirData">Data da Chamada</label>
-  <input type="date" id="excluirData" />
-  <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada</button>
+  <h2>❌ Excluir Chamada por Intervalo de Datas</h2>
+  <label for="excluirDataInicio">Data Início</label>
+  <input type="date" id="excluirDataInicio" />
+  <label for="excluirDataFim">Data Fim</label>
+  <input type="date" id="excluirDataFim" />
+  <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada(s)</button>
 </section>
 
 <pre id="resultado" tabindex="0" aria-label="Resultado do relatório"></pre>
@@ -223,7 +224,8 @@
   const pagamentoDataFim = document.getElementById('pagamentoDataFim');
   const btnGerarPagamento = document.getElementById('btnGerarPagamento');
 
-  const excluirData = document.getElementById('excluirData');
+  const excluirDataInicio = document.getElementById('excluirDataInicio');
+  const excluirDataFim = document.getElementById('excluirDataFim');
   const btnExcluirChamada = document.getElementById('btnExcluirChamada');
 
   const resultado = document.getElementById('resultado');
@@ -452,53 +454,83 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
       scrollParaResultado();
       return texto.trim();
     } catch (error) {
-      console.error('Erro ao gerar relatório de pagamento diarista:', error);
-      resultado.textContent = 'Erro ao gerar relatório de pagamento diarista.';
+      console.error('Erro ao gerar relatório de pagamento:', error);
+      resultado.textContent = 'Erro ao gerar relatório de pagamento.';
       return null;
     }
   }
 
+  function formatarDataDMY(data) {
+    const d = new Date(data);
+    if (isNaN(d)) return data;
+    const dia = d.getDate().toString().padStart(2, '0');
+    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+    const ano = d.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  }
+
   async function excluirChamada() {
-    const dataExcluir = excluirData.value;
-    if (!dataExcluir) {
-      alert('Selecione a data da chamada a ser excluída.');
+    const dataInicio = excluirDataInicio.value;
+    const dataFim = excluirDataFim.value;
+
+    if (!dataInicio || !dataFim) {
+      alert('Selecione as datas de início e fim para exclusão.');
       return;
     }
+
+    if (new Date(dataFim) < new Date(dataInicio)) {
+      alert('Data fim não pode ser menor que data início.');
+      return;
+    }
+
     const senha = prompt('Digite a senha para confirmar exclusão:');
     if (senha !== '1234') {
       alert('Senha incorreta.');
       return;
     }
+
     try {
-      await remove(ref(db, `chamadas/${dataExcluir}`));
-      alert(`Chamada do dia ${formatarDataDMY(dataExcluir)} excluída com sucesso.`);
-      excluirData.value = '';
+      const chamadasSnap = await get(ref(db, 'chamadas'));
+      if (!chamadasSnap.exists()) {
+        alert('Não há chamadas para excluir.');
+        return;
+      }
+
+      const chamadas = chamadasSnap.val();
+      const datasParaExcluir = Object.keys(chamadas).filter(dataChamada => {
+        const dt = new Date(dataChamada);
+        return dt >= new Date(dataInicio) && dt <= new Date(dataFim);
+      });
+
+      if (datasParaExcluir.length === 0) {
+        alert('Nenhuma chamada encontrada no intervalo selecionado.');
+        return;
+      }
+
+      const exclusoes = datasParaExcluir.map(data => remove(ref(db, `chamadas/${data}`)));
+      await Promise.all(exclusoes);
+
+      alert(`Chamadas excluídas com sucesso para as datas:\n${datasParaExcluir.map(formatarDataDMY).join(', ')}`);
+
+      excluirDataInicio.value = '';
+      excluirDataFim.value = '';
       resultado.textContent = '';
       textoRelatorioAtual = '';
     } catch (error) {
-      console.error('Erro ao excluir chamada:', error);
-      alert('Erro ao excluir chamada.');
+      console.error('Erro ao excluir chamadas:', error);
+      alert('Erro ao excluir chamadas.');
     }
   }
 
   function enviarWhatsApp() {
     if (!textoRelatorioAtual) {
-      alert('Gere um relatório antes de enviar por WhatsApp.');
+      alert('Gere um relatório antes de enviar.');
       return;
     }
+    // WhatsApp URL encode
     const textoEncoded = encodeURIComponent(textoRelatorioAtual);
-    // Sem número fixo, apenas abre a tela para escolher contato no WhatsApp Web/app
     const url = `https://wa.me/?text=${textoEncoded}`;
     window.open(url, '_blank');
-  }
-
-  function formatarDataDMY(data) {
-    const dt = new Date(data);
-    if (isNaN(dt)) return data;
-    const d = dt.getDate().toString().padStart(2, '0');
-    const m = (dt.getMonth() + 1).toString().padStart(2, '0');
-    const a = dt.getFullYear();
-    return `${d}/${m}/${a}`;
   }
 
   btnGerarFaltas.addEventListener('click', gerarRelatorioFaltas);

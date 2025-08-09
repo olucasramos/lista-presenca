@@ -69,7 +69,6 @@
       outline: none;
       cursor: pointer;
       color: #154360;
-      /* Centralizar com margin auto já suficiente, mas se quiser pode usar flexbox */
     }
     .funcionario-card {
       background-color: rgba(21, 67, 96, 0.85);
@@ -244,11 +243,11 @@
     function montarCards() {
       listaFuncionarios.innerHTML = '';
 
-      // Ordena os funcionários pelo nome em ordem alfabética
-      const funcionariosOrdenados = Object.entries(funcionarios)
+      // Converter objeto para array e ordenar alfabeticamente pelo nome
+      const listaOrdenada = Object.entries(funcionarios)
         .sort(([, a], [, b]) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
 
-      for (const [id, f] of funcionariosOrdenados) {
+      for (const [id, f] of listaOrdenada) {
         let tipoComAcento = '';
         if (f.tipo.toLowerCase() === 'funcionario') tipoComAcento = 'Funcionário';
         else if (f.tipo.toLowerCase() === 'diarista') tipoComAcento = 'Diarista';
@@ -309,6 +308,80 @@
       }
     }
 
+    // Função para carregar a chamada salva na data selecionada e atualizar a interface
+    async function carregarChamadaData(data) {
+      if (!data) return;
+
+      try {
+        const snapshot = await get(ref(db, `chamadas/${data}`));
+        if (snapshot.exists()) {
+          const chamadasDoDia = snapshot.val();
+          for (const id in funcionarios) {
+            const statusRadios = document.getElementsByName(`status_${id}`);
+            const atestadoGroup = document.getElementById(`atestado-group-${id}`);
+
+            // Limpa seleção dos status
+            statusRadios.forEach(radio => radio.checked = false);
+
+            if (chamadasDoDia[id]) {
+              const status = chamadasDoDia[id].status || 'presente';
+              const atestado = chamadasDoDia[id].atestado;
+
+              // Marca o radio do status
+              for (const radio of statusRadios) {
+                if (radio.value === status) {
+                  radio.checked = true;
+                  // Mostra ou esconde o grupo de atestado
+                  if (status === 'falta' && atestadoGroup) {
+                    atestadoGroup.style.display = 'flex';
+                  } else if (atestadoGroup) {
+                    atestadoGroup.style.display = 'none';
+                  }
+                }
+              }
+
+              // Marca o radio do atestado se existir
+              if (atestadoGroup && atestado !== null && atestado !== undefined) {
+                const radiosAtestado = document.getElementsByName(`atestado_${id}`);
+                radiosAtestado.forEach(radioAtestado => {
+                  radioAtestado.checked = (atestado === true && radioAtestado.value === 'com') ||
+                                         (atestado === false && radioAtestado.value === 'sem');
+                });
+              } else if (atestadoGroup) {
+                // Nenhum atestado selecionado
+                const radiosAtestado = document.getElementsByName(`atestado_${id}`);
+                radiosAtestado.forEach(radioAtestado => radioAtestado.checked = false);
+              }
+
+            } else {
+              // Se não tiver dados pra esse funcionário, volta ao padrão
+              statusRadios.forEach(radio => {
+                radio.checked = (radio.value === 'presente');
+              });
+              if (atestadoGroup) atestadoGroup.style.display = 'none';
+              const radiosAtestado = document.getElementsByName(`atestado_${id}`);
+              radiosAtestado.forEach(radioAtestado => radioAtestado.checked = false);
+            }
+          }
+        } else {
+          // Se não existir chamada para essa data, reseta tudo para padrão
+          for (const id in funcionarios) {
+            const statusRadios = document.getElementsByName(`status_${id}`);
+            const atestadoGroup = document.getElementById(`atestado-group-${id}`);
+
+            statusRadios.forEach(radio => {
+              radio.checked = (radio.value === 'presente');
+            });
+            if (atestadoGroup) atestadoGroup.style.display = 'none';
+            const radiosAtestado = document.getElementsByName(`atestado_${id}`);
+            radiosAtestado.forEach(radioAtestado => radioAtestado.checked = false);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar chamada da data:', error);
+      }
+    }
+
     async function salvarChamada() {
       const dataSelecionada = dataSelecionadaInput.value;
       if (!dataSelecionada) {
@@ -360,8 +433,17 @@
 
     btnSalvar.addEventListener('click', salvarChamada);
 
-    definirDataHoje();
-    carregarFuncionarios();
+    dataSelecionadaInput.addEventListener('change', () => {
+      carregarChamadaData(dataSelecionadaInput.value);
+    });
+
+    async function iniciar() {
+      definirDataHoje();
+      await carregarFuncionarios();
+      carregarChamadaData(dataSelecionadaInput.value);
+    }
+
+    iniciar();
   </script>
 </body>
 </html>

@@ -1,17 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal - Controle de Presenças</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Controle de Presenças</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f6f8fa;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      font-size: 1.5rem;
+    }
+    main {
+      max-width: 400px;
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 0 10px;
+    }
+    a.btn {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      font-size: 1.2rem;
+      border-radius: 12px;
+      text-decoration: none;
+      display: block;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.3s;
+    }
+    a.btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <h1>Controle de Presenças</h1>
-    <div class="menu">
-        <a href="chamada.html" class="btn">📋 Chamada</a>
-        <a href="funcionarios.html" class="btn">👷 Funcionários</a>
-        <a href="relatorios.html" class="btn">📊 Relatórios</a>
-    </div>
+  <header>Controle de Presenças</header>
+  <main>
+    <a href="chamada.html" class="btn">📋 Chamada</a>
+    <a href="funcionarios.html" class="btn">👷 Funcionários</a>
+    <a href="relatorios.html" class="btn">📊 Relatórios</a>
+  </main>
 </body>
 </html>

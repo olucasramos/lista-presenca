@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Funcionários</title>
 <style>
-  /* Estilos baseados no padrão já usado */
   * {
     box-sizing: border-box;
   }
@@ -77,6 +76,14 @@
   input[type="text"]:focus, input[type="number"]:focus, select:focus {
     outline: 2px solid #6dd5fa;
   }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
   button.btn-acao {
     background-color: #2980b9;
     padding: 12px 24px;
@@ -145,6 +152,21 @@
   .campo-oculto {
     display: none;
   }
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 400px;
+    background-color: rgba(21, 67, 96, 0.85);
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+    user-select: none;
+  }
 </style>
 </head>
 <body>
@@ -182,7 +204,7 @@
   <label for="obra">Obra</label>
   <input type="text" id="obra" required autocomplete="off" />
 
-  <!-- Campos específicos para diarista -->
+  <!-- Campos para diarista -->
   <div id="dadosDiarista" class="campo-oculto">
     <label for="cpf">CPF</label>
     <input type="text" id="cpf" placeholder="000.000.000-00" autocomplete="off" maxlength="14" />
@@ -203,7 +225,7 @@
     <input type="text" id="banco" autocomplete="off" />
 
     <label for="valorDiaria">Valor da diária (R$)</label>
-    <input type="number" id="valorDiaria" min="0" step="0.01" autocomplete="off" />
+    <input type="number" id="valorDiaria" min="0" step="0.01" autocomplete="off" inputmode="decimal" />
   </div>
 
   <button type="submit" class="btn-acao">Salvar</button>
@@ -330,8 +352,9 @@
         await update(ref(db, 'funcionarios/' + editandoId), dados);
         alert('Funcionário atualizado com sucesso!');
       } else {
-        const novoRef = ref(db, 'funcionarios');
-        const newKey = (await get(novoRef)).exists() ? Object.keys((await get(novoRef)).val()).length + 1 : 1;
+        const funcionariosRef = ref(db, 'funcionarios');
+        const snapshot = await get(funcionariosRef);
+        const newKey = snapshot.exists() ? (Object.keys(snapshot.val()).length + 1).toString() : '1';
         await set(ref(db, 'funcionarios/' + newKey), dados);
         alert('Funcionário cadastrado com sucesso!');
       }

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funcionários</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>👷 Funcionários</h1>
+    <form id="form-funcionario">
+        <input type="text" id="nome" placeholder="Nome" required>
+        <select id="tipo" required>
+            <option value="">Tipo</option>
+            <option value="funcionario">Funcionário</option>
+            <option value="diarista">Diarista</option>
+        </select>
+        <div id="campos-funcionario" style="display:none;">
+            <input type="text" id="funcao" placeholder="Função">
+            <input type="text" id="obra" placeholder="Obra">
+        </div>
+        <div id="campos-diarista" style="display:none;">
+            <input type="text" id="cpf" placeholder="CPF">
+            <input type="text" id="pixTipo" placeholder="Tipo de chave PIX">
+            <input type="text" id="pix" placeholder="Chave PIX">
+            <input type="text" id="banco" placeholder="Banco">
+            <input type="number" id="valorDiaria" placeholder="Valor da diária">
+            <input type="text" id="obraDiarista" placeholder="Obra">
+        </div>
+        <button type="submit" class="btn">💾 Salvar</button>
+    </form>
+
+    <h2>Lista</h2>
+    <div id="lista-funcionarios"></div>
+    <a href="index.html" class="btn btn-voltar">⬅ Voltar</a>
+
+    <script type="module">
+        import { db, ref, set, get, remove } from './firebase.js';
+
+        const tipoSelect = document.getElementById("tipo");
+        tipoSelect.addEventListener("change", () => {
+            document.getElementById("campos-funcionario").style.display = tipoSelect.value === 'funcionario' ? 'block' : 'none';
+            document.getElementById("campos-diarista").style.display = tipoSelect.value === 'diarista' ? 'block' : 'none';
+        });
+
+        document.getElementById("form-funcionario").addEventListener("submit", e => {
+            e.preventDefault();
+            const id = Date.now();
+            const nome = document.getElementById("nome").value;
+            const tipo = tipoSelect.value;
+
+            let dados = { nome, tipo };
+
+            if (tipo === "funcionario") {
+                dados.funcao = document.getElementById("funcao").value;
+                dados.obra = document.getElementById("obra").value;
+            } else {
+                dados.cpf = document.getElementById("cpf").value;
+                dados.pixTipo = document.getElementById("pixTipo").value;
+                dados.pix = document.getElementById("pix").value;
+                dados.banco = document.getElementById("banco").value;
+                dados.valorDiaria = document.getElementById("valorDiaria").value;
+                dados.obra = document.getElementById("obraDiarista").value;
+            }
+
+            set(ref(db, 'funcionarios/' + id), dados).then(() => {
+                alert("Funcionário salvo!");
+                location.reload();
+            });
+        });
+
+        // Listar funcionários
+        get(ref(db, 'funcionarios')).then(snapshot => {
+            if (snapshot.exists()) {
+                const funcionarios = snapshot.val();
+                for (let id in funcionarios) {
+                    let div = document.createElement("div");
+                    div.innerHTML = `
+                        <strong>${funcionarios[id].nome}</strong> (${funcionarios[id].tipo})
+                        <button onclick="excluir(${id})">❌</button>
+                        <hr>
+                    `;
+                    document.getElementById("lista-funcionarios").appendChild(div);
+                }
+            }
+        });
+
+        window.excluir = (id) => {
+            const senha = prompt("Digite a senha para excluir:");
+            if (senha === "1234") {
+                remove(ref(db, 'funcionarios/' + id)).then(() => {
+                    alert("Funcionário removido!");
+                    location.reload();
+                });
+            } else {
+                alert("Senha incorreta!");
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,182 +1,202 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Relatórios Simplificados</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-      background: #f4f4f9;
-      color: #333;
-    }
-    label, select, input, button {
-      font-size: 1rem;
-      margin: 0.5em 0;
-    }
-    button {
-      padding: 0.6em 1.2em;
-      margin-right: 10px;
-      border-radius: 6px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #resultado {
-      margin-top: 1.5em;
-      background: white;
-      padding: 1em;
-      border-radius: 6px;
-      min-height: 80px;
-      white-space: pre-wrap;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relatórios</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px auto;
+    max-width: 800px;
+    background: #f4f4f9;
+    color: #333;
+  }
+  label, select, input, button {
+    font-size: 1rem;
+    margin: 0.5em 0;
+  }
+  button {
+    padding: 0.6em 1.2em;
+    margin-right: 10px;
+    border-radius: 6px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  #resultado {
+    margin-top: 1.5em;
+    background: white;
+    padding: 1em;
+    border-radius: 6px;
+    min-height: 80px;
+    white-space: pre-wrap;
+  }
+  a.btn-voltar {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+  }
+  a.btn-voltar:hover {
+    background-color: #0056b3;
+  }
+</style>
 </head>
 <body>
 
-  <h1>Relatórios</h1>
+<h1>Relatórios</h1>
 
-  <label for="tipoRelatorio">Tipo de Relatório:</label>
-  <select id="tipoRelatorio">
-    <option value="diaristas">Relatório de Diaristas</option>
-    <option value="faltas">Relatório de Faltas</option>
-  </select>
+<label for="tipoRelatorio">Tipo de Relatório:</label>
+<select id="tipoRelatorio">
+  <option value="diaristas">Relatório de Diaristas</option>
+  <option value="faltas">Relatório de Faltas</option>
+</select>
 
-  <br />
+<br />
 
-  <label for="dataInicio">Data Início:</label>
-  <input type="date" id="dataInicio" />
+<label for="dataInicio">Data Início:</label>
+<input type="date" id="dataInicio" />
 
-  <br />
+<br />
 
-  <label for="dataFim">Data Fim:</label>
-  <input type="date" id="dataFim" />
+<label for="dataFim">Data Fim:</label>
+<input type="date" id="dataFim" />
 
-  <br />
+<br />
 
-  <button id="btnGerarRelatorio">Gerar Relatório</button>
-  <button id="btnWhatsApp">Enviar WhatsApp</button>
+<button id="btnGerarRelatorio">Gerar Relatório</button>
+<button id="btnWhatsApp">Enviar WhatsApp</button>
 
-  <div id="resultado">Aqui aparecerá o relatório.</div>
+<div id="resultado">Aqui aparecerá o relatório.</div>
 
-  <script type="module">
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-    import { app } from "./firebase.js";
+<a href="index.html" class="btn-voltar">⬅ Voltar</a>
 
-    const db = getDatabase(app);
+<script type="module">
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { app } from "./firebase.js";
 
-    let textoRelatorio = "";
+const db = getDatabase(app);
+let textoRelatorio = "";
 
-    function dataNoPeriodo(dataStr, inicioStr, fimStr) {
-      const d = new Date(dataStr);
-      const inicio = new Date(inicioStr);
-      const fim = new Date(fimStr);
-      return d >= inicio && d <= fim;
+function dataNoPeriodo(dataStr, inicioStr, fimStr) {
+  const d = new Date(dataStr);
+  const inicio = new Date(inicioStr);
+  const fim = new Date(fimStr);
+  return d >= inicio && d <= fim;
+}
+
+async function gerarRelatorio() {
+  const tipo = document.getElementById('tipoRelatorio').value;
+  const dataInicio = document.getElementById('dataInicio').value;
+  const dataFim = document.getElementById('dataFim').value;
+
+  if (!dataInicio || !dataFim) {
+    alert('Por favor, selecione as datas de início e fim.');
+    return;
+  }
+
+  try {
+    const snapshotFunc = await get(ref(db, 'funcionarios'));
+    const snapshotChamadas = await get(ref(db, 'chamadas'));
+
+    if (!snapshotFunc.exists() || !snapshotChamadas.exists()) {
+      document.getElementById('resultado').innerText = 'Não há dados suficientes para gerar o relatório.';
+      return;
     }
 
-    async function gerarRelatorio() {
-      const tipo = document.getElementById('tipoRelatorio').value;
-      const dataInicio = document.getElementById('dataInicio').value;
-      const dataFim = document.getElementById('dataFim').value;
+    const funcionarios = snapshotFunc.val();
+    const chamadas = snapshotChamadas.val();
 
-      if (!dataInicio || !dataFim) {
-        alert('Por favor, selecione as datas de início e fim.');
-        return;
-      }
+    console.log('Funcionários:', funcionarios);
+    console.log('Chamadas:', chamadas);
 
-      const snapshotFunc = await get(ref(db, 'funcionarios'));
-      const snapshotChamadas = await get(ref(db, 'chamadas'));
+    let relatorio = {};
+    textoRelatorio = '';
 
-      if (!snapshotFunc.exists() || !snapshotChamadas.exists()) {
-        document.getElementById('resultado').innerText = 'Não há dados suficientes para gerar o relatório.';
-        return;
-      }
+    if (tipo === 'diaristas') {
+      textoRelatorio += `Relatório de Diaristas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
 
-      const funcionarios = snapshotFunc.val();
-      const chamadas = snapshotChamadas.val();
-
-      let relatorio = {};
-      textoRelatorio = '';
-
-      if (tipo === 'diaristas') {
-        textoRelatorio += `Relatório de Diaristas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
-        for (const data in chamadas) {
-          if (dataNoPeriodo(data, dataInicio, dataFim)) {
-            for (const idFunc in chamadas[data]) {
-              const status = chamadas[data][idFunc].status;
-              if (status === 'presente') {
-                const f = funcionarios[idFunc];
-                if (f && f.tipo === 'diarista') {
-                  if (!relatorio[idFunc]) {
-                    relatorio[idFunc] = { nome: f.nome, dias: 0, diaria: parseFloat(f.valorDiaria) || 0 };
-                  }
-                  relatorio[idFunc].dias++;
+      for (const data in chamadas) {
+        if (dataNoPeriodo(data, dataInicio, dataFim)) {
+          for (const idFunc in chamadas[data]) {
+            const status = chamadas[data][idFunc].status || chamadas[data][idFunc];
+            if (status === 'presente') {
+              const f = funcionarios[idFunc];
+              if (f && f.tipo === 'diarista') {
+                if (!relatorio[idFunc]) {
+                  relatorio[idFunc] = { nome: f.nome, dias: 0, diaria: parseFloat(f.valorDiaria) || 0 };
                 }
+                relatorio[idFunc].dias++;
               }
             }
           }
         }
+      }
 
-        let texto = '';
-        for (const id in relatorio) {
-          const r = relatorio[id];
-          texto += `${r.nome}: ${r.dias} dias x R$ ${r.diaria.toFixed(2)} = R$ ${(r.dias*r.diaria).toFixed(2)}\n`;
-        }
+      let texto = '';
+      for (const id in relatorio) {
+        const r = relatorio[id];
+        texto += `${r.nome}: ${r.dias} dias x R$ ${r.diaria.toFixed(2)} = R$ ${(r.dias * r.diaria).toFixed(2)}\n`;
+      }
 
-        textoRelatorio += texto || 'Nenhum diarista encontrado no período.';
-        document.getElementById('resultado').innerText = textoRelatorio;
-      } 
-      else if (tipo === 'faltas') {
-        textoRelatorio += `Relatório de Faltas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
-        const tipoFiltro = 'todos';
+      textoRelatorio += texto || 'Nenhum diarista encontrado no período.';
+      document.getElementById('resultado').innerText = textoRelatorio;
+    }
+    else if (tipo === 'faltas') {
+      textoRelatorio += `Relatório de Faltas\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
 
-        for (const data in chamadas) {
-          if (dataNoPeriodo(data, dataInicio, dataFim)) {
-            for (const idFunc in chamadas[data]) {
-              const status = chamadas[data][idFunc].status;
-              if (status === 'falta') {
-                const f = funcionarios[idFunc];
-                if (f && (tipoFiltro === 'todos' || f.tipo === tipoFiltro)) {
-                  if (!relatorio[idFunc]) {
-                    relatorio[idFunc] = { nome: f.nome, faltas: [] };
-                  }
-                  relatorio[idFunc].faltas.push(data);
+      for (const data in chamadas) {
+        if (dataNoPeriodo(data, dataInicio, dataFim)) {
+          for (const idFunc in chamadas[data]) {
+            const status = chamadas[data][idFunc].status || chamadas[data][idFunc];
+            if (status === 'falta') {
+              const f = funcionarios[idFunc];
+              if (f) {
+                if (!relatorio[idFunc]) {
+                  relatorio[idFunc] = { nome: f.nome, faltas: [] };
                 }
+                relatorio[idFunc].faltas.push(data);
               }
             }
           }
         }
-
-        let texto = '';
-        for (const id in relatorio) {
-          const r = relatorio[id];
-          texto += `${r.nome}: ${r.faltas.length} faltas (${r.faltas.join(', ')})\n`;
-        }
-
-        textoRelatorio += texto || 'Nenhuma falta registrada no período.';
-        document.getElementById('resultado').innerText = textoRelatorio;
       }
+
+      let texto = '';
+      for (const id in relatorio) {
+        const r = relatorio[id];
+        texto += `${r.nome}: ${r.faltas.length} faltas (${r.faltas.join(', ')})\n`;
+      }
+
+      textoRelatorio += texto || 'Nenhuma falta registrada no período.';
+      document.getElementById('resultado').innerText = textoRelatorio;
     }
 
-    document.getElementById('btnGerarRelatorio').addEventListener('click', gerarRelatorio);
+  } catch (error) {
+    console.error("Erro ao buscar dados do Firebase:", error);
+    alert("Erro ao buscar dados. Veja o console para mais detalhes.");
+  }
+}
 
-    document.getElementById('btnWhatsApp').addEventListener('click', () => {
-      if (!textoRelatorio) {
-        alert('Gere o relatório antes de enviar pelo WhatsApp.');
-        return;
-      }
-      const textoUrl = encodeURIComponent(textoRelatorio);
-      window.open(`https://wa.me/5527997792023?text=${textoUrl}`, '_blank');
-    });
-  </script>
+document.getElementById('btnGerarRelatorio').addEventListener('click', gerarRelatorio);
+
+document.getElementById('btnWhatsApp').addEventListener('click', () => {
+  if (!textoRelatorio) {
+    alert('Gere o relatório antes de enviar pelo WhatsApp.');
+    return;
+  }
+  const textoUrl = encodeURIComponent(textoRelatorio);
+  window.open(`https://wa.me/5527997792023?text=${textoUrl}`, '_blank');
+});
+</script>
 
 </body>
 </html>

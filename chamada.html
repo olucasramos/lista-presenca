@@ -3,172 +3,185 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chamada - Controle de Presenças</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Chamada</title>
   <style>
-    /* Cabeçalho fixo */
-    header {
-      background-color: #007BFF;
-      color: white;
-      padding: 15px;
-      font-size: 1.2rem;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+      background: #f4f4f9;
+      color: #333;
+      padding: 10px;
+    }
+    h1 {
       text-align: center;
     }
-    main {
-      max-width: 800px;
-      margin: 70px auto 20px auto;
-      padding: 10px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    #data-hoje {
+    #dataAtual {
       font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      text-align: center;
     }
-    .funcionario {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #eee;
-      padding: 10px 0;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
     }
-    .funcionario > div {
-      flex: 1 1 150px;
-      margin-right: 10px;
-      min-width: 100px;
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
     }
-    label {
-      display: flex;
-      align-items: center;
-      gap: 5px;
+    th {
+      background-color: #007bff;
+      color: white;
     }
-    select, input[type="checkbox"] {
-      padding: 6px;
+    .btn-salvar {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 25px;
       font-size: 1rem;
       border-radius: 6px;
-      border: 1px solid #ccc;
-      min-width: 90px;
-    }
-    button, a.btn {
-      display: inline-block;
-      margin: 10px 5px 0 0;
-      padding: 12px 20px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: none;
       cursor: pointer;
-      text-decoration: none;
-      color: white;
-      background-color: #28a745;
-      transition: background-color 0.3s ease;
+      display: block;
+      margin: 0 auto 20px auto;
     }
-    button:hover, a.btn:hover {
+    .btn-salvar:hover {
       background-color: #218838;
     }
     a.btn-voltar {
+      display: block;
+      width: max-content;
+      margin: 0 auto;
       background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      text-align: center;
     }
     a.btn-voltar:hover {
-      background-color: #0069d9;
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <header>📋 Chamada - Controle de Presenças</header>
-  <main>
-    <div id="data-hoje"></div>
 
-    <div id="lista-funcionarios">Carregando funcionários...</div>
+  <h1>Chamada</h1>
+  <div id="dataAtual"></div>
 
-    <button id="btn-salvar">💾 Salvar Chamada</button>
+  <table id="tabelaFuncionarios">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Tipo</th>
+        <th>Presente</th>
+        <th>Falta</th>
+        <th>Atestado (funcionários)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-    <div style="margin-top:20px;">
-      <a href="index.html" class="btn btn-voltar">⬅ Voltar</a>
-      <a href="funcionarios.html" class="btn btn-voltar">👷 Funcionários</a>
-      <a href="relatorios.html" class="btn btn-voltar">📊 Relatórios</a>
-    </div>
-  </main>
+  <button class="btn-salvar" id="btnSalvar">Salvar Chamada</button>
+
+  <a href="index.html" class="btn-voltar">⬅ Voltar</a>
 
   <script type="module">
     import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
     import { app } from "./firebase.js";
 
     const db = getDatabase(app);
-    const listaDiv = document.getElementById("lista-funcionarios");
-    const dataHoje = new Date().toLocaleDateString('pt-BR');
-    document.getElementById("data-hoje").innerText = `Data: ${dataHoje}`;
+    const tbody = document.querySelector("#tabelaFuncionarios tbody");
+    const dataAtualDiv = document.getElementById("dataAtual");
+    const btnSalvar = document.getElementById("btnSalvar");
 
-    // Função para formatar data em YYYY-MM-DD para usar no Firebase path
-    function formatarDataFirebase(data) {
-      const [dia, mes, ano] = data.split('/');
-      return `${ano}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;
+    let funcionarios = {};
+
+    // Define a data atual no formato YYYY-MM-DD
+    function formatarData(data) {
+      return data.toISOString().slice(0, 10);
     }
 
-    // Carregar funcionários e montar lista
+    const dataHoje = formatarData(new Date());
+    dataAtualDiv.textContent = `Data: ${dataHoje}`;
+
+    // Função para carregar funcionários do Firebase e montar a tabela
     async function carregarFuncionarios() {
-      listaDiv.innerHTML = "Carregando...";
-      const snapshot = await get(ref(db, 'funcionarios'));
-      if (!snapshot.exists()) {
-        listaDiv.innerHTML = "<p>Nenhum funcionário cadastrado.</p>";
-        return;
+      try {
+        const snapshot = await get(ref(db, 'funcionarios'));
+        if (snapshot.exists()) {
+          funcionarios = snapshot.val();
+          montarTabela();
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5">Nenhum funcionário encontrado.</td></tr>';
+        }
+      } catch (error) {
+        console.error('Erro ao carregar funcionários:', error);
+        tbody.innerHTML = '<tr><td colspan="5">Erro ao carregar funcionários.</td></tr>';
       }
-      const funcionarios = snapshot.val();
-      listaDiv.innerHTML = "";
+    }
+
+    // Monta as linhas da tabela com inputs para marcar presença/falta e atestado
+    function montarTabela() {
+      tbody.innerHTML = '';
       for (const id in funcionarios) {
         const f = funcionarios[id];
-        // Criar div por funcionário
-        const div = document.createElement("div");
-        div.className = "funcionario";
+        const tr = document.createElement('tr');
 
-        div.innerHTML = `
-          <div><strong>${f.nome}</strong> (${f.tipo})</div>
-          <div>
-            <select id="status-${id}">
-              <option value="presente">Presente</option>
-              <option value="falta">Falta</option>
-            </select>
-          </div>
-          <div>
-            ${f.tipo === "funcionario" ? `
-              <label><input type="checkbox" id="atestado-${id}"> Atestado</label>
-            ` : ''}
-          </div>
+        tr.innerHTML = `
+          <td>${f.nome}</td>
+          <td>${f.tipo}</td>
+          <td><input type="radio" name="status_${id}" value="presente"></td>
+          <td><input type="radio" name="status_${id}" value="falta" checked></td>
+          <td>${f.tipo === 'funcionario' ? `<input type="checkbox" id="atestado_${id}" />` : '-'}</td>
         `;
 
-        listaDiv.appendChild(div);
+        tbody.appendChild(tr);
       }
     }
 
+    // Função para salvar a chamada no Firebase na data atual
+    async function salvarChamada() {
+      const chamadasDoDia = {};
+      for (const id in funcionarios) {
+        const statusRadios = document.getElementsByName(`status_${id}`);
+        let statusSelecionado = 'falta';
+        for (const radio of statusRadios) {
+          if (radio.checked) {
+            statusSelecionado = radio.value;
+            break;
+          }
+        }
+
+        const func = funcionarios[id];
+        // Para funcionários, verificar se atestado foi marcado
+        let atestado = false;
+        if (func.tipo === 'funcionario') {
+          const checkbox = document.getElementById(`atestado_${id}`);
+          atestado = checkbox ? checkbox.checked : false;
+        }
+
+        chamadasDoDia[id] = {
+          status: statusSelecionado,
+          atestado: atestado
+        };
+      }
+
+      try {
+        await set(ref(db, `chamadas/${dataHoje}`), chamadasDoDia);
+        alert('Chamada salva com sucesso!');
+      } catch (error) {
+        console.error('Erro ao salvar chamada:', error);
+        alert('Erro ao salvar chamada. Veja o console para detalhes.');
+      }
+    }
+
+    btnSalvar.addEventListener('click', salvarChamada);
+
+    // Inicializa carregando os funcionários
     carregarFuncionarios();
 
-    document.getElementById("btn-salvar").addEventListener("click", async () => {
-      const snapshot = await get(ref(db, 'funcionarios'));
-      if (!snapshot.exists()) {
-        alert("Nenhum funcionário para salvar chamada.");
-        return;
-      }
-      const funcionarios = snapshot.val();
-      const dataFirebase = new Date().toISOString().slice(0,10); // yyyy-mm-dd
-
-      for (const id in funcionarios) {
-        const statusEl = document.getElementById(`status-${id}`);
-        const atestadoEl = document.getElementById(`atestado-${id}`);
-
-        const status = statusEl ? statusEl.value : "presente";
-        const atestado = atestadoEl ? atestadoEl.checked : false;
-
-        await set(ref(db, `chamadas/${dataFirebase}/${id}`), {
-          status: status,
-          atestado: atestado
-        });
-      }
-      alert("Chamada salva com sucesso!");
-    });
   </script>
 </body>
 </html>

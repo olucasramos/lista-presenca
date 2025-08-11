@@ -1,0 +1,235 @@
+<script type="module">
+  import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+  import { app } from "./firebase.js";
+
+  const db = getDatabase(app);
+
+  // 🔹 Função para criar data no fuso horário local
+  function parseDataLocal(yyyyMmDd) {
+    const [ano, mes, dia] = yyyyMmDd.split('-').map(Number);
+    return new Date(ano, mes - 1, dia);
+  }
+
+  // 🔹 Formatar para DD/MM/AAAA
+  function formatarDataDMY(data) {
+    const d = typeof data === "string" ? parseDataLocal(data) : data;
+    if (isNaN(d)) return data;
+    const dia = String(d.getDate()).padStart(2, '0');
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const ano = d.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  const faltasTipo = document.getElementById('faltasTipo');
+  const faltasDataInicio = document.getElementById('faltasDataInicio');
+  const faltasDataFim = document.getElementById('faltasDataFim');
+  const btnGerarFaltas = document.getElementById('btnGerarFaltas');
+
+  const listaFuncionario = document.getElementById('listaFuncionario');
+  const btnGerarLista = document.getElementById('btnGerarLista');
+
+  const pagamentoDataInicio = document.getElementById('pagamentoDataInicio');
+  const pagamentoDataFim = document.getElementById('pagamentoDataFim');
+  const btnGerarPagamento = document.getElementById('btnGerarPagamento');
+
+  const excluirDataInicio = document.getElementById('excluirDataInicio');
+  const excluirDataFim = document.getElementById('excluirDataFim');
+  const btnExcluirChamada = document.getElementById('btnExcluirChamada');
+
+  const resultado = document.getElementById('resultado');
+  const btnEnviarWhats = document.getElementById('btnEnviarWhats');
+
+  let funcionariosCache = {};
+  let textoRelatorioAtual = '';
+
+  async function carregarFuncionarios() {
+    try {
+      const snapshot = await get(ref(db, 'funcionarios'));
+      if (snapshot.exists()) {
+        funcionariosCache = snapshot.val();
+        atualizarListaFuncionarios();
+      } else {
+        funcionariosCache = {};
+        listaFuncionario.innerHTML = '<option value="todos">Nenhum funcionário</option>';
+      }
+    } catch (error) {
+      console.error('Erro ao carregar funcionários:', error);
+      listaFuncionario.innerHTML = '<option value="todos">Erro ao carregar</option>';
+    }
+  }
+
+  function atualizarListaFuncionarios() {
+    listaFuncionario.innerHTML = '<option value="todos">Todos</option>';
+    Object.entries(funcionariosCache).forEach(([id, f]) => {
+      listaFuncionario.innerHTML += `<option value="${id}">${f.nome}</option>`;
+    });
+  }
+
+  function formatCPF(cpf) {
+    if (!cpf) return '-';
+    let v = cpf.replace(/\D/g, '');
+    v = v.padStart(11, '0');
+    return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  }
+
+  function formatTelefone(tel) {
+    if (!tel) return '-';
+    let v = tel.replace(/\D/g, '');
+    if (v.length === 10) return v.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    if (v.length === 11) return v.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    return tel;
+  }
+
+  // ------------------ RELATÓRIO DE FALTAS ------------------
+  btnGerarFaltas.addEventListener('click', async () => {
+    const tipo = faltasTipo.value;
+    const inicio = parseDataLocal(faltasDataInicio.value);
+    const fim = parseDataLocal(faltasDataFim.value);
+
+    if (isNaN(inicio) || isNaN(fim)) {
+      alert('Selecione as datas inicial e final.');
+      return;
+    }
+
+    if (fim < inicio) {
+      alert('A data final não pode ser menor que a inicial.');
+      return;
+    }
+
+    let texto = `Relatório de ${tipo} de ${formatarDataDMY(inicio)} a ${formatarDataDMY(fim)}:\n\n`;
+
+    try {
+      const snapshot = await get(ref(db, 'chamadas'));
+      if (snapshot.exists()) {
+        const chamadas = snapshot.val();
+        for (let idFuncionario in chamadas) {
+          let funcionario = funcionariosCache[idFuncionario] || { nome: 'Desconhecido' };
+          let faltas = [];
+
+          for (let dataChamada in chamadas[idFuncionario]) {
+            const data = parseDataLocal(dataChamada);
+            if (data >= inicio && data <= fim) {
+              let status = chamadas[idFuncionario][dataChamada];
+              if (status === tipo) {
+                faltas.push(formatarDataDMY(data));
+              }
+            }
+          }
+
+          if (faltas.length > 0) {
+            texto += `${funcionario.nome}: ${faltas.join(', ')}\n`;
+          }
+        }
+      } else {
+        texto += 'Nenhum registro encontrado.';
+      }
+
+      resultado.textContent = texto;
+      textoRelatorioAtual = texto;
+    } catch (error) {
+      console.error('Erro ao gerar relatório de faltas:', error);
+    }
+  });
+
+  // ------------------ RELATÓRIO DE PAGAMENTO ------------------
+  btnGerarPagamento.addEventListener('click', async () => {
+    const inicio = parseDataLocal(pagamentoDataInicio.value);
+    const fim = parseDataLocal(pagamentoDataFim.value);
+
+    if (isNaN(inicio) || isNaN(fim)) {
+      alert('Selecione as datas inicial e final.');
+      return;
+    }
+
+    if (fim < inicio) {
+      alert('A data final não pode ser menor que a inicial.');
+      return;
+    }
+
+    let texto = `Relatório de pagamento de diaristas de ${formatarDataDMY(inicio)} a ${formatarDataDMY(fim)}:\n\n`;
+
+    try {
+      const snapshot = await get(ref(db, 'chamadas'));
+      if (snapshot.exists()) {
+        const chamadas = snapshot.val();
+
+        for (let idFuncionario in chamadas) {
+          let funcionario = funcionariosCache[idFuncionario] || {};
+          let presencas = 0;
+
+          for (let dataChamada in chamadas[idFuncionario]) {
+            const data = parseDataLocal(dataChamada);
+            if (data >= inicio && data <= fim && chamadas[idFuncionario][dataChamada] === 'presenca') {
+              presencas++;
+            }
+          }
+
+          if (funcionario.tipo === 'diarista' && presencas > 0) {
+            const valor = funcionario.valorDiaria || 0;
+            const total = presencas * valor;
+            texto += `${funcionario.nome} - Presenças: ${presencas} - Total: R$ ${total.toFixed(2)}\n`;
+          }
+        }
+      } else {
+        texto += 'Nenhum registro encontrado.';
+      }
+
+      resultado.textContent = texto;
+      textoRelatorioAtual = texto;
+    } catch (error) {
+      console.error('Erro ao gerar relatório de pagamento:', error);
+    }
+  });
+
+  // ------------------ EXCLUIR INTERVALO DE DATAS ------------------
+  btnExcluirChamada.addEventListener('click', async () => {
+    const inicio = parseDataLocal(excluirDataInicio.value);
+    const fim = parseDataLocal(excluirDataFim.value);
+
+    if (isNaN(inicio) || isNaN(fim)) {
+      alert('Selecione as datas inicial e final.');
+      return;
+    }
+
+    if (fim < inicio) {
+      alert('A data final não pode ser menor que a inicial.');
+      return;
+    }
+
+    if (!confirm(`Tem certeza que deseja excluir as chamadas de ${formatarDataDMY(inicio)} a ${formatarDataDMY(fim)}?`)) {
+      return;
+    }
+
+    try {
+      const snapshot = await get(ref(db, 'chamadas'));
+      if (snapshot.exists()) {
+        const chamadas = snapshot.val();
+
+        for (let idFuncionario in chamadas) {
+          for (let dataChamada in chamadas[idFuncionario]) {
+            const data = parseDataLocal(dataChamada);
+            if (data >= inicio && data <= fim) {
+              await remove(ref(db, `chamadas/${idFuncionario}/${dataChamada}`));
+            }
+          }
+        }
+
+        alert('Registros excluídos com sucesso.');
+      }
+    } catch (error) {
+      console.error('Erro ao excluir chamadas:', error);
+    }
+  });
+
+  // ------------------ ENVIAR PARA WHATSAPP ------------------
+  btnEnviarWhats.addEventListener('click', () => {
+    if (!textoRelatorioAtual) {
+      alert('Nenhum relatório gerado.');
+      return;
+    }
+    const texto = encodeURIComponent(textoRelatorioAtual);
+    window.open(`https://wa.me/?text=${texto}`, '_blank');
+  });
+
+  carregarFuncionarios();
+</script>

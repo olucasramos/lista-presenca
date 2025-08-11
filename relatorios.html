@@ -283,7 +283,7 @@
       alert('Selecione a data de início e fim');
       return null;
     }
-    if (new Date(fim) < new Date(inicio)) {
+    if (fim < inicio) {
       alert('Data fim não pode ser menor que data início.');
       return null;
     }
@@ -307,8 +307,7 @@
       }
 
       for (const dataChamada in chamadas) {
-        const dt = new Date(dataChamada);
-        if (dt < new Date(inicio) || dt > new Date(fim)) continue;
+        if (dataChamada < inicio || dataChamada > fim) continue;
 
         const presencasDia = chamadas[dataChamada];
         for (const idFunc in presencasDia) {
@@ -401,7 +400,7 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
       alert('Selecione a data de início e fim');
       return null;
     }
-    if (new Date(fim) < new Date(inicio)) {
+    if (fim < inicio) {
       alert('Data fim não pode ser menor que data início.');
       return null;
     }
@@ -431,8 +430,7 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
         let datasPresentes = [];
 
         for (const dataChamada in chamadas) {
-          const dt = new Date(dataChamada);
-          if (dt < new Date(inicio) || dt > new Date(fim)) continue;
+          if (dataChamada < inicio || dataChamada > fim) continue;
 
           const presencasDia = chamadas[dataChamada];
           if (presencasDia[id] && presencasDia[id].status === 'presente') {
@@ -460,85 +458,72 @@ Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
     }
   }
 
-  function formatarDataDMY(data) {
-    const d = new Date(data);
-    if (isNaN(d)) return data;
-    const dia = d.getDate().toString().padStart(2, '0');
-    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
-    const ano = d.getFullYear();
-    return `${dia}/${mes}/${ano}`;
-  }
-
   async function excluirChamada() {
     const dataInicio = excluirDataInicio.value;
     const dataFim = excluirDataFim.value;
 
     if (!dataInicio || !dataFim) {
-      alert('Selecione as datas de início e fim para exclusão.');
+      alert('Selecione a data de início e fim para excluir.');
       return;
     }
-
-    if (new Date(dataFim) < new Date(dataInicio)) {
+    if (dataFim < dataInicio) {
       alert('Data fim não pode ser menor que data início.');
       return;
     }
 
-    const senha = prompt('Digite a senha para confirmar exclusão:');
-    if (senha !== '1234') {
-      alert('Senha incorreta.');
+    if (!confirm(`Tem certeza que deseja excluir as chamadas de ${formatarDataDMY(dataInicio)} até ${formatarDataDMY(dataFim)}? Esta ação é irreversível.`)) {
       return;
     }
 
     try {
       const chamadasSnap = await get(ref(db, 'chamadas'));
       if (!chamadasSnap.exists()) {
-        alert('Não há chamadas para excluir.');
+        alert('Nenhuma chamada encontrada para exclusão.');
         return;
       }
-
       const chamadas = chamadasSnap.val();
-      const datasParaExcluir = Object.keys(chamadas).filter(dataChamada => {
-        const dt = new Date(dataChamada);
-        return dt >= new Date(dataInicio) && dt <= new Date(dataFim);
-      });
+
+      const datasParaExcluir = Object.keys(chamadas).filter(dataChamada => dataChamada >= dataInicio && dataChamada <= dataFim);
 
       if (datasParaExcluir.length === 0) {
-        alert('Nenhuma chamada encontrada no intervalo selecionado.');
+        alert('Nenhuma chamada encontrada no intervalo de datas informado.');
         return;
       }
 
-      const exclusoes = datasParaExcluir.map(data => remove(ref(db, `chamadas/${data}`)));
-      await Promise.all(exclusoes);
+      for (const data of datasParaExcluir) {
+        await remove(ref(db, `chamadas/${data}`));
+      }
 
-      alert(`Chamadas excluídas com sucesso para as datas:\n${datasParaExcluir.map(formatarDataDMY).join(', ')}`);
-
-      excluirDataInicio.value = '';
-      excluirDataFim.value = '';
+      alert(`Chamadas de ${formatarDataDMY(dataInicio)} até ${formatarDataDMY(dataFim)} excluídas com sucesso.`);
       resultado.textContent = '';
       textoRelatorioAtual = '';
     } catch (error) {
       console.error('Erro ao excluir chamadas:', error);
-      alert('Erro ao excluir chamadas.');
+      alert('Erro ao excluir chamadas. Veja o console para detalhes.');
     }
   }
 
-  function enviarWhatsApp() {
-    if (!textoRelatorioAtual) {
-      alert('Gere um relatório antes de enviar.');
-      return;
-    }
-    // WhatsApp URL encode
-    const textoEncoded = encodeURIComponent(textoRelatorioAtual);
-    const url = `https://wa.me/?text=${textoEncoded}`;
-    window.open(url, '_blank');
+  function formatarDataDMY(dataISO) {
+    if (!dataISO) return '-';
+    const [ano, mes, dia] = dataISO.split('-');
+    return `${dia}/${mes}/${ano}`;
   }
 
   btnGerarFaltas.addEventListener('click', gerarRelatorioFaltas);
   btnGerarLista.addEventListener('click', gerarRelatorioDadosFuncionario);
   btnGerarPagamento.addEventListener('click', gerarRelatorioPagamentoDiarista);
   btnExcluirChamada.addEventListener('click', excluirChamada);
-  btnEnviarWhats.addEventListener('click', enviarWhatsApp);
 
+  btnEnviarWhats.addEventListener('click', () => {
+    if (!textoRelatorioAtual) {
+      alert('Gere um relatório antes de enviar.');
+      return;
+    }
+    const textoEncoded = encodeURIComponent(textoRelatorioAtual);
+    window.open(`https://wa.me/?text=${textoEncoded}`, '_blank');
+  });
+
+  // Carrega os funcionários ao abrir a página
   carregarFuncionarios();
 </script>
 

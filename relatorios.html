@@ -36,7 +36,6 @@
     font-weight: 600;
     box-shadow: 0 4px 10px rgba(21,67,96,0.7);
     transition: background-color 0.25s ease, box-shadow 0.25s ease;
-    user-select: none;
   }
   a.btn-voltar:hover {
     background-color: #0e2a48;
@@ -175,6 +174,15 @@
   <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada(s)</button>
 </section>
 
+<section id="excluirHoraExtraSection">
+  <h2>❌ Excluir Hora Extra por Intervalo de Datas</h2>
+  <label for="excluirHoraExtraInicio">Data Início</label>
+  <input type="date" id="excluirHoraExtraInicio" />
+  <label for="excluirHoraExtraFim">Data Fim</label>
+  <input type="date" id="excluirHoraExtraFim" />
+  <button id="btnExcluirHoraExtra" class="btn-acao" style="background-color:#c0392b;">Excluir Hora Extra(s)</button>
+</section>
+
 <pre id="resultado" tabindex="0" aria-label="Resultado do relatório"></pre>
 
 <button id="btnEnviarWhats" class="btn-acao" style="background-color:#25D366; margin-bottom:40px;">📲 Enviar relatório por WhatsApp</button>
@@ -209,12 +217,17 @@ const excluirDataInicio = document.getElementById('excluirDataInicio');
 const excluirDataFim = document.getElementById('excluirDataFim');
 const btnExcluirChamada = document.getElementById('btnExcluirChamada');
 
+const excluirHoraExtraInicio = document.getElementById('excluirHoraExtraInicio');
+const excluirHoraExtraFim = document.getElementById('excluirHoraExtraFim');
+const btnExcluirHoraExtra = document.getElementById('btnExcluirHoraExtra');
+
 const resultado = document.getElementById('resultado');
 const btnEnviarWhats = document.getElementById('btnEnviarWhats');
 
 let funcionariosCache = {};
 let textoRelatorioAtual = '';
 
+// --- Carregar funcionários ---
 async function carregarFuncionarios() {
   try {
     const snapshot = await get(ref(db, 'funcionarios'));
@@ -260,9 +273,7 @@ function formatarDataDMY(dataISO) {
   return `${dia}/${mes}/${ano}`;
 }
 
-// --- Funções existentes de relatórios omitidas para brevidade ---
-// (faltas, dados do funcionário, pagamento diarista, exclusão)
-
+// --- Relatório de Hora Extra ---
 btnGerarHoraExtra.addEventListener('click', async () => {
   const inicio = horaExtraDataInicio.value;
   const fim = horaExtraDataFim.value;
@@ -321,6 +332,39 @@ btnGerarHoraExtra.addEventListener('click', async () => {
   }
 });
 
+// --- Excluir Hora Extra ---
+btnExcluirHoraExtra.addEventListener('click', async () => {
+  const inicio = excluirHoraExtraInicio.value;
+  const fim = excluirHoraExtraFim.value;
+
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+  if (!confirm(`Deseja realmente excluir todas as horas extras entre ${inicio} e ${fim}?`)) return;
+
+  try {
+    const horaExtraSnap = await get(ref(db, 'horaextra'));
+    if (!horaExtraSnap.exists()) { alert('Não há registros de hora extra para excluir.'); return; }
+
+    const horaExtra = horaExtraSnap.val();
+    let excluidos = 0;
+
+    for (const data in horaExtra) {
+      if (data >= inicio && data <= fim) {
+        await remove(ref(db, `horaextra/${data}`));
+        excluidos++;
+      }
+    }
+
+    if (excluidos > 0) alert(`Excluídas horas extras de ${excluidos} dia(s) no período selecionado.`);
+    else alert('Não havia registros de hora extra no período selecionado.');
+
+  } catch (error) {
+    console.error('Erro ao excluir horas extras:', error);
+    alert('Erro ao excluir horas extras.');
+  }
+});
+
+// --- Envio para WhatsApp ---
 btnEnviarWhats.addEventListener('click', () => {
   if (!textoRelatorioAtual) { alert('Gere um relatório antes de enviar.'); return; }
   const textoEncoded = encodeURIComponent(textoRelatorioAtual);

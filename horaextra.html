@@ -5,172 +5,216 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Hora Extra</title>
 <style>
+  * { box-sizing: border-box; }
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #2980b9, #6dd5fa);
     color: #fff;
     margin: 0;
-    padding: 15px;
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  }
-  label {
-    font-size: 1rem;
-  }
-  .funcionario {
-    background: rgba(21, 67, 96, 0.85);
-    padding: 12px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  }
-  .linha-topo {
+    min-height: 100vh;
+    padding: 20px 15px 60px 15px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
   }
-  .opcoes {
-    margin-top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+  h1 { 
+    font-size: 2.4rem;
+    margin: 0 0 20px 0;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    user-select: none;
+    text-align: center;
   }
-  select, input[type="radio"] {
+  #dataSelecionada {
+    display: block;
+    font-size: 1.1rem;
+    margin: 0 auto 20px auto;
+    font-weight: 600;
+    text-align: center;
+    user-select: none;
+    max-width: 400px;
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
     cursor: pointer;
+    color: #154360;
   }
-  .desabilitado {
-    opacity: 0.5;
-    pointer-events: none;
+  .funcionario-card {
+    background-color: rgba(21, 67, 96, 0.85);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+    user-select: none;
   }
-  button {
-    background-color: #154360;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 1rem;
+  .funcionario-nome {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .opcoes, .hora-extra-group {
+    display: none;
+    margin-top: 10px;
+    gap: 12px;
+  }
+  .opcoes label, .hora-extra-group label {
+    cursor: pointer;
+    user-select: none;
+    margin-right: 10px;
+  }
+  select, input[type="radio"], input[type="checkbox"] {
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  .btn-salvar {
+    background-color: #4caf50;
+    padding: 15px 28px;
+    border-radius: 12px;
+    font-size: 1.2rem;
     font-weight: 600;
     color: white;
     border: none;
+    box-shadow: 0 5px 12px rgba(76, 175, 80, 0.7);
     cursor: pointer;
-    box-shadow: 0 5px 12px rgba(21, 67, 96, 0.6);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    display: block;
+    margin: 20px auto 30px auto;
+    max-width: 280px;
   }
-  button:hover {
-    background-color: #0e2a48;
+  .btn-salvar:hover {
+    background-color: #388e3c;
+    box-shadow: 0 7px 18px rgba(56, 142, 60, 0.9);
+  }
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(21, 67, 96, 0.9);
+    color: #ddd;
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 8px 0;
+    user-select: none;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
   }
 </style>
 </head>
 <body>
 
 <h1>Hora Extra</h1>
-
-<div style="text-align:center; margin-bottom:15px;">
-  <label for="data">Data: </label>
-  <input type="date" id="data">
-</div>
+<input type="date" id="dataSelecionada" />
 
 <div id="listaFuncionarios"></div>
 
-<div style="text-align:center; margin-top:20px;">
-  <button id="salvar">Salvar</button>
-</div>
+<button class="btn-salvar" id="btnSalvar">Salvar Hora Extra</button>
+
+<footer>Desenvolvido por Lucas Ramos Aragão</footer>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { app } from "./firebase.js";
 
-// Configuração Firebase
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  databaseURL: "SUA_DATABASE_URL",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_STORAGE_BUCKET",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
-};
-const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const listaFuncionarios = document.getElementById("listaFuncionarios");
+const dataSelecionadaInput = document.getElementById("dataSelecionada");
+const btnSalvar = document.getElementById("btnSalvar");
+
+// Função para definir a data para hoje
+function definirDataHoje() {
+  const hoje = new Date();
+  const yyyy = hoje.getFullYear();
+  const mm = String(hoje.getMonth() + 1).padStart(2,'0');
+  const dd = String(hoje.getDate()).padStart(2,'0');
+  dataSelecionadaInput.value = `${yyyy}-${mm}-${dd}`;
+}
 
 // Carregar funcionários
-const listaEl = document.getElementById('listaFuncionarios');
-get(ref(db, 'funcionarios')).then(snapshot => {
-  if (snapshot.exists()) {
-    const funcionarios = Object.entries(snapshot.val())
-      .filter(([, f]) => f.tipo?.toLowerCase() === 'funcionario')
-      .sort((a, b) => a[1].nome.localeCompare(b[1].nome));
+async function carregarFuncionarios() {
+  try {
+    const snapshot = await get(ref(db, 'funcionarios'));
+    if (snapshot.exists()) {
+      const funcionarios = snapshot.val();
+      montarCards(funcionarios);
+    } else {
+      listaFuncionarios.innerHTML = '<p>Nenhum funcionário encontrado.</p>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar funcionários:', error);
+    listaFuncionarios.innerHTML = '<p>Erro ao carregar funcionários.</p>';
+  }
+}
 
-    funcionarios.forEach(([id, func]) => {
-      const div = document.createElement('div');
-      div.className = 'funcionario';
+function montarCards(funcionarios) {
+  listaFuncionarios.innerHTML = '';
+  const listaOrdenada = Object.entries(funcionarios)
+    .filter(([, f]) => f.tipo.toLowerCase() === 'funcionario')
+    .sort(([, a], [, b]) => a.nome.localeCompare(b.nome, 'pt-BR', {sensitivity:'base'}));
 
-      div.innerHTML = `
-        <div class="linha-topo">
-          <strong>${func.nome}</strong>
-          <input type="checkbox" class="ativar">
+  for (const [id, f] of listaOrdenada) {
+    const card = document.createElement('div');
+    card.classList.add('funcionario-card');
+
+    const validadorTexto = f.validador ? "sim" : "não";
+
+    card.innerHTML = `
+      <div class="funcionario-nome">
+        ${f.nome} (Hora Extra)
+        <input type="checkbox" class="hora-extra-checkbox">
+      </div>
+      <div class="hora-extra-group">
+        <div class="opcoes">
+          <label><input type="radio" name="percentual-${id}" value="100" checked>100%</label>
+          <label><input type="radio" name="percentual-${id}" value="50">50%</label>
         </div>
-        <div class="opcoes desabilitado">
-          <label><input type="radio" name="percentual-${id}" value="100"> 100%</label>
-          <label><input type="radio" name="percentual-${id}" value="50"> 50%</label>
-          <label>Início:
-            <select class="hora-inicio">
-              ${Array.from({length: 24}, (_, i) => `<option value="${i}:00">${i}:00</option>`).join('')}
+        <div>
+          <label>Quantidade de horas:
+            <select class="qtd-horas">
+              ${Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
             </select>
           </label>
-          <label>Fim:
-            <select class="hora-fim">
-              ${Array.from({length: 24}, (_, i) => `<option value="${i}:00">${i}:00</option>`).join('')}
-            </select>
-          </label>
         </div>
-      `;
-
-      const checkbox = div.querySelector('.ativar');
-      const opcoes = div.querySelector('.opcoes');
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          opcoes.classList.remove('desabilitado');
-        } else {
-          opcoes.classList.add('desabilitado');
-        }
-      });
-
-      div.dataset.id = id;
-      listaEl.appendChild(div);
+      </div>
+    `;
+    const checkbox = card.querySelector('.hora-extra-checkbox');
+    const grupo = card.querySelector('.hora-extra-group');
+    checkbox.addEventListener('change', () => {
+      grupo.style.display = checkbox.checked ? 'block' : 'none';
     });
+
+    card.dataset.id = id;
+    listaFuncionarios.appendChild(card);
   }
-});
+}
 
-// Salvar no Firebase
-document.getElementById('salvar').addEventListener('click', () => {
-  const dataSelecionada = document.getElementById('data').value;
-  if (!dataSelecionada) {
-    alert('Selecione a data.');
-    return;
-  }
+btnSalvar.addEventListener('click', async () => {
+  const data = dataSelecionadaInput.value;
+  if (!data) { alert('Selecione a data.'); return; }
 
-  const funcionariosDivs = document.querySelectorAll('.funcionario');
-  funcionariosDivs.forEach(div => {
-    const id = div.dataset.id;
-    const ativo = div.querySelector('.ativar').checked;
-    if (!ativo) return;
+  const cards = document.querySelectorAll('.funcionario-card');
+  for (const card of cards) {
+    const id = card.dataset.id;
+    const checkbox = card.querySelector('.hora-extra-checkbox');
+    if (!checkbox.checked) continue;
 
-    const percentual = div.querySelector(`input[name="percentual-${id}"]:checked`)?.value || null;
-    const horaInicio = div.querySelector('.hora-inicio').value;
-    const horaFim = div.querySelector('.hora-fim').value;
-    const qtdHoras = parseInt(horaFim) - parseInt(horaInicio);
+    const percentual = card.querySelector(`input[name="percentual-${id}"]:checked`).value;
+    const qtdHoras = parseInt(card.querySelector('.qtd-horas').value);
 
-    set(ref(db, `horaextra/${dataSelecionada}/${id}`), {
+    await set(ref(db, `horaextra/${data}/${id}`), {
       percentual,
-      horaInicio,
-      horaFim,
       quantidadeHoras: qtdHoras
     });
-  });
+  }
 
-  alert('Hora extra salva com sucesso!');
+  alert('Horas extras salvas com sucesso!');
 });
+
+definirDataHoje();
+carregarFuncionarios();
 </script>
 
 </body>

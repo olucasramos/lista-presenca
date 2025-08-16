@@ -17,6 +17,30 @@
     flex-direction: column;
     align-items: center;
   }
+  header {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  a.btn-voltar {
+    cursor: pointer;
+    background-color: #154360;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    user-select: none;
+  }
+  a.btn-voltar:hover {
+    background-color: #0e2a48;
+    box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
+  }
   h1 { 
     font-size: 2.4rem;
     margin: 0 0 20px 0;
@@ -54,6 +78,14 @@
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hora-extra-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
   }
   .opcoes, .hora-extra-group {
     display: none;
@@ -65,10 +97,10 @@
     user-select: none;
     margin-right: 10px;
   }
-  select, input[type="radio"], input[type="checkbox"] {
+  select {
     cursor: pointer;
-    vertical-align: middle;
-    margin-right: 6px;
+    font-size: 1.1rem; /* um pouco maior */
+    padding: 2px 6px;
   }
   .btn-salvar {
     background-color: #4caf50;
@@ -106,6 +138,10 @@
 </head>
 <body>
 
+<header>
+  <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+</header>
+
 <h1>Hora Extra</h1>
 <input type="date" id="dataSelecionada" />
 
@@ -124,7 +160,7 @@ const listaFuncionarios = document.getElementById("listaFuncionarios");
 const dataSelecionadaInput = document.getElementById("dataSelecionada");
 const btnSalvar = document.getElementById("btnSalvar");
 
-// Função para definir a data para hoje
+// Definir data para hoje
 function definirDataHoje() {
   const hoje = new Date();
   const yyyy = hoje.getFullYear();
@@ -159,11 +195,9 @@ function montarCards(funcionarios) {
     const card = document.createElement('div');
     card.classList.add('funcionario-card');
 
-    const validadorTexto = f.validador ? "sim" : "não";
-
     card.innerHTML = `
       <div class="funcionario-nome">
-        ${f.nome} (Hora Extra)
+        ${f.nome}
         <input type="checkbox" class="hora-extra-checkbox">
       </div>
       <div class="hora-extra-group">

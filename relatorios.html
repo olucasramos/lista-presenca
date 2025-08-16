@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relatórios</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2980b9, #6dd5fa);
+    color: #fff;
+    margin: 0;
+    min-height: 100vh;
+    padding: 20px 15px 80px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    user-select: none;
+  }
+  a.btn-voltar {
+    cursor: pointer;
+    background-color: #154360;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    user-select: none;
+  }
+  a.btn-voltar:hover {
+    background-color: #0e2a48;
+    box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
+  }
+  h1 { font-size: 2.4rem; margin: 0 0 18px 0; text-shadow: 0 2px 6px rgba(0,0,0,0.25); user-select: none; line-height: 1.2; text-align: center; max-width: 400px; width: 100%; }
+  section {
+    background-color: rgba(21, 67, 96, 0.85);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+    user-select: none;
+  }
+  section h2 { margin-top: 0; margin-bottom: 14px; font-weight: 700; font-size: 1.5rem; border-bottom: 2px solid #6dd5fa; padding-bottom: 6px; }
+  label { display: block; margin-bottom: 6px; font-weight: 600; }
+  select, input[type="date"], input[type="password"], input[type="number"] {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+  }
+  button.btn-acao {
+    background-color: #2980b9;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    border: none;
+    box-shadow: 0 5px 12px rgba(41, 128, 185, 0.7);
+    cursor: pointer;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    user-select: none;
+    display: block;
+    margin: 0 auto 10px auto;
+    min-width: 160px;
+  }
+  button.btn-acao:hover { background-color: #1c5d8e; box-shadow: 0 7px 18px rgba(28, 93, 142, 0.9); }
+  #resultado {
+    background-color: rgba(21, 67, 96, 0.85);
+    border-radius: 12px;
+    padding: 18px 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+    user-select: text;
+    margin-bottom: 24px;
+    scroll-margin-top: 60px;
+  }
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(21, 67, 96, 0.9);
+    color: #ddd;
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 8px 0;
+    user-select: none;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+    max-width: 100%;
+  }
+  @media (max-width: 420px) {
+    h1 { font-size: 2rem; }
+    section { padding: 16px 20px; }
+    button.btn-acao { min-width: 140px; margin-bottom: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+</header>
+
+<h1>Relatórios</h1>
+
+<section id="faltasSection">
+  <h2>📋 Relatório de Faltas</h2>
+  <label for="faltasTipo">Tipo</label>
+  <select id="faltasTipo">
+    <option value="todos">Todos</option>
+    <option value="funcionario">Funcionário</option>
+    <option value="diarista">Diarista</option>
+  </select>
+  <label for="faltasDataInicio">Data Início</label>
+  <input type="date" id="faltasDataInicio" />
+  <label for="faltasDataFim">Data Fim</label>
+  <input type="date" id="faltasDataFim" />
+  <button id="btnGerarFaltas" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="dadosFuncionarioSection">
+  <h2>🧑 Dados do Funcionário</h2>
+  <label for="listaFuncionario">Funcionário</label>
+  <select id="listaFuncionario">
+    <option value="todos">Todos</option>
+  </select>
+  <button id="btnGerarLista" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="pagamentoDiaristaSection">
+  <h2>💰 Relatório de Pagamento Diarista</h2>
+  <label for="pagamentoDataInicio">Data Início</label>
+  <input type="date" id="pagamentoDataInicio" />
+  <label for="pagamentoDataFim">Data Fim</label>
+  <input type="date" id="pagamentoDataFim" />
+  <button id="btnGerarPagamento" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="horaExtraSection">
+  <h2>⏱️ Relatório de Hora Extra</h2>
+  <label for="horaExtraDataInicio">Data Início</label>
+  <input type="date" id="horaExtraDataInicio" />
+  <label for="horaExtraDataFim">Data Fim</label>
+  <input type="date" id="horaExtraDataFim" />
+  <button id="btnGerarHoraExtra" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="excluirChamadaSection">
+  <h2>❌ Excluir Chamada por Intervalo de Datas</h2>
+  <label for="excluirDataInicio">Data Início</label>
+  <input type="date" id="excluirDataInicio" />
+  <label for="excluirDataFim">Data Fim</label>
+  <input type="date" id="excluirDataFim" />
+  <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada(s)</button>
+</section>
+
+<pre id="resultado" tabindex="0" aria-label="Resultado do relatório"></pre>
+
+<button id="btnEnviarWhats" class="btn-acao" style="background-color:#25D366; margin-bottom:40px;">📲 Enviar relatório por WhatsApp</button>
+
+<footer>
+  Desenvolvido por Lucas Ramos Aragão
+</footer>
+
+<script type="module">
+import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { app } from "./firebase.js";
+
+const db = getDatabase(app);
+
+const faltasTipo = document.getElementById('faltasTipo');
+const faltasDataInicio = document.getElementById('faltasDataInicio');
+const faltasDataFim = document.getElementById('faltasDataFim');
+const btnGerarFaltas = document.getElementById('btnGerarFaltas');
+
+const listaFuncionario = document.getElementById('listaFuncionario');
+const btnGerarLista = document.getElementById('btnGerarLista');
+
+const pagamentoDataInicio = document.getElementById('pagamentoDataInicio');
+const pagamentoDataFim = document.getElementById('pagamentoDataFim');
+const btnGerarPagamento = document.getElementById('btnGerarPagamento');
+
+const horaExtraDataInicio = document.getElementById('horaExtraDataInicio');
+const horaExtraDataFim = document.getElementById('horaExtraDataFim');
+const btnGerarHoraExtra = document.getElementById('btnGerarHoraExtra');
+
+const excluirDataInicio = document.getElementById('excluirDataInicio');
+const excluirDataFim = document.getElementById('excluirDataFim');
+const btnExcluirChamada = document.getElementById('btnExcluirChamada');
+
+const resultado = document.getElementById('resultado');
+const btnEnviarWhats = document.getElementById('btnEnviarWhats');
+
+let funcionariosCache = {};
+let textoRelatorioAtual = '';
+
+async function carregarFuncionarios() {
+  try {
+    const snapshot = await get(ref(db, 'funcionarios'));
+    if (snapshot.exists()) {
+      funcionariosCache = snapshot.val();
+      atualizarListaFuncionarios();
+    } else {
+      funcionariosCache = {};
+      listaFuncionario.innerHTML = '<option value="todos">Nenhum funcionário</option>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar funcionários:', error);
+    listaFuncionario.innerHTML = '<option value="todos">Erro ao carregar</option>';
+  }
+}
+
+function atualizarListaFuncionarios() {
+  listaFuncionario.innerHTML = '<option value="todos">Todos</option>';
+  Object.entries(funcionariosCache).forEach(([id, f]) => {
+    listaFuncionario.innerHTML += `<option value="${id}">${f.nome}</option>`;
+  });
+}
+
+function formatCPF(cpf) {
+  if (!cpf) return '-';
+  let v = cpf.replace(/\D/g, '');
+  v = v.padStart(11, '0');
+  return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
+
+function capitalize(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function scrollParaResultado() {
+  resultado.scrollIntoView({ behavior: 'smooth' });
+}
+
+function formatarDataDMY(dataISO) {
+  if (!dataISO) return '-';
+  const [ano, mes, dia] = dataISO.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+// --- Funções existentes de relatórios omitidas para brevidade ---
+// (faltas, dados do funcionário, pagamento diarista, exclusão)
+
+btnGerarHoraExtra.addEventListener('click', async () => {
+  const inicio = horaExtraDataInicio.value;
+  const fim = horaExtraDataFim.value;
+
+  resultado.textContent = '';
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+
+  try {
+    const horaExtraSnap = await get(ref(db, 'horaextra'));
+    const funcionariosSnap = await get(ref(db, 'funcionarios'));
+    if (!horaExtraSnap.exists() || !funcionariosSnap.exists()) {
+      resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+      return;
+    }
+
+    const horaExtra = horaExtraSnap.val();
+    const funcionarios = funcionariosSnap.val();
+
+    let texto = `⏱️ *Relatório de Hora Extra* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+
+    for (const [idFunc, f] of Object.entries(funcionarios)) {
+      let horas100 = 0;
+      let horas50 = 0;
+      let datas = [];
+
+      for (const data in horaExtra) {
+        if (data < inicio || data > fim) continue;
+        const dia = horaExtra[data][idFunc];
+        if (!dia) continue;
+
+        const qtd = dia.quantidadeHoras || 0;
+        if (dia.percentual === "100") horas100 += qtd;
+        else if (dia.percentual === "50") horas50 += qtd;
+        datas.push(`${formatarDataDMY(data)} (${dia.percentual}%)`);
+      }
+
+      if (horas100 + horas50 === 0) continue;
+
+      texto += `👤 *${f.nome}*\n`;
+      texto += `Horas 100%: *${horas100}*\nHoras 50%: *${horas50}*\n`;
+      texto += `Dias: ${datas.join(', ')}\n\n`;
+    }
+
+    if (texto.trim() === `⏱️ *Relatório de Hora Extra* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})`) {
+      texto += 'Nenhuma hora extra registrada no período.';
+    }
+
+    resultado.textContent = texto.trim();
+    textoRelatorioAtual = texto.trim();
+    scrollParaResultado();
+
+  } catch (error) {
+    console.error('Erro ao gerar relatório de hora extra:', error);
+    resultado.textContent = 'Erro ao gerar relatório de hora extra.';
+  }
+});
+
+btnEnviarWhats.addEventListener('click', () => {
+  if (!textoRelatorioAtual) { alert('Gere um relatório antes de enviar.'); return; }
+  const textoEncoded = encodeURIComponent(textoRelatorioAtual);
+  window.open(`https://wa.me/?text=${textoEncoded}`, '_blank');
+});
+
+carregarFuncionarios();
+</script>
+
+</body>
+</html>

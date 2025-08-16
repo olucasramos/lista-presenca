@@ -83,26 +83,42 @@
     gap: 8px;
   }
   .hora-extra-checkbox {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     cursor: pointer;
     vertical-align: middle;
-    margin-right: 6px;
+    appearance: none;
+    border: 2px solid #fff;
+    position: relative;
+    transition: all 0.2s ease;
   }
-  .opcoes, .hora-extra-group {
+  .hora-extra-checkbox:checked {
+    background-color: #fff;
+  }
+  .hora-extra-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #2980b9;
+  }
+  .hora-extra-group, .qtd-horas-group {
     display: none;
     margin-top: 10px;
     gap: 12px;
   }
-  .opcoes label, .hora-extra-group label {
+  .hora-extra-group label, .qtd-horas-group label {
     cursor: pointer;
     user-select: none;
     margin-right: 10px;
   }
   select {
     cursor: pointer;
-    font-size: 1.1rem; /* um pouco maior */
+    font-size: 1.1rem;
     padding: 2px 6px;
   }
   .btn-salvar {
@@ -163,7 +179,7 @@ const listaFuncionarios = document.getElementById("listaFuncionarios");
 const dataSelecionadaInput = document.getElementById("dataSelecionada");
 const btnSalvar = document.getElementById("btnSalvar");
 
-// Definir data para hoje
+// Data de hoje
 function definirDataHoje() {
   const hoje = new Date();
   const yyyy = hoje.getFullYear();
@@ -188,6 +204,7 @@ async function carregarFuncionarios() {
   }
 }
 
+// Montar cards
 function montarCards(funcionarios) {
   listaFuncionarios.innerHTML = '';
   const listaOrdenada = Object.entries(funcionarios)
@@ -204,23 +221,35 @@ function montarCards(funcionarios) {
         <input type="checkbox" class="hora-extra-checkbox">
       </div>
       <div class="hora-extra-group">
-        <div class="opcoes">
-          <label><input type="radio" name="percentual-${id}" value="100" checked>100%</label>
-          <label><input type="radio" name="percentual-${id}" value="50">50%</label>
-        </div>
-        <div>
-          <label>Quantidade de horas:
-            <select class="qtd-horas">
-              ${Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
-            </select>
-          </label>
-        </div>
+        <label><input type="checkbox" class="percentual-checkbox"> 100%</label>
+        <label><input type="checkbox" class="percentual-checkbox"> 50%</label>
+      </div>
+      <div class="qtd-horas-group">
+        <label>Quantidade de horas:
+          <select class="qtd-horas">
+            ${Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
+          </select>
+        </label>
       </div>
     `;
+
     const checkbox = card.querySelector('.hora-extra-checkbox');
-    const grupo = card.querySelector('.hora-extra-group');
+    const grupoPercentual = card.querySelector('.hora-extra-group');
+    const grupoHoras = card.querySelector('.qtd-horas-group');
+    const percentualCheckboxes = card.querySelectorAll('.percentual-checkbox');
+
+    // Mostrar grupo percentual ao marcar checkbox
     checkbox.addEventListener('change', () => {
-      grupo.style.display = checkbox.checked ? 'block' : 'none';
+      grupoPercentual.style.display = checkbox.checked ? 'flex' : 'none';
+      if (!checkbox.checked) grupoHoras.style.display = 'none';
+    });
+
+    // Mostrar quantidade de horas após escolher percentual
+    percentualCheckboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        percentualCheckboxes.forEach(other => { if(other!==cb) other.checked=false; });
+        grupoHoras.style.display = cb.checked ? 'block' : 'none';
+      });
     });
 
     card.dataset.id = id;
@@ -228,6 +257,7 @@ function montarCards(funcionarios) {
   }
 }
 
+// Salvar hora extra
 btnSalvar.addEventListener('click', async () => {
   const data = dataSelecionadaInput.value;
   if (!data) { alert('Selecione a data.'); return; }
@@ -238,7 +268,10 @@ btnSalvar.addEventListener('click', async () => {
     const checkbox = card.querySelector('.hora-extra-checkbox');
     if (!checkbox.checked) continue;
 
-    const percentual = card.querySelector(`input[name="percentual-${id}"]:checked`).value;
+    const percentualCheckbox = card.querySelector('.percentual-checkbox:checked');
+    if(!percentualCheckbox){ alert(`Selecione percentual para ${card.querySelector('.funcionario-nome').textContent.trim()}`); return; }
+    const percentual = percentualCheckbox.nextSibling.textContent.trim().replace('%','');
+
     const qtdHoras = parseInt(card.querySelector('.qtd-horas').value);
 
     await set(ref(db, `horaextra/${data}/${id}`), {

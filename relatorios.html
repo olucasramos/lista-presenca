@@ -116,6 +116,7 @@
     font-size: 0.95rem;
     user-select: text;
     margin-bottom: 24px;
+    scroll-margin-top: 60px;
   }
   footer {
     position: fixed;
@@ -131,6 +132,11 @@
     box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
     max-width: 100%;
   }
+  @media (max-width: 420px) {
+    h1 { font-size: 2rem; }
+    section { padding: 16px 20px; }
+    button.btn-acao { min-width: 140px; margin-bottom: 10px; }
+  }
 </style>
 </head>
 <body>
@@ -141,8 +147,41 @@
 
 <h1>Relatórios</h1>
 
+<section id="faltasSection">
+  <h2>📋 Relatório de Faltas</h2>
+  <label for="faltasTipo">Tipo</label>
+  <select id="faltasTipo">
+    <option value="todos">Todos</option>
+    <option value="funcionario">Funcionário</option>
+    <option value="diarista">Diarista</option>
+  </select>
+  <label for="faltasDataInicio">Data Início</label>
+  <input type="date" id="faltasDataInicio" />
+  <label for="faltasDataFim">Data Fim</label>
+  <input type="date" id="faltasDataFim" />
+  <button id="btnGerarFaltas" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="dadosFuncionarioSection">
+  <h2>🧑 Dados do Funcionário</h2>
+  <label for="listaFuncionario">Funcionário</label>
+  <select id="listaFuncionario">
+    <option value="todos">Todos</option>
+  </select>
+  <button id="btnGerarLista" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="pagamentoDiaristaSection">
+  <h2>💰 Relatório de Pagamento Diarista</h2>
+  <label for="pagamentoDataInicio">Data Início</label>
+  <input type="date" id="pagamentoDataInicio" />
+  <label for="pagamentoDataFim">Data Fim</label>
+  <input type="date" id="pagamentoDataFim" />
+  <button id="btnGerarPagamento" class="btn-acao">Gerar Relatório</button>
+</section>
+
 <section id="horaExtraSection">
-  <h2>⏱️ Relatório de Hora Extra (Funcionários)</h2>
+  <h2>⏱️ Relatório de Hora Extra</h2>
   <label for="horaExtraDataInicio">Data Início</label>
   <input type="date" id="horaExtraDataInicio" />
   <label for="horaExtraDataFim">Data Fim</label>
@@ -150,114 +189,340 @@
   <button id="btnGerarHoraExtra" class="btn-acao">Gerar Relatório</button>
 </section>
 
+<section id="excluirChamadaSection">
+  <h2>❌ Excluir Chamada por Intervalo de Datas</h2>
+  <label for="excluirDataInicio">Data Início</label>
+  <input type="date" id="excluirDataInicio" />
+  <label for="excluirDataFim">Data Fim</label>
+  <input type="date" id="excluirDataFim" />
+  <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada(s)</button>
+</section>
+
 <pre id="resultado" tabindex="0" aria-label="Resultado do relatório"></pre>
 
 <button id="btnEnviarWhats" class="btn-acao" style="background-color:#25D366; margin-bottom:40px;">📲 Enviar relatório por WhatsApp</button>
 
-<footer>Desenvolvido por Lucas Ramos Aragão</footer>
+<footer>
+  Desenvolvido por Lucas Ramos Aragão
+</footer>
 
 <script type="module">
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 import { app } from "./firebase.js";
 
 const db = getDatabase(app);
+
+const faltasTipo = document.getElementById('faltasTipo');
+const faltasDataInicio = document.getElementById('faltasDataInicio');
+const faltasDataFim = document.getElementById('faltasDataFim');
+const btnGerarFaltas = document.getElementById('btnGerarFaltas');
+
+const listaFuncionario = document.getElementById('listaFuncionario');
+const btnGerarLista = document.getElementById('btnGerarLista');
+
+const pagamentoDataInicio = document.getElementById('pagamentoDataInicio');
+const pagamentoDataFim = document.getElementById('pagamentoDataFim');
+const btnGerarPagamento = document.getElementById('btnGerarPagamento');
+
 const horaExtraDataInicio = document.getElementById('horaExtraDataInicio');
 const horaExtraDataFim = document.getElementById('horaExtraDataFim');
 const btnGerarHoraExtra = document.getElementById('btnGerarHoraExtra');
+
+const excluirDataInicio = document.getElementById('excluirDataInicio');
+const excluirDataFim = document.getElementById('excluirDataFim');
+const btnExcluirChamada = document.getElementById('btnExcluirChamada');
+
 const resultado = document.getElementById('resultado');
 const btnEnviarWhats = document.getElementById('btnEnviarWhats');
 
 let funcionariosCache = {};
 let textoRelatorioAtual = '';
 
-// ===================== Funções utilitárias =====================
-function formatarDataDMY(dataISO) {
-  if (!dataISO) return '-';
-  const [ano, mes, dia] = dataISO.split('-');
-  return `${dia}/${mes}/${ano}`;
-}
-function capitalize(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-function scrollParaResultado() {
-  resultado.scrollIntoView({ behavior: 'smooth' });
-}
-
-// ===================== Carregar funcionários =====================
 async function carregarFuncionarios() {
   try {
     const snapshot = await get(ref(db, 'funcionarios'));
     if (snapshot.exists()) {
       funcionariosCache = snapshot.val();
+      atualizarListaFuncionarios();
     } else {
       funcionariosCache = {};
+      listaFuncionario.innerHTML = '<option value="todos">Nenhum funcionário</option>';
     }
   } catch (error) {
     console.error('Erro ao carregar funcionários:', error);
+    listaFuncionario.innerHTML = '<option value="todos">Erro ao carregar</option>';
   }
 }
 
-// ===================== Relatório de Hora Extra =====================
+function atualizarListaFuncionarios() {
+  listaFuncionario.innerHTML = '<option value="todos">Todos</option>';
+  Object.entries(funcionariosCache).forEach(([id, f]) => {
+    listaFuncionario.innerHTML += `<option value="${id}">${f.nome}</option>`;
+  });
+}
+
+function formatCPF(cpf) {
+  if (!cpf) return '-';
+  let v = cpf.replace(/\D/g, '');
+  v = v.padStart(11, '0');
+  return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
+
+function capitalize(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function scrollParaResultado() {
+  resultado.scrollIntoView({ behavior: 'smooth' });
+}
+
+// --- Relatório de Faltas ---
+async function gerarRelatorioFaltas() {
+  const tipoFiltro = faltasTipo.value;
+  const inicio = faltasDataInicio.value;
+  const fim = faltasDataFim.value;
+
+  resultado.textContent = '';
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return null; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return null; }
+
+  try {
+    const chamadasSnap = await get(ref(db, 'chamadas'));
+    const funcionariosSnap = await get(ref(db, 'funcionarios'));
+    if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
+      resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+      return null;
+    }
+    const chamadas = chamadasSnap.val();
+    const funcionarios = funcionariosSnap.val();
+
+    let faltas = {};
+    for (const id in funcionarios) {
+      const f = funcionarios[id];
+      if (tipoFiltro !== 'todos' && f.tipo !== tipoFiltro) continue;
+      faltas[id] = { nome: f.nome, tipo: f.tipo, diasFaltados: [] };
+    }
+
+    for (const dataChamada in chamadas) {
+      if (dataChamada < inicio || dataChamada > fim) continue;
+      const presencasDia = chamadas[dataChamada];
+      for (const idFunc in presencasDia) {
+        if (!faltas[idFunc]) continue;
+        const presenca = presencasDia[idFunc];
+        if (presenca.status === 'falta') {
+          let infoAtestado = '';
+          if (funcionarios[idFunc].tipo === 'funcionario') {
+            infoAtestado = presenca.atestado ? ' (Com atestado)' : ' (Sem atestado)';
+          }
+          faltas[idFunc].diasFaltados.push(`${formatarDataDMY(dataChamada)}${infoAtestado}`);
+        }
+      }
+    }
+
+    let texto = `📋 *Relatório de Faltas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+    for (const id in faltas) {
+      const f = faltas[id];
+      texto += `👤 *${f.nome}* (${capitalize(f.tipo)}) - *${f.diasFaltados.length} faltas*\n`;
+      if (f.diasFaltados.length > 0) texto += `🗓️ Dias: ${f.diasFaltados.join(', ')}\n`;
+      texto += '\n';
+    }
+    resultado.textContent = texto.trim();
+    textoRelatorioAtual = texto.trim();
+    scrollParaResultado();
+    return texto.trim();
+  } catch (error) {
+    console.error('Erro ao gerar relatório de faltas:', error);
+    resultado.textContent = 'Erro ao gerar relatório de faltas.';
+    return null;
+  }
+}
+
+// --- Relatório de Funcionário ---
+async function gerarRelatorioDadosFuncionario() {
+  const funcionarioId = listaFuncionario.value;
+  resultado.textContent = '';
+
+  try {
+    const funcionariosSnap = await get(ref(db, 'funcionarios'));
+    if (!funcionariosSnap.exists()) {
+      resultado.textContent = 'Nenhum funcionário cadastrado.';
+      return null;
+    }
+    const funcionarios = funcionariosSnap.val();
+
+    let texto = '';
+    if (funcionarioId === 'todos') {
+      texto = '🧑 *Lista completa de Funcionários:*\n\n';
+      for (const id in funcionarios) texto += formatarFuncionario(funcionarios[id]) + '\n\n';
+    } else {
+      const f = funcionarios[funcionarioId];
+      if (!f) { resultado.textContent = 'Funcionário não encontrado.'; return null; }
+      texto = '🧑 *Informações do Funcionário:*\n\n' + formatarFuncionario(f);
+    }
+    resultado.textContent = texto.trim();
+    textoRelatorioAtual = texto.trim();
+    scrollParaResultado();
+    return texto.trim();
+  } catch (error) {
+    console.error('Erro ao gerar lista de funcionários:', error);
+    resultado.textContent = 'Erro ao gerar lista de funcionários.';
+    return null;
+  }
+}
+
+function formatarFuncionario(f) {
+  const funcaoDisplay = (f.funcao === 'Outro' && f.funcaoOutro) ? f.funcaoOutro : f.funcao;
+  return `👤 Nome: *${f.nome}*\nTipo: *${capitalize(f.tipo)}*\nFunção: *${funcaoDisplay}*\nObra: *${f.obra}*` +
+         (f.tipo === 'diarista' ? `\nCPF: *${formatCPF(f.cpf)}*\nValor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
+}
+
+// --- Relatório Pagamento Diarista ---
+async function gerarRelatorioPagamentoDiarista() {
+  const inicio = pagamentoDataInicio.value;
+  const fim = pagamentoDataFim.value;
+
+  resultado.textContent = '';
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return null; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return null; }
+
+  try {
+    const chamadasSnap = await get(ref(db, 'chamadas'));
+    const funcionariosSnap = await get(ref(db, 'funcionarios'));
+    if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
+      resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+      return null;
+    }
+    const chamadas = chamadasSnap.val();
+    const funcionarios = funcionariosSnap.val();
+
+    let texto = `💰 *Relatório de Pagamento Diaristas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+
+    const diaristas = Object.entries(funcionarios).filter(([, f]) => f.tipo === 'diarista');
+    if (diaristas.length === 0) { resultado.textContent = 'Nenhum diarista cadastrado.'; textoRelatorioAtual = ''; return null; }
+
+    for (const [id, f] of diaristas) {
+      let diasPresentes = 0;
+      let datasPresentes = [];
+      for (const dataChamada in chamadas) {
+        if (dataChamada < inicio || dataChamada > fim) continue;
+        const presencasDia = chamadas[dataChamada];
+        if (presencasDia[id] && presencasDia[id].status === 'presente') { diasPresentes++; datasPresentes.push(formatarDataDMY(dataChamada)); }
+      }
+      texto += `👤 *${f.nome}*\nDias Trabalhados: *${diasPresentes}*\nDatas: ${datasPresentes.join(', ')}\nValor diário: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*\nTotal: *R$ ${(diasPresentes*parseFloat(f.valorDiaria)).toFixed(2)}*\n\n`;
+    }
+
+    resultado.textContent = texto.trim();
+    textoRelatorioAtual = texto.trim();
+    scrollParaResultado();
+    return texto.trim();
+  } catch (error) {
+    console.error('Erro ao gerar relatório de pagamento:', error);
+    resultado.textContent = 'Erro ao gerar relatório de pagamento.';
+    return null;
+  }
+}
+
+// --- Relatório Hora Extra ---
 async function gerarRelatorioHoraExtra() {
   const inicio = horaExtraDataInicio.value;
   const fim = horaExtraDataFim.value;
 
   resultado.textContent = '';
-  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
-  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return null; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return null; }
 
   try {
-    const snapHoraExtra = await get(ref(db, 'horaextra'));
-    if (!snapHoraExtra.exists()) {
-      resultado.textContent = 'Não há horas extras registradas.';
-      return;
+    const horaExtraSnap = await get(ref(db, 'horasExtras'));
+    const funcionariosSnap = await get(ref(db, 'funcionarios'));
+    if (!horaExtraSnap.exists() || !funcionariosSnap.exists()) {
+      resultado.textContent = 'Não há dados suficientes para gerar o relatório de horas extras.';
+      return null;
     }
 
-    const registros = snapHoraExtra.val();
-    let texto = '⏱️ Relatório de Hora Extra (Funcionários)\n\n';
+    const horasExtras = horaExtraSnap.val();
+    const funcionarios = funcionariosSnap.val();
 
-    for (const idFunc in funcionariosCache) {
-      const f = funcionariosCache[idFunc];
-      if (f.tipo !== 'funcionario') continue; // somente funcionários
+    let texto = `⏱️ *Relatório de Horas Extras* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+    let encontrou = false;
 
-      let horasFuncionario = [];
-      for (const data in registros) {
-        if (data < inicio || data > fim) continue;
-        const dadosDia = registros[data][idFunc];
-        if (dadosDia) {
-          horasFuncionario.push(`${formatarDataDMY(data)} - ${dadosDia.quantidadeHoras} hora(s) - ${dadosDia.percentual}%`);
-        }
-      }
+    for (const idFunc in horasExtras) {
+      const f = funcionarios[idFunc];
+      if (!f || f.tipo !== 'funcionario') continue;
 
-      texto += `👤 ${f.nome}\n`;
-      texto += horasFuncionario.length > 0 ? horasFuncionario.join('\n') + '\n' : 'Sem horas extras\n';
+      const registros = Object.entries(horasExtras[idFunc]).filter(([data, h]) => data >= inicio && data <= fim);
+      if (registros.length === 0) continue;
+      encontrou = true;
+      texto += `👤 *${f.nome}*\n`;
+      registros.forEach(([data, h]) => {
+        texto += `🗓️ ${formatarDataDMY(data)} - ${h.quantidade}h (${h.tipo}%)\n`;
+      });
       texto += '\n';
     }
 
-    resultado.textContent = texto;
-    textoRelatorioAtual = texto;
+    if (!encontrou) texto += 'Nenhuma hora extra encontrada no período.';
+    resultado.textContent = texto.trim();
+    textoRelatorioAtual = texto.trim();
     scrollParaResultado();
+    return texto.trim();
   } catch (error) {
-    console.error(error);
-    resultado.textContent = 'Erro ao gerar relatório de hora extra.';
+    console.error('Erro ao gerar relatório de horas extras:', error);
+    resultado.textContent = 'Erro ao gerar relatório de horas extras.';
+    return null;
   }
 }
 
-// ===================== Inicialização =====================
-carregarFuncionarios();
+// --- Excluir Chamada ---
+async function excluirChamadaPorIntervalo() {
+  const inicio = excluirDataInicio.value;
+  const fim = excluirDataFim.value;
 
-// ===================== Eventos =====================
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+
+  if (!confirm(`Tem certeza que deseja excluir todas as chamadas de ${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)}?`)) return;
+
+  try {
+    const chamadasSnap = await get(ref(db, 'chamadas'));
+    if (!chamadasSnap.exists()) { alert('Nenhuma chamada encontrada'); return; }
+    const chamadas = chamadasSnap.val();
+
+    const datasParaExcluir = Object.keys(chamadas).filter(data => data >= inicio && data <= fim);
+    for (const data of datasParaExcluir) {
+      await remove(ref(db, `chamadas/${data}`));
+    }
+    alert(`Chamadas excluídas: ${datasParaExcluir.length}`);
+  } catch (error) {
+    console.error('Erro ao excluir chamadas:', error);
+    alert('Erro ao excluir chamadas');
+  }
+}
+
+// --- Funções auxiliares ---
+function formatarDataDMY(data) {
+  const d = new Date(data);
+  if (isNaN(d)) return data;
+  const dia = String(d.getDate()).padStart(2, '0');
+  const mes = String(d.getMonth()+1).padStart(2, '0');
+  const ano = d.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+}
+
+// --- Eventos ---
+btnGerarFaltas.addEventListener('click', gerarRelatorioFaltas);
+btnGerarLista.addEventListener('click', gerarRelatorioDadosFuncionario);
+btnGerarPagamento.addEventListener('click', gerarRelatorioPagamentoDiarista);
 btnGerarHoraExtra.addEventListener('click', gerarRelatorioHoraExtra);
+btnExcluirChamada.addEventListener('click', excluirChamadaPorIntervalo);
 
 btnEnviarWhats.addEventListener('click', () => {
-  if (!textoRelatorioAtual) {
-    alert('Gere um relatório primeiro.');
-    return;
-  }
-  const texto = encodeURIComponent(textoRelatorioAtual);
-  window.open(`https://wa.me/?text=${texto}`, '_blank');
+  if (!textoRelatorioAtual) { alert('Nenhum relatório gerado para enviar'); return; }
+  const url = `https://wa.me/?text=${encodeURIComponent(textoRelatorioAtual)}`;
+  window.open(url, '_blank');
 });
+
+// Inicializa
+carregarFuncionarios();
 </script>
 
 </body>

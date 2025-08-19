@@ -17,19 +17,126 @@
     flex-direction: column;
     align-items: center;
   }
-  header { width: 100%; max-width: 400px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: flex-start; user-select: none; }
-  a.btn-voltar { cursor: pointer; background-color: #154360; color: white; text-decoration: none; padding: 8px 16px; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 10px rgba(21,67,96,0.7); transition: background-color 0.25s ease, box-shadow 0.25s ease; user-select: none; }
-  a.btn-voltar:hover { background-color: #0e2a48; box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9); }
-  h1 { font-size: 2.4rem; margin: 0 0 18px 0; text-shadow: 0 2px 6px rgba(0,0,0,0.25); user-select: none; line-height: 1.2; text-align: center; max-width: 400px; width: 100%; }
-  section { background-color: rgba(21, 67, 96, 0.85); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; width: 100%; max-width: 400px; box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7); user-select: none; }
-  section h2 { margin-top: 0; margin-bottom: 14px; font-weight: 700; font-size: 1.5rem; border-bottom: 2px solid #6dd5fa; padding-bottom: 6px; }
-  label { display: block; margin-bottom: 6px; font-weight: 600; }
-  select, input[type="date"] { width: 100%; padding: 8px 10px; margin-bottom: 14px; border-radius: 8px; border: none; font-size: 1rem; }
-  button.btn-acao { background-color: #2980b9; padding: 12px 24px; border-radius: 12px; font-size: 1.1rem; font-weight: 600; color: white; border: none; box-shadow: 0 5px 12px rgba(41, 128, 185, 0.7); cursor: pointer; transition: background-color 0.25s ease, box-shadow 0.25s ease; display: block; margin: 0 auto 10px auto; min-width: 160px; user-select: none; }
-  button.btn-acao:hover { background-color: #1c5d8e; box-shadow: 0 7px 18px rgba(28, 93, 142, 0.9); }
-  #resultado { background-color: rgba(21, 67, 96, 0.85); border-radius: 12px; padding: 18px 20px; max-width: 400px; width: 100%; box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7); max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-size: 0.95rem; user-select: text; margin-bottom: 24px; scroll-margin-top: 60px; }
-  footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(21, 67, 96, 0.9); color: #ddd; text-align: center; font-size: 0.85rem; padding: 8px 0; user-select: none; box-shadow: 0 -2px 6px rgba(0,0,0,0.3); max-width: 100%; }
-  @media (max-width: 420px) { h1 { font-size: 2rem; } section { padding: 16px 20px; } button.btn-acao { min-width: 140px; margin-bottom: 10px; } }
+  header {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    user-select: none;
+  }
+  a.btn-voltar {
+    cursor: pointer;
+    background-color: #154360;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    user-select: none;
+  }
+  a.btn-voltar:hover {
+    background-color: #0e2a48;
+    box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
+  }
+  h1 {
+    font-size: 2.4rem;
+    margin: 0 0 18px 0;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    user-select: none;
+    line-height: 1.2;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+  }
+  section {
+    background-color: rgba(21, 67, 96, 0.85);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+    user-select: none;
+  }
+  section h2 {
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #6dd5fa;
+    padding-bottom: 6px;
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  select, input[type="date"], input[type="password"] {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+  }
+  button.btn-acao {
+    background-color: #2980b9;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    border: none;
+    box-shadow: 0 5px 12px rgba(41, 128, 185, 0.7);
+    cursor: pointer;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    user-select: none;
+    display: block;
+    margin: 0 auto 10px auto;
+    min-width: 160px;
+  }
+  button.btn-acao:hover {
+    background-color: #1c5d8e;
+    box-shadow: 0 7px 18px rgba(28, 93, 142, 0.9);
+  }
+  #resultado {
+    background-color: rgba(21, 67, 96, 0.85);
+    border-radius: 12px;
+    padding: 18px 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+    user-select: text;
+    margin-bottom: 24px;
+    scroll-margin-top: 60px;
+  }
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(21, 67, 96, 0.9);
+    color: #ddd;
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 8px 0;
+    user-select: none;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+    max-width: 100%;
+  }
+  @media (max-width: 420px) {
+    h1 { font-size: 2rem; }
+    section { padding: 16px 20px; }
+    button.btn-acao { min-width: 140px; margin-bottom: 10px; }
+  }
 </style>
 </head>
 <body>
@@ -58,7 +165,9 @@
 <section id="dadosFuncionarioSection">
   <h2>🧑 Dados do Funcionário</h2>
   <label for="listaFuncionario">Funcionário</label>
-  <select id="listaFuncionario"><option value="todos">Todos</option></select>
+  <select id="listaFuncionario">
+    <option value="todos">Todos</option>
+  </select>
   <button id="btnGerarLista" class="btn-acao">Gerar Relatório</button>
 </section>
 
@@ -93,7 +202,9 @@
 
 <button id="btnEnviarWhats" class="btn-acao" style="background-color:#25D366; margin-bottom:40px;">📲 Enviar relatório por WhatsApp</button>
 
-<footer>Desenvolvido por Lucas Ramos Aragão</footer>
+<footer>
+  Desenvolvido por Lucas Ramos Aragão
+</footer>
 
 <script type="module">
 import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
@@ -150,206 +261,104 @@ function atualizarListaFuncionarios() {
   });
 }
 
-function formatCPF(cpf) { if (!cpf) return '-'; let v = cpf.replace(/\D/g, ''); v = v.padStart(11,'0'); return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"); }
-function capitalize(str) { if (!str) return ''; return str.charAt(0).toUpperCase() + str.slice(1); }
-function scrollParaResultado() { resultado.scrollIntoView({ behavior: 'smooth' }); }
-
-function formatarDataDMY(data) {
-  const d = new Date(data);
-  if (isNaN(d)) return data;
-  const dia = String(d.getDate()).padStart(2,'0');
-  const mes = String(d.getMonth()+1).padStart(2,'0');
-  const ano = d.getFullYear();
-  return `${dia}/${mes}/${ano}`;
+function formatCPF(cpf) {
+  if (!cpf) return '-';
+  let v = cpf.replace(/\D/g, '');
+  v = v.padStart(11, '0');
+  return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 }
 
-function formatarFuncionario(f) {
-  const funcaoDisplay = (f.funcao==='Outro' && f.funcaoOutro)?f.funcaoOutro:f.funcao;
-  return `👤 Nome: *${f.nome}*\nTipo: *${capitalize(f.tipo)}*\nFunção: *${funcaoDisplay}*\nObra: *${f.obra}*` +
-         (f.tipo==='diarista'?`\nCPF: *${formatCPF(f.cpf)}*\nValor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*`:'');
+function capitalize(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// --- Relatório de Faltas ---
-async function gerarRelatorioFaltas() {
-  const tipoFiltro = faltasTipo.value;
-  const inicio = faltasDataInicio.value;
-  const fim = faltasDataFim.value;
-  resultado.textContent='';
-  if(!inicio||!fim){ alert('Selecione a data de início e fim'); return null;}
-  if(fim<inicio){ alert('Data fim não pode ser menor que data início'); return null;}
-  try {
-    const chamadasSnap = await get(ref(db,'chamadas'));
-    const funcionariosSnap = await get(ref(db,'funcionarios'));
-    if(!chamadasSnap.exists()||!funcionariosSnap.exists()){ resultado.textContent='Não há dados suficientes para gerar o relatório.'; return null;}
-    const chamadas = chamadasSnap.val();
-    const funcionarios = funcionariosSnap.val();
-    let faltas={};
-    for(const id in funcionarios){
-      const f=funcionarios[id];
-      if(tipoFiltro!=='todos'&&f.tipo!==tipoFiltro) continue;
-      faltas[id]={nome:f.nome,tipo:f.tipo,diasFaltados:[]};
-    }
-    for(const dataChamada in chamadas){
-      if(dataChamada<inicio||dataChamada>fim) continue;
-      const presencasDia = chamadas[dataChamada];
-      for(const idFunc in presencasDia){
-        if(!faltas[idFunc]) continue;
-        const presenca = presencasDia[idFunc];
-        if(presenca.status==='falta'){
-          let infoAtestado='';
-          if(funcionarios[idFunc].tipo==='funcionario'){ infoAtestado = presenca.atestado?' (Com atestado)':' (Sem atestado)'; }
-          faltas[idFunc].diasFaltados.push(`${formatarDataDMY(dataChamada)}${infoAtestado}`);
-        }
-      }
-    }
-    let texto = `📋 *Relatório de Faltas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
-    for(const id in faltas){
-      const f=faltas[id];
-      texto+=`👤 *${f.nome}* (${capitalize(f.tipo)}) - *${f.diasFaltados.length} faltas*\n`;
-      if(f.diasFaltados.length>0) texto+=`🗓️ Dias: ${f.diasFaltados.join(', ')}\n`;
-      texto+='\n';
-    }
-    resultado.textContent=texto.trim();
-    textoRelatorioAtual=texto.trim();
-    scrollParaResultado();
-    return texto.trim();
-  }catch(error){ console.error(error); resultado.textContent='Erro ao gerar relatório de faltas.'; return null;}
-}
-
-// --- Relatório de Funcionário ---
-async function gerarRelatorioDadosFuncionario() {
-  const funcionarioId = listaFuncionario.value;
-  resultado.textContent='';
-  try{
-    const funcionariosSnap = await get(ref(db,'funcionarios'));
-    if(!funcionariosSnap.exists()){ resultado.textContent='Nenhum funcionário cadastrado.'; return null;}
-    const funcionarios = funcionariosSnap.val();
-    let texto='';
-    if(funcionarioId==='todos'){
-      texto='🧑 *Lista completa de Funcionários:*\n\n';
-      for(const id in funcionarios) texto+=formatarFuncionario(funcionarios[id])+'\n\n';
-    }else{
-      const f=funcionarios[funcionarioId];
-      if(!f){ resultado.textContent='Funcionário não encontrado.'; return null;}
-      texto='🧑 *Informações do Funcionário:*\n\n'+formatarFuncionario(f);
-    }
-    resultado.textContent=texto.trim();
-    textoRelatorioAtual=texto.trim();
-    scrollParaResultado();
-    return texto.trim();
-  }catch(error){ console.error(error); resultado.textContent='Erro ao gerar lista de funcionários.'; return null;}
-}
-
-// --- Relatório Pagamento Diarista ---
-async function gerarRelatorioPagamentoDiarista() {
-  const inicio = pagamentoDataInicio.value;
-  const fim = pagamentoDataFim.value;
-  resultado.textContent='';
-  if(!inicio||!fim){ alert('Selecione a data de início e fim'); return null;}
-  if(fim<inicio){ alert('Data fim não pode ser menor que data início'); return null;}
-  try{
-    const chamadasSnap = await get(ref(db,'chamadas'));
-    const funcionariosSnap = await get(ref(db,'funcionarios'));
-    if(!chamadasSnap.exists()||!funcionariosSnap.exists()){ resultado.textContent='Não há dados suficientes para gerar o relatório.'; return null;}
-    const chamadas = chamadasSnap.val();
-    const funcionarios = funcionariosSnap.val();
-    let texto=`💰 *Relatório de Pagamento Diarista* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
-    let totalExibido=0;
-    for(const id in funcionarios){
-      const f=funcionarios[id];
-      if(f.tipo!=='diarista') continue;
-      let diasTrabalhados=0;
-      for(const dataChamada in chamadas){
-        if(dataChamada<inicio||dataChamada>fim) continue;
-        const presenca = chamadas[dataChamada][id];
-        if(presenca&&presenca.status==='presente') diasTrabalhados++;
-      }
-      if(diasTrabalhados>0){
-        totalExibido++;
-        texto+=`👤 *${f.nome}* - ${diasTrabalhados} dia(s) de trabalho\n💵 Valor total: R$ ${(diasTrabalhados*f.valorDiaria).toFixed(2)}\n\n`;
-      }
-    }
-    if(totalExibido===0) texto='Não há pagamentos de diaristas no período selecionado.';
-    resultado.textContent=texto.trim();
-    textoRelatorioAtual=texto.trim();
-    scrollParaResultado();
-    return texto.trim();
-  }catch(error){ console.error(error); resultado.textContent='Erro ao gerar relatório de pagamento.'; return null;}
+function scrollParaResultado() {
+  resultado.scrollIntoView({ behavior: 'smooth' });
 }
 
 // --- Relatório Hora Extra ---
 async function gerarRelatorioHoraExtra() {
   const inicio = horaExtraDataInicio.value;
   const fim = horaExtraDataFim.value;
-  resultado.textContent='';
-  if(!inicio||!fim){ alert('Selecione a data de início e fim'); return null;}
-  if(fim<inicio){ alert('Data fim não pode ser menor que data início'); return null;}
-  try{
-    const horaExtraSnap = await get(ref(db,'horaextra'));
-    const funcionariosSnap = await get(ref(db,'funcionarios'));
-    if(!horaExtraSnap.exists()||!funcionariosSnap.exists()){ resultado.textContent='Não há dados suficientes para gerar o relatório de horas extras.'; return null;}
-    const horaExtra = horaExtraSnap.val();
-    const funcionarios = funcionariosSnap.val();
-    let texto=`⏱️ *Relatório de Hora Extra* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
-    let totalExibido=0;
-    for(const id in funcionarios){
-      const f = funcionarios[id];
-      if(f.tipo!=='funcionario') continue;
-      let registroHoraExtra = [];
-      for(const data in horaExtra){
-        if(data<inicio||data>fim) continue;
-        if(horaExtra[data][id]){
-          const h = horaExtra[data][id];
-          registroHoraExtra.push(`${formatarDataDMY(data)} - ${h.quantidadeHoras}h (${h.percentual}%)`);
-        }
-      }
-      if(registroHoraExtra.length>0){
-        totalExibido++;
-        texto+=`👤 *${f.nome}* - ${registroHoraExtra.length} registro(s) de hora extra\n🕒 Dias/Valores: ${registroHoraExtra.join(', ')}\n\n`;
-      }
+
+  resultado.textContent = '';
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return null; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return null; }
+
+  try {
+    const horaExtraSnap = await get(ref(db, 'horaextra'));
+    const funcionariosSnap = await get(ref(db, 'funcionarios'));
+    if (!horaExtraSnap.exists() || !funcionariosSnap.exists()) {
+      resultado.textContent = 'Não há dados suficientes para gerar o relatório de horas extras.';
+      return null;
     }
-    if(totalExibido===0) texto='Não há horas extras registradas no período selecionado.';
-    resultado.textContent=texto.trim();
-    textoRelatorioAtual=texto.trim();
+
+    const horasExtras = horaExtraSnap.val();
+    const funcionarios = funcionariosSnap.val();
+
+    let texto = `⏱️ *Relatório de Horas Extras* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+    let encontrou = false;
+
+    for (const idFunc in horasExtras) {
+      const f = funcionarios[idFunc];
+      if (!f || f.tipo !== 'funcionario') continue;
+
+      const registros = Object.entries(horasExtras[idFunc])
+        .filter(([data, h]) => data >= inicio && data <= fim);
+
+      if (registros.length === 0) continue;
+      encontrou = true;
+
+      const agrupado = {};
+      let totalHoras = 0;
+      registros.forEach(([data, h]) => {
+        const perc = h.percentual;
+        if (!agrupado[perc]) agrupado[perc] = [];
+        agrupado[perc].push(`(${formatarDataDMY(data)} - ${h.quantidadeHoras}h)`);
+        totalHoras += parseInt(h.quantidadeHoras);
+      });
+
+      texto += `👤 *${f.nome}* - ${totalHoras} Hora(s) extra(s)\n`;
+
+      for (const perc in agrupado) {
+        texto += `${perc}% - ${agrupado[perc].join(', ')}\n`;
+      }
+      texto += '\n';
+    }
+
+    if (!encontrou) texto += 'Nenhuma hora extra encontrada no período.';
+    resultado.textContent = texto.trim();
+    textoRelatorioAtual = texto.trim();
     scrollParaResultado();
     return texto.trim();
-  }catch(error){ console.error(error); resultado.textContent='Erro ao gerar relatório de horas extras.'; return null;}
+  } catch (error) {
+    console.error('Erro ao gerar relatório de horas extras:', error);
+    resultado.textContent = 'Erro ao gerar relatório de horas extras.';
+    return null;
+  }
 }
 
-// --- Excluir chamadas ---
-async function excluirChamada() {
-  const inicio = excluirDataInicio.value;
-  const fim = excluirDataFim.value;
-  if(!inicio||!fim){ alert('Selecione a data de início e fim'); return; }
-  if(fim<inicio){ alert('Data fim não pode ser menor que data início'); return; }
-  if(!confirm(`Deseja realmente excluir chamadas de ${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)}?`)) return;
-  try{
-    const chamadasSnap = await get(ref(db,'chamadas'));
-    if(!chamadasSnap.exists()){ alert('Não há chamadas para excluir.'); return; }
-    const chamadas = chamadasSnap.val();
-    for(const data in chamadas){
-      if(data>=inicio && data<=fim) await remove(ref(db,`chamadas/${data}`));
-    }
-    alert('Chamada(s) excluída(s) com sucesso!');
-  }catch(error){ console.error(error); alert('Erro ao excluir chamadas'); }
+// --- Funções auxiliares ---
+function formatarDataDMY(data) {
+  const d = new Date(data);
+  if (isNaN(d)) return data;
+  const dia = String(d.getDate()).padStart(2, '0');
+  const mes = String(d.getMonth()+1).padStart(2, '0');
+  const ano = d.getFullYear();
+  return `${dia}/${mes}/${ano}`;
 }
 
-// --- Envio WhatsApp ---
-btnEnviarWhats.addEventListener('click', ()=>{
-  if(!textoRelatorioAtual){ alert('Gere um relatório primeiro.'); return; }
-  const textoEncoded = encodeURIComponent(textoRelatorioAtual);
-  window.open(`https://wa.me/?text=${textoEncoded}`, '_blank');
-});
+// Carregar funcionários
+carregarFuncionarios();
 
 // --- Eventos ---
-btnGerarFaltas.addEventListener('click', gerarRelatorioFaltas);
-btnGerarLista.addEventListener('click', gerarRelatorioDadosFuncionario);
-btnGerarPagamento.addEventListener('click', gerarRelatorioPagamentoDiarista);
 btnGerarHoraExtra.addEventListener('click', gerarRelatorioHoraExtra);
-btnExcluirChamada.addEventListener('click', excluirChamada);
-
-carregarFuncionarios();
+btnEnviarWhats.addEventListener('click', () => {
+  if (!textoRelatorioAtual) { alert('Nenhum relatório gerado para enviar'); return; }
+  const url = `https://wa.me/?text=${encodeURIComponent(textoRelatorioAtual)}`;
+  window.open(url, '_blank');
+});
 </script>
-
 </body>
 </html>

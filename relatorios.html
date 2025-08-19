@@ -1,305 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relatórios</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2980b9, #6dd5fa);
+    color: #fff;
+    margin: 0;
+    min-height: 100vh;
+    padding: 20px 15px 80px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    user-select: none;
+  }
+  a.btn-voltar {
+    cursor: pointer;
+    background-color: #154360;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    user-select: none;
+  }
+  a.btn-voltar:hover { background-color: #0e2a48; box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9); }
+  h1 {
+    font-size: 2.4rem;
+    margin: 0 0 18px 0;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+  }
+  section {
+    background-color: rgba(21, 67, 96, 0.85);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+  }
+  section h2 {
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #6dd5fa;
+    padding-bottom: 6px;
+  }
+  label { display: block; margin-bottom: 6px; font-weight: 600; }
+  select, input[type="date"], input[type="password"] {
+    width: 100%; padding: 8px 10px; margin-bottom: 14px;
+    border-radius: 8px; border: none; font-size: 1rem;
+  }
+  button.btn-acao {
+    background-color: #2980b9;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    border: none;
+    box-shadow: 0 5px 12px rgba(41, 128, 185, 0.7);
+    cursor: pointer;
+    display: block;
+    margin: 0 auto 10px auto;
+    min-width: 160px;
+  }
+  button.btn-acao:hover { background-color: #1c5d8e; box-shadow: 0 7px 18px rgba(28, 93, 142, 0.9); }
+  #resultado {
+    background-color: rgba(21, 67, 96, 0.85);
+    border-radius: 12px;
+    padding: 18px 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+  }
+  footer {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: rgba(21, 67, 96, 0.9);
+    color: #ddd; text-align: center;
+    font-size: 0.85rem; padding: 8px 0;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+</header>
+
+<h1>Relatórios</h1>
+
+<section id="faltasSection">
+  <h2>📋 Relatório de Faltas</h2>
+  <label for="faltasTipo">Tipo</label>
+  <select id="faltasTipo">
+    <option value="todos">Todos</option>
+    <option value="funcionario">Funcionário</option>
+    <option value="diarista">Diarista</option>
+  </select>
+  <label for="faltasDataInicio">Data Início</label>
+  <input type="date" id="faltasDataInicio" />
+  <label for="faltasDataFim">Data Fim</label>
+  <input type="date" id="faltasDataFim" />
+  <button id="btnGerarFaltas" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="dadosFuncionarioSection">
+  <h2>🧑 Dados do Funcionário</h2>
+  <label for="listaFuncionario">Funcionário</label>
+  <select id="listaFuncionario"><option value="todos">Todos</option></select>
+  <button id="btnGerarLista" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="pagamentoDiaristaSection">
+  <h2>💰 Relatório de Pagamento Diarista</h2>
+  <label for="pagamentoDataInicio">Data Início</label>
+  <input type="date" id="pagamentoDataInicio" />
+  <label for="pagamentoDataFim">Data Fim</label>
+  <input type="date" id="pagamentoDataFim" />
+  <button id="btnGerarPagamento" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="horaExtraSection">
+  <h2>⏱️ Relatório de Hora Extra</h2>
+  <label for="horaExtraDataInicio">Data Início</label>
+  <input type="date" id="horaExtraDataInicio" />
+  <label for="horaExtraDataFim">Data Fim</label>
+  <input type="date" id="horaExtraDataFim" />
+  <button id="btnGerarHoraExtra" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<section id="excluirChamadaSection">
+  <h2>❌ Excluir Chamada por Intervalo</h2>
+  <label for="excluirDataInicio">Data Início</label>
+  <input type="date" id="excluirDataInicio" />
+  <label for="excluirDataFim">Data Fim</label>
+  <input type="date" id="excluirDataFim" />
+  <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada(s)</button>
+</section>
+
+<section id="excluirHoraExtraSection">
+  <h2>❌ Excluir Hora Extra por Intervalo</h2>
+  <label for="excluirHoraExtraInicio">Data Início</label>
+  <input type="date" id="excluirHoraExtraInicio" />
+  <label for="excluirHoraExtraFim">Data Fim</label>
+  <input type="date" id="excluirHoraExtraFim" />
+  <button id="btnExcluirHoraExtra" class="btn-acao" style="background-color:#c0392b;">Excluir Hora Extra(s)</button>
+</section>
+
+<pre id="resultado"></pre>
+
+<button id="btnEnviarWhats" class="btn-acao" style="background-color:#25D366; margin-bottom:40px;">📲 Enviar relatório por WhatsApp</button>
+
+<footer>Desenvolvido por Lucas Ramos Aragão</footer>
+
 <script type="module">
 import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 import { app } from "./firebase.js";
 
 const db = getDatabase(app);
 
-const faltasTipo = document.getElementById('faltasTipo');
-const faltasDataInicio = document.getElementById('faltasDataInicio');
-const faltasDataFim = document.getElementById('faltasDataFim');
-const btnGerarFaltas = document.getElementById('btnGerarFaltas');
-
-const listaFuncionario = document.getElementById('listaFuncionario');
-const btnGerarLista = document.getElementById('btnGerarLista');
-
-const pagamentoDataInicio = document.getElementById('pagamentoDataInicio');
-const pagamentoDataFim = document.getElementById('pagamentoDataFim');
-const btnGerarPagamento = document.getElementById('btnGerarPagamento');
-
+const btnGerarHoraExtra = document.getElementById('btnGerarHoraExtra');
 const horaExtraDataInicio = document.getElementById('horaExtraDataInicio');
 const horaExtraDataFim = document.getElementById('horaExtraDataFim');
-const btnGerarHoraExtra = document.getElementById('btnGerarHoraExtra');
-
-const excluirDataInicio = document.getElementById('excluirDataInicio');
-const excluirDataFim = document.getElementById('excluirDataFim');
-const btnExcluirChamada = document.getElementById('btnExcluirChamada');
-
+const btnExcluirHoraExtra = document.getElementById('btnExcluirHoraExtra');
 const excluirHoraExtraInicio = document.getElementById('excluirHoraExtraInicio');
 const excluirHoraExtraFim = document.getElementById('excluirHoraExtraFim');
-const btnExcluirHoraExtra = document.getElementById('btnExcluirHoraExtra');
 
 const resultado = document.getElementById('resultado');
-const btnEnviarWhats = document.getElementById('btnEnviarWhats');
-
-let funcionariosCache = {};
 let textoRelatorioAtual = '';
 
-// --- Carregar funcionários ---
-async function carregarFuncionarios() {
-  try {
-    const snapshot = await get(ref(db, 'funcionarios'));
-    if (snapshot.exists()) {
-      funcionariosCache = snapshot.val();
-      atualizarListaFuncionarios();
-    } else {
-      funcionariosCache = {};
-      listaFuncionario.innerHTML = '<option value="todos">Nenhum funcionário</option>';
+function formatarDataDMY(dataISO){ if(!dataISO) return '-'; const [a,m,d]=dataISO.split('-'); return `${d}/${m}/${a}`; }
+function capitalize(str){ return str?str.charAt(0).toUpperCase()+str.slice(1):''; }
+
+async function gerarRelatorioHoraExtra(){
+  const inicio = horaExtraDataInicio.value, fim = horaExtraDataFim.value;
+  if(!inicio||!fim){alert("Selecione as datas.");return;}
+  if(fim<inicio){alert("Data fim inválida.");return;}
+  try{
+    const heSnap = await get(ref(db,'horaExtra'));
+    const funcSnap = await get(ref(db,'funcionarios'));
+    if(!heSnap.exists()||!funcSnap.exists()){resultado.textContent="Sem dados.";return;}
+    const horaExtra = heSnap.val(), funcionarios = funcSnap.val();
+    let rel = `⏱️ *Relatório de Hora Extra* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+    let totPorFunc = {};
+    for(const data in horaExtra){
+      if(data<inicio||data>fim) continue;
+      for(const id in horaExtra[data]){
+        const he = horaExtra[data][id];
+        if(!totPorFunc[id]) totPorFunc[id]={nome:funcionarios[id]?.nome||'Desconhecido',h50:0,h100:0};
+        if(he.tipo==='50'){totPorFunc[id].h50+=parseFloat(he.horas)||0;}
+        if(he.tipo==='100'){totPorFunc[id].h100+=parseFloat(he.horas)||0;}
+      }
     }
-  } catch (error) {
-    console.error('Erro ao carregar funcionários:', error);
-    listaFuncionario.innerHTML = '<option value="todos">Erro ao carregar</option>';
-  }
+    for(const id in totPorFunc){
+      const f=totPorFunc[id];
+      rel+=`👤 *${f.nome}*\n➡️ 50%: *${f.h50}h*\n➡️ 100%: *${f.h100}h*\n\n`;
+    }
+    resultado.textContent=rel.trim(); textoRelatorioAtual=rel.trim();
+  }catch(e){console.error(e);resultado.textContent="Erro ao gerar relatório.";}
 }
 
-function atualizarListaFuncionarios() {
-  listaFuncionario.innerHTML = '<option value="todos">Todos</option>';
-  Object.entries(funcionariosCache).forEach(([id, f]) => {
-    listaFuncionario.innerHTML += `<option value="${id}">${f.nome}</option>`;
-  });
+async function excluirHoraExtra(){
+  const ini=excluirHoraExtraInicio.value,fim=excluirHoraExtraFim.value;
+  if(!ini||!fim){alert("Selecione as datas.");return;}
+  if(fim<ini){alert("Data fim inválida.");return;}
+  if(!confirm(`Excluir hora extra de ${formatarDataDMY(ini)} até ${formatarDataDMY(fim)}?`)) return;
+  try{
+    const heSnap=await get(ref(db,'horaExtra'));
+    if(!heSnap.exists()){alert("Nenhum registro.");return;}
+    const dados=heSnap.val();
+    const datas=Object.keys(dados).filter(d=>d>=ini&&d<=fim);
+    for(const d of datas){await remove(ref(db,`horaExtra/${d}`));}
+    alert("Hora extra excluída.");resultado.textContent='';
+  }catch(e){console.error(e);alert("Erro ao excluir.");}
 }
 
-function formatarDataDMY(dataISO) {
-  if (!dataISO) return '-';
-  const [ano, mes, dia] = dataISO.split('-');
-  return `${dia}/${mes}/${ano}`;
-}
+btnGerarHoraExtra.addEventListener('click',gerarRelatorioHoraExtra);
+btnExcluirHoraExtra.addEventListener('click',excluirHoraExtra);
 
-function scrollParaResultado() {
-  resultado.scrollIntoView({ behavior: 'smooth' });
-}
-
-// --- Relatório de Faltas ---
-btnGerarFaltas.addEventListener('click', async () => {
-  const inicio = faltasDataInicio.value;
-  const fim = faltasDataFim.value;
-  const tipo = faltasTipo.value;
-
-  if (!inicio || !fim) { alert('Selecione o intervalo de datas.'); return; }
-  if (fim < inicio) { alert('Data fim não pode ser menor que início.'); return; }
-
-  try {
-    const snap = await get(ref(db, 'chamada'));
-    if (!snap.exists()) { resultado.textContent = 'Nenhum registro de chamada.'; return; }
-
-    const chamadas = snap.val();
-    let texto = `📋 *Relatório de Faltas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
-
-    for (const data in chamadas) {
-      if (data < inicio || data > fim) continue;
-
-      for (const [idFunc, registro] of Object.entries(chamadas[data])) {
-        const func = funcionariosCache[idFunc];
-        if (!func) continue;
-        if (tipo !== 'todos' && func.tipo !== tipo) continue;
-        if (registro.status === 'falta') {
-          texto += `❌ ${func.nome} - ${formatarDataDMY(data)}\n`;
-        }
-      }
-    }
-
-    if (texto.trim().endsWith(')')) texto += 'Nenhuma falta encontrada no período.';
-    resultado.textContent = texto;
-    textoRelatorioAtual = texto;
-    scrollParaResultado();
-
-  } catch (err) {
-    console.error(err);
-    resultado.textContent = 'Erro ao gerar relatório de faltas.';
-  }
+document.getElementById('btnEnviarWhats').addEventListener('click',()=>{
+  if(!textoRelatorioAtual){alert("Gere um relatório antes.");return;}
+  window.open(`https://wa.me/?text=${encodeURIComponent(textoRelatorioAtual)}`,'_blank');
 });
-
-// --- Dados do Funcionário ---
-btnGerarLista.addEventListener('click', () => {
-  const id = listaFuncionario.value;
-  let texto = '🧑 *Dados de Funcionários*\n\n';
-
-  if (id === 'todos') {
-    Object.values(funcionariosCache).forEach(f => {
-      texto += `👤 ${f.nome}\nCPF: ${f.cpf || '-'}\nCargo: ${f.tipo || '-'}\n\n`;
-    });
-  } else {
-    const f = funcionariosCache[id];
-    texto += `👤 ${f.nome}\nCPF: ${f.cpf || '-'}\nCargo: ${f.tipo || '-'}\n`;
-  }
-
-  resultado.textContent = texto;
-  textoRelatorioAtual = texto;
-  scrollParaResultado();
-});
-
-// --- Relatório de Pagamento Diarista ---
-btnGerarPagamento.addEventListener('click', async () => {
-  const inicio = pagamentoDataInicio.value;
-  const fim = pagamentoDataFim.value;
-
-  if (!inicio || !fim) { alert('Selecione as datas.'); return; }
-  if (fim < inicio) { alert('Data fim não pode ser menor que início.'); return; }
-
-  try {
-    const snap = await get(ref(db, 'chamada'));
-    if (!snap.exists()) { resultado.textContent = 'Nenhum registro de chamada.'; return; }
-
-    const chamadas = snap.val();
-    let texto = `💰 *Relatório de Pagamento Diaristas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
-
-    let valores = {};
-
-    for (const data in chamadas) {
-      if (data < inicio || data > fim) continue;
-
-      for (const [idFunc, registro] of Object.entries(chamadas[data])) {
-        const func = funcionariosCache[idFunc];
-        if (!func || func.tipo !== 'diarista') continue;
-        if (registro.status === 'presenca') {
-          valores[idFunc] = (valores[idFunc] || 0) + (func.valorDia || 0);
-        }
-      }
-    }
-
-    for (const [id, total] of Object.entries(valores)) {
-      texto += `👤 ${funcionariosCache[id].nome}: R$ ${total.toFixed(2)}\n`;
-    }
-
-    if (Object.keys(valores).length === 0) texto += 'Nenhum pagamento encontrado no período.';
-    resultado.textContent = texto;
-    textoRelatorioAtual = texto;
-    scrollParaResultado();
-
-  } catch (err) {
-    console.error(err);
-    resultado.textContent = 'Erro ao gerar relatório de pagamento.';
-  }
-});
-
-// --- Relatório de Hora Extra (já existia) ---
-btnGerarHoraExtra.addEventListener('click', async () => {
-  const inicio = horaExtraDataInicio.value;
-  const fim = horaExtraDataFim.value;
-
-  resultado.textContent = '';
-  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
-  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
-
-  try {
-    const horaExtraSnap = await get(ref(db, 'horaextra'));
-    const funcionariosSnap = await get(ref(db, 'funcionarios'));
-    if (!horaExtraSnap.exists() || !funcionariosSnap.exists()) {
-      resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
-      return;
-    }
-
-    const horaExtra = horaExtraSnap.val();
-    const funcionarios = funcionariosSnap.val();
-
-    let texto = `⏱️ *Relatório de Hora Extra* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
-
-    for (const [idFunc, f] of Object.entries(funcionarios)) {
-      let horas100 = 0;
-      let horas50 = 0;
-      let datas = [];
-
-      for (const data in horaExtra) {
-        if (data < inicio || data > fim) continue;
-        const dia = horaExtra[data][idFunc];
-        if (!dia) continue;
-
-        const qtd = dia.quantidadeHoras || 0;
-        if (dia.percentual === "100") horas100 += qtd;
-        else if (dia.percentual === "50") horas50 += qtd;
-        datas.push(`${formatarDataDMY(data)} (${dia.percentual}%)`);
-      }
-
-      if (horas100 + horas50 === 0) continue;
-
-      texto += `👤 *${f.nome}*\n`;
-      texto += `Horas 100%: *${horas100}*\nHoras 50%: *${horas50}*\n`;
-      texto += `Dias: ${datas.join(', ')}\n\n`;
-    }
-
-    if (texto.trim().endsWith(')')) {
-      texto += 'Nenhuma hora extra registrada no período.';
-    }
-
-    resultado.textContent = texto.trim();
-    textoRelatorioAtual = texto.trim();
-    scrollParaResultado();
-
-  } catch (error) {
-    console.error('Erro ao gerar relatório de hora extra:', error);
-    resultado.textContent = 'Erro ao gerar relatório de hora extra.';
-  }
-});
-
-// --- Excluir Chamada ---
-btnExcluirChamada.addEventListener('click', async () => {
-  const inicio = excluirDataInicio.value;
-  const fim = excluirDataFim.value;
-
-  if (!inicio || !fim) { alert('Selecione as datas.'); return; }
-  if (fim < inicio) { alert('Data fim não pode ser menor que início.'); return; }
-  if (!confirm(`Deseja realmente excluir as chamadas entre ${inicio} e ${fim}?`)) return;
-
-  try {
-    const snap = await get(ref(db, 'chamada'));
-    if (!snap.exists()) { alert('Não há registros de chamada.'); return; }
-
-    const chamadas = snap.val();
-    let excluidos = 0;
-
-    for (const data in chamadas) {
-      if (data >= inicio && data <= fim) {
-        await remove(ref(db, `chamada/${data}`));
-        excluidos++;
-      }
-    }
-
-    if (excluidos > 0) alert(`Excluídas chamadas de ${excluidos} dia(s).`);
-    else alert('Nenhum registro encontrado no período.');
-
-  } catch (err) {
-    console.error(err);
-    alert('Erro ao excluir chamadas.');
-  }
-});
-
-// --- Excluir Hora Extra (já existia) ---
-btnExcluirHoraExtra.addEventListener('click', async () => {
-  const inicio = excluirHoraExtraInicio.value;
-  const fim = excluirHoraExtraFim.value;
-
-  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
-  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
-  if (!confirm(`Deseja realmente excluir todas as horas extras entre ${inicio} e ${fim}?`)) return;
-
-  try {
-    const horaExtraSnap = await get(ref(db, 'horaextra'));
-    if (!horaExtraSnap.exists()) { alert('Não há registros de hora extra para excluir.'); return; }
-
-    const horaExtra = horaExtraSnap.val();
-    let excluidos = 0;
-
-    for (const data in horaExtra) {
-      if (data >= inicio && data <= fim) {
-        await remove(ref(db, `horaextra/${data}`));
-        excluidos++;
-      }
-    }
-
-    if (excluidos > 0) alert(`Excluídas horas extras de ${excluidos} dia(s).`);
-    else alert('Não havia registros de hora extra no período selecionado.');
-
-  } catch (error) {
-    console.error('Erro ao excluir horas extras:', error);
-    alert('Erro ao excluir horas extras.');
-  }
-});
-
-// --- Envio para WhatsApp ---
-btnEnviarWhats.addEventListener('click', () => {
-  if (!textoRelatorioAtual) { alert('Gere um relatório antes de enviar.'); return; }
-  const textoEncoded = encodeURIComponent(textoRelatorioAtual);
-  window.open(`https://wa.me/?text=${textoEncoded}`, '_blank');
-});
-
-carregarFuncionarios();
 </script>
+</body>
+</html>

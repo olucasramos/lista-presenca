@@ -6,137 +6,20 @@
 <title>Relatórios</title>
 <style>
   * { box-sizing: border-box; }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #2980b9, #6dd5fa);
-    color: #fff;
-    margin: 0;
-    min-height: 100vh;
-    padding: 20px 15px 80px 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  header {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto 10px auto;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    user-select: none;
-  }
-  a.btn-voltar {
-    cursor: pointer;
-    background-color: #154360;
-    color: white;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 12px;
-    font-weight: 600;
-    box-shadow: 0 4px 10px rgba(21,67,96,0.7);
-    transition: background-color 0.25s ease, box-shadow 0.25s ease;
-    user-select: none;
-  }
-  a.btn-voltar:hover {
-    background-color: #0e2a48;
-    box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
-  }
-  h1 {
-    font-size: 2.4rem;
-    margin: 0 0 18px 0;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    user-select: none;
-    line-height: 1.2;
-    text-align: center;
-    max-width: 400px;
-    width: 100%;
-  }
-  section {
-    background-color: rgba(21, 67, 96, 0.85);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
-    user-select: none;
-  }
-  section h2 {
-    margin-top: 0;
-    margin-bottom: 14px;
-    font-weight: 700;
-    font-size: 1.5rem;
-    border-bottom: 2px solid #6dd5fa;
-    padding-bottom: 6px;
-  }
-  label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-  }
-  select, input[type="date"], input[type="password"] {
-    width: 100%;
-    padding: 8px 10px;
-    margin-bottom: 14px;
-    border-radius: 8px;
-    border: none;
-    font-size: 1rem;
-  }
-  button.btn-acao {
-    background-color: #2980b9;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: white;
-    border: none;
-    box-shadow: 0 5px 12px rgba(41, 128, 185, 0.7);
-    cursor: pointer;
-    transition: background-color 0.25s ease, box-shadow 0.25s ease;
-    user-select: none;
-    display: block;
-    margin: 0 auto 10px auto;
-    min-width: 160px;
-  }
-  button.btn-acao:hover {
-    background-color: #1c5d8e;
-    box-shadow: 0 7px 18px rgba(28, 93, 142, 0.9);
-  }
-  #resultado {
-    background-color: rgba(21, 67, 96, 0.85);
-    border-radius: 12px;
-    padding: 18px 20px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
-    max-height: 400px;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    font-size: 0.95rem;
-    user-select: text;
-    margin-bottom: 24px;
-    scroll-margin-top: 60px;
-  }
-  footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(21, 67, 96, 0.9);
-    color: #ddd;
-    text-align: center;
-    font-size: 0.85rem;
-    padding: 8px 0;
-    user-select: none;
-    box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
-    max-width: 100%;
-  }
-  @media (max-width: 420px) {
-    h1 { font-size: 2rem; }
-    section { padding: 16px 20px; }
-    button.btn-acao { min-width: 140px; margin-bottom: 10px; }
-  }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #2980b9, #6dd5fa); color: #fff; margin: 0; min-height: 100vh; padding: 20px 15px 80px 15px; display: flex; flex-direction: column; align-items: center; }
+  header { width: 100%; max-width: 400px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: flex-start; user-select: none; }
+  a.btn-voltar { cursor: pointer; background-color: #154360; color: white; text-decoration: none; padding: 8px 16px; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 10px rgba(21,67,96,0.7); transition: background-color 0.25s ease, box-shadow 0.25s ease; user-select: none; }
+  a.btn-voltar:hover { background-color: #0e2a48; box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9); }
+  h1 { font-size: 2.4rem; margin: 0 0 18px 0; text-shadow: 0 2px 6px rgba(0,0,0,0.25); user-select: none; line-height: 1.2; text-align: center; max-width: 400px; width: 100%; }
+  section { background-color: rgba(21, 67, 96, 0.85); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; width: 100%; max-width: 400px; box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7); user-select: none; }
+  section h2 { margin-top: 0; margin-bottom: 14px; font-weight: 700; font-size: 1.5rem; border-bottom: 2px solid #6dd5fa; padding-bottom: 6px; }
+  label { display: block; margin-bottom: 6px; font-weight: 600; }
+  select, input[type="date"], input[type="password"] { width: 100%; padding: 8px 10px; margin-bottom: 14px; border-radius: 8px; border: none; font-size: 1rem; }
+  button.btn-acao { background-color: #2980b9; padding: 12px 24px; border-radius: 12px; font-size: 1.1rem; font-weight: 600; color: white; border: none; box-shadow: 0 5px 12px rgba(41, 128, 185, 0.7); cursor: pointer; transition: background-color 0.25s ease, box-shadow 0.25s ease; user-select: none; display: block; margin: 0 auto 10px auto; min-width: 160px; }
+  button.btn-acao:hover { background-color: #1c5d8e; box-shadow: 0 7px 18px rgba(28, 93, 142, 0.9); }
+  #resultado { background-color: rgba(21, 67, 96, 0.85); border-radius: 12px; padding: 18px 20px; max-width: 400px; width: 100%; box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7); max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-size: 0.95rem; user-select: text; margin-bottom: 24px; scroll-margin-top: 60px; }
+  footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(21, 67, 96, 0.9); color: #ddd; text-align: center; font-size: 0.85rem; padding: 8px 0; user-select: none; box-shadow: 0 -2px 6px rgba(0,0,0,0.3); max-width: 100%; }
+  @media (max-width: 420px) { h1 { font-size: 2rem; } section { padding: 16px 20px; } button.btn-acao { min-width: 140px; margin-bottom: 10px; } }
 </style>
 </head>
 <body>
@@ -147,6 +30,7 @@
 
 <h1>Relatórios</h1>
 
+<!-- Relatório de Faltas -->
 <section id="faltasSection">
   <h2>📋 Relatório de Faltas</h2>
   <label for="faltasTipo">Tipo</label>
@@ -162,6 +46,7 @@
   <button id="btnGerarFaltas" class="btn-acao">Gerar Relatório</button>
 </section>
 
+<!-- Dados Funcionário -->
 <section id="dadosFuncionarioSection">
   <h2>🧑 Dados do Funcionário</h2>
   <label for="listaFuncionario">Funcionário</label>
@@ -171,6 +56,7 @@
   <button id="btnGerarLista" class="btn-acao">Gerar Relatório</button>
 </section>
 
+<!-- Pagamento Diarista -->
 <section id="pagamentoDiaristaSection">
   <h2>💰 Relatório de Pagamento Diarista</h2>
   <label for="pagamentoDataInicio">Data Início</label>
@@ -180,6 +66,17 @@
   <button id="btnGerarPagamento" class="btn-acao">Gerar Relatório</button>
 </section>
 
+<!-- Hora Extra -->
+<section id="horaExtraSection">
+  <h2>⏱️ Relatório de Hora Extra</h2>
+  <label for="horaExtraDataInicio">Data Início</label>
+  <input type="date" id="horaExtraDataInicio" />
+  <label for="horaExtraDataFim">Data Fim</label>
+  <input type="date" id="horaExtraDataFim" />
+  <button id="btnGerarHoraExtra" class="btn-acao">Gerar Relatório</button>
+</section>
+
+<!-- Excluir Chamada -->
 <section id="excluirChamadaSection">
   <h2>❌ Excluir Chamada por Intervalo de Datas</h2>
   <label for="excluirDataInicio">Data Início</label>
@@ -187,6 +84,18 @@
   <label for="excluirDataFim">Data Fim</label>
   <input type="date" id="excluirDataFim" />
   <button id="btnExcluirChamada" class="btn-acao" style="background-color:#c0392b;">Excluir Chamada(s)</button>
+</section>
+
+<!-- Excluir Hora Extra -->
+<section id="excluirHoraExtraSection">
+  <h2>❌ Excluir Hora Extra</h2>
+  <label for="excluirHoraExtraDataInicio">Data Início</label>
+  <input type="date" id="excluirHoraExtraDataInicio" />
+  <label for="excluirHoraExtraDataFim">Data Fim</label>
+  <input type="date" id="excluirHoraExtraDataFim" />
+  <label for="senhaExcluirHoraExtra">Senha</label>
+  <input type="password" id="senhaExcluirHoraExtra" placeholder="Digite a senha" />
+  <button id="btnExcluirHoraExtra" class="btn-acao" style="background-color:#c0392b;">Excluir Hora Extra</button>
 </section>
 
 <pre id="resultado" tabindex="0" aria-label="Resultado do relatório"></pre>
@@ -215,9 +124,18 @@ const pagamentoDataInicio = document.getElementById('pagamentoDataInicio');
 const pagamentoDataFim = document.getElementById('pagamentoDataFim');
 const btnGerarPagamento = document.getElementById('btnGerarPagamento');
 
+const horaExtraDataInicio = document.getElementById('horaExtraDataInicio');
+const horaExtraDataFim = document.getElementById('horaExtraDataFim');
+const btnGerarHoraExtra = document.getElementById('btnGerarHoraExtra');
+
 const excluirDataInicio = document.getElementById('excluirDataInicio');
 const excluirDataFim = document.getElementById('excluirDataFim');
 const btnExcluirChamada = document.getElementById('btnExcluirChamada');
+
+const excluirHoraExtraDataInicio = document.getElementById('excluirHoraExtraDataInicio');
+const excluirHoraExtraDataFim = document.getElementById('excluirHoraExtraDataFim');
+const senhaExcluirHoraExtra = document.getElementById('senhaExcluirHoraExtra');
+const btnExcluirHoraExtra = document.getElementById('btnExcluirHoraExtra');
 
 const resultado = document.getElementById('resultado');
 const btnEnviarWhats = document.getElementById('btnEnviarWhats');
@@ -225,7 +143,6 @@ const btnEnviarWhats = document.getElementById('btnEnviarWhats');
 let funcionariosCache = {};
 let textoRelatorioAtual = '';
 
-// Carregar funcionários do Firebase
 async function carregarFuncionarios() {
   try {
     const snapshot = await get(ref(db, 'funcionarios'));
@@ -251,37 +168,47 @@ function atualizarListaFuncionarios() {
 
 function formatCPF(cpf) {
   if (!cpf) return '-';
-  let v = cpf.replace(/\D/g, '').padStart(11, '0');
+  let v = cpf.replace(/\D/g, '');
+  v = v.padStart(11, '0');
   return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 }
 
-function capitalize(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''; }
-function scrollParaResultado() { resultado.scrollIntoView({ behavior: 'smooth' }); }
-function formatarDataDMY(dataISO) { if (!dataISO) return '-'; const [ano, mes, dia] = dataISO.split('-'); return `${dia}/${mes}/${ano}`; }
+function capitalize(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
-// Funções de relatórios
+function scrollParaResultado() {
+  resultado.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Formatar data
+function formatarDataDMY(dataISO) {
+  if (!dataISO) return '-';
+  const [ano, mes, dia] = dataISO.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+// Relatório de Faltas
 async function gerarRelatorioFaltas() {
   const tipoFiltro = faltasTipo.value;
   const inicio = faltasDataInicio.value;
   const fim = faltasDataFim.value;
   resultado.textContent = '';
-  if (!inicio || !fim) return alert('Selecione a data de início e fim');
-  if (fim < inicio) return alert('Data fim não pode ser menor que data início.');
-
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
   try {
     const chamadasSnap = await get(ref(db, 'chamadas'));
     const funcionariosSnap = await get(ref(db, 'funcionarios'));
-    if (!chamadasSnap.exists() || !funcionariosSnap.exists()) { resultado.textContent = 'Não há dados suficientes.'; return; }
+    if (!chamadasSnap.exists() || !funcionariosSnap.exists()) { resultado.textContent = 'Não há dados suficientes para gerar o relatório.'; return; }
     const chamadas = chamadasSnap.val();
     const funcionarios = funcionariosSnap.val();
-
     let faltas = {};
     for (const id in funcionarios) {
       const f = funcionarios[id];
       if (tipoFiltro !== 'todos' && f.tipo !== tipoFiltro) continue;
       faltas[id] = { nome: f.nome, tipo: f.tipo, diasFaltados: [] };
     }
-
     for (const dataChamada in chamadas) {
       if (dataChamada < inicio || dataChamada > fim) continue;
       const presencasDia = chamadas[dataChamada];
@@ -290,14 +217,11 @@ async function gerarRelatorioFaltas() {
         const presenca = presencasDia[idFunc];
         if (presenca.status === 'falta') {
           let infoAtestado = '';
-          if (funcionarios[idFunc].tipo === 'funcionario') {
-            infoAtestado = presenca.atestado ? ' (Com atestado)' : ' (Sem atestado)';
-          }
+          if (funcionarios[idFunc].tipo === 'funcionario') infoAtestado = presenca.atestado ? ' (Com atestado)' : ' (Sem atestado)';
           faltas[idFunc].diasFaltados.push(`${formatarDataDMY(dataChamada)}${infoAtestado}`);
         }
       }
     }
-
     let texto = `📋 *Relatório de Faltas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
     for (const id in faltas) {
       const f = faltas[id];
@@ -308,12 +232,10 @@ async function gerarRelatorioFaltas() {
     resultado.textContent = texto.trim();
     textoRelatorioAtual = texto.trim();
     scrollParaResultado();
-  } catch (error) {
-    console.error(error);
-    resultado.textContent = 'Erro ao gerar relatório de faltas.';
-  }
+  } catch (error) { console.error(error); resultado.textContent = 'Erro ao gerar relatório de faltas.'; }
 }
 
+// Relatório Dados Funcionário
 async function gerarRelatorioDadosFuncionario() {
   const funcionarioId = listaFuncionario.value;
   resultado.textContent = '';
@@ -321,7 +243,6 @@ async function gerarRelatorioDadosFuncionario() {
     const funcionariosSnap = await get(ref(db, 'funcionarios'));
     if (!funcionariosSnap.exists()) { resultado.textContent = 'Nenhum funcionário cadastrado.'; return; }
     const funcionarios = funcionariosSnap.val();
-
     let texto = '';
     if (funcionarioId === 'todos') {
       texto = '🧑 *Lista completa de Funcionários:*\n\n';
@@ -334,100 +255,135 @@ async function gerarRelatorioDadosFuncionario() {
     resultado.textContent = texto.trim();
     textoRelatorioAtual = texto.trim();
     scrollParaResultado();
-  } catch (error) {
-    console.error(error);
-    resultado.textContent = 'Erro ao gerar lista de funcionários.';
-  }
+  } catch (error) { console.error(error); resultado.textContent = 'Erro ao gerar lista de funcionários.'; }
 }
 
 function formatarFuncionario(f) {
   const funcaoDisplay = (f.funcao === 'Outro' && f.funcaoOutro) ? f.funcaoOutro : f.funcao;
-  return `👤 Nome: *${f.nome}*\nTipo: *${capitalize(f.tipo)}*\nFunção: *${funcaoDisplay}*\nObra: *${f.obra}*` +
-         (f.tipo === 'diarista' ? `\nCPF: *${formatCPF(f.cpf)}*\nValor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
+  return `👤 Nome: *${f.nome}*\nTipo: *${capitalize(f.tipo)}*\nFunção: *${funcaoDisplay}*\nObra: *${f.obra}*` + (f.tipo === 'diarista' ? `\nCPF: *${formatCPF(f.cpf)}*\nValor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*` : '');
 }
 
+// Relatório Pagamento Diarista
 async function gerarRelatorioPagamentoDiarista() {
   const inicio = pagamentoDataInicio.value;
   const fim = pagamentoDataFim.value;
   resultado.textContent = '';
-  if (!inicio || !fim) return alert('Selecione a data de início e fim');
-  if (fim < inicio) return alert('Data fim não pode ser menor que data início.');
-
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
   try {
     const chamadasSnap = await get(ref(db, 'chamadas'));
     const funcionariosSnap = await get(ref(db, 'funcionarios'));
-    if (!chamadasSnap.exists() || !funcionariosSnap.exists()) { resultado.textContent = 'Não há dados suficientes.'; return; }
-
+    if (!chamadasSnap.exists() || !funcionariosSnap.exists()) { resultado.textContent = 'Não há dados suficientes para gerar o relatório.'; return; }
     const chamadas = chamadasSnap.val();
     const funcionarios = funcionariosSnap.val();
     let texto = `💰 *Relatório de Pagamento Diaristas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
-
     const diaristas = Object.entries(funcionarios).filter(([, f]) => f.tipo === 'diarista');
-    if (diaristas.length === 0) { resultado.textContent = 'Nenhum diarista cadastrado.'; textoRelatorioAtual = ''; return; }
-
-    for (const [id, f] of diaristas) {
-      let diasPresentes = 0;
-      let datasPresentes = [];
-      for (const dataChamada in chamadas) {
-        if (dataChamada < inicio || dataChamada > fim) continue;
-        const presencasDia = chamadas[dataChamada];
-        if (presencasDia[id] && presencasDia[id].status === 'presente') {
-          diasPresentes++;
-          datasPresentes.push(formatarDataDMY(dataChamada));
-        }
+    if (diaristas.length === 0) { resultado.textContent = 'Nenhum diarista cadastrado.'; return; }
+    diaristas.forEach(([id, f]) => {
+      let total = 0;
+      let dias = [];
+      for (const data in chamadas) {
+        if (data < inicio || data > fim) continue;
+        const presenca = chamadas[data][id];
+        if (presenca && presenca.status === 'presenca') { total += parseFloat(f.valorDiaria); dias.push(formatarDataDMY(data)); }
       }
-      if (diasPresentes === 0) continue;
-      const valorDiaria = parseFloat(f.valorDiaria) || 0;
-      const total = valorDiaria * diasPresentes;
-      texto += `👤 *${f.nome}*\nDias trabalhados: *${diasPresentes}* (${datasPresentes.join(', ')})\nValor diária: *R$ ${valorDiaria.toFixed(2)}*\n*Total a pagar: R$ ${total.toFixed(2)}*\nBanco: ${f.banco || '-'}\nChave PIX: ${f.tipoChavePix || '-'} - ${f.chavePix || '-'}\n\n`;
-    }
-
+      texto += `👤 *${f.nome}* - R$ ${total.toFixed(2)}\n🗓️ Dias pagos: ${dias.join(', ')}\n\n`;
+    });
     resultado.textContent = texto.trim();
     textoRelatorioAtual = texto.trim();
     scrollParaResultado();
-  } catch (error) {
-    console.error(error);
-    resultado.textContent = 'Erro ao gerar relatório de pagamento.';
-  }
+  } catch (error) { console.error(error); resultado.textContent = 'Erro ao gerar relatório de pagamento.'; }
 }
 
-async function excluirChamada() {
-  const dataInicio = excluirDataInicio.value;
-  const dataFim = excluirDataFim.value;
-  if (!dataInicio || !dataFim) return alert('Selecione a data de início e fim');
-  if (fim < inicio) return alert('Data fim não pode ser menor que data início.');
-  if (!confirm(`Deseja excluir as chamadas de ${formatarDataDMY(dataInicio)} até ${formatarDataDMY(dataFim)}?`)) return;
+// Relatório Hora Extra
+async function gerarRelatorioHoraExtra() {
+  const inicio = horaExtraDataInicio.value;
+  const fim = horaExtraDataFim.value;
+  resultado.textContent = '';
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+  try {
+    const horasSnap = await get(ref(db, 'horaExtra'));
+    const funcionariosSnap = await get(ref(db, 'funcionarios'));
+    if (!horasSnap.exists() || !funcionariosSnap.exists()) { resultado.textContent = 'Não há dados suficientes.'; return; }
+    const horas = horasSnap.val();
+    const funcionarios = funcionariosSnap.val();
+    let texto = `⏱️ *Relatório de Hora Extra* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+    for (const id in funcionarios) {
+      let horas100 = 0, horas50 = 0;
+      let datas100 = [], datas50 = [];
+      for (const data in horas) {
+        if (data < inicio || data > fim) continue;
+        if (!horas[data][id]) continue;
+        const hx = horas[data][id];
+        if (hx.h100) { horas100 += hx.h100; datas100.push(formatarDataDMY(data)); }
+        if (hx.h50) { horas50 += hx.h50; datas50.push(formatarDataDMY(data)); }
+      }
+      if (horas100 === 0 && horas50 === 0) continue;
+      texto += `👤 *${funcionarios[id].nome}*\n100%: *${horas100}h* (${datas100.join(', ')})\n50%: *${horas50}h* (${datas50.join(', ')})\n\n`;
+    }
+    resultado.textContent = texto.trim();
+    textoRelatorioAtual = texto.trim();
+    scrollParaResultado();
+  } catch (error) { console.error(error); resultado.textContent = 'Erro ao gerar relatório de hora extra.'; }
+}
 
+// Excluir Chamada
+async function excluirChamada() {
+  const inicio = excluirDataInicio.value;
+  const fim = excluirDataFim.value;
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+  if (!confirm(`Deseja excluir chamadas de ${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)}?`)) return;
   try {
     const chamadasSnap = await get(ref(db, 'chamadas'));
-    if (!chamadasSnap.exists()) return alert('Nenhuma chamada encontrada para exclusão.');
+    if (!chamadasSnap.exists()) { alert('Nenhuma chamada encontrada.'); return; }
     const chamadas = chamadasSnap.val();
-    const datasParaExcluir = Object.keys(chamadas).filter(d => d >= dataInicio && d <= dataFim);
-    if (datasParaExcluir.length === 0) return alert('Nenhuma chamada encontrada no intervalo.');
-
+    const datasParaExcluir = Object.keys(chamadas).filter(d => d >= inicio && d <= fim);
     for (const data of datasParaExcluir) await remove(ref(db, `chamadas/${data}`));
-    alert(`Chamadas de ${formatarDataDMY(dataInicio)} até ${formatarDataDMY(dataFim)} excluídas com sucesso.`);
+    alert(`Chamadas de ${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)} excluídas com sucesso.`);
     resultado.textContent = '';
     textoRelatorioAtual = '';
-  } catch (error) {
-    console.error(error);
-    alert('Erro ao excluir chamadas.');
-  }
+  } catch (error) { console.error(error); alert('Erro ao excluir chamadas.'); }
 }
+
+// Excluir Hora Extra
+async function excluirHoraExtra() {
+  const inicio = excluirHoraExtraDataInicio.value;
+  const fim = excluirHoraExtraDataFim.value;
+  const senha = senhaExcluirHoraExtra.value;
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+  if (senha !== '1234') { alert('Senha incorreta.'); return; }
+  if (!confirm(`Deseja excluir horas extras de ${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)}?`)) return;
+  try {
+    const horasSnap = await get(ref(db, 'horaExtra'));
+    if (!horasSnap.exists()) { alert('Nenhuma hora extra encontrada.'); return; }
+    const horas = horasSnap.val();
+    const datasParaExcluir = Object.keys(horas).filter(d => d >= inicio && d <= fim);
+    for (const data of datasParaExcluir) await remove(ref(db, `horaExtra/${data}`));
+    alert(`Horas extras de ${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)} excluídas com sucesso.`);
+    resultado.textContent = '';
+    textoRelatorioAtual = '';
+  } catch (error) { console.error(error); alert('Erro ao excluir horas extras.'); }
+}
+
+// Enviar WhatsApp
+btnEnviarWhats.addEventListener('click', () => {
+  if (!textoRelatorioAtual) return alert('Gere um relatório antes de enviar.');
+  const textoCodificado = encodeURIComponent(textoRelatorioAtual);
+  window.open(`https://wa.me/?text=${textoCodificado}`, '_blank');
+});
 
 // Eventos
 btnGerarFaltas.addEventListener('click', gerarRelatorioFaltas);
 btnGerarLista.addEventListener('click', gerarRelatorioDadosFuncionario);
 btnGerarPagamento.addEventListener('click', gerarRelatorioPagamentoDiarista);
+btnGerarHoraExtra.addEventListener('click', gerarRelatorioHoraExtra);
 btnExcluirChamada.addEventListener('click', excluirChamada);
+btnExcluirHoraExtra.addEventListener('click', excluirHoraExtra);
 
-btnEnviarWhats.addEventListener('click', () => {
-  if (!textoRelatorioAtual) return alert('Gere um relatório antes de enviar.');
-  const textoEncoded = encodeURIComponent(textoRelatorioAtual);
-  window.open(`https://wa.me/?text=${textoEncoded}`, '_blank');
-});
-
-// Inicialização
+// Inicializar
 carregarFuncionarios();
 </script>
 

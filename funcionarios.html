@@ -5,7 +5,226 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Funcionários</title>
   <style>
-    /* estilos mantidos iguais */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #2980b9, #6dd5fa);
+      color: #fff;
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px 15px 60px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 12px auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      user-select: none;
+    }
+    a.btn-voltar {
+      cursor: pointer;
+      background-color: #154360;
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+    }
+    a.btn-voltar:hover {
+      background-color: #0e2a48;
+      box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
+    }
+    h1 {
+      font-size: 2.4rem;
+      margin: 0 0 20px 0;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      user-select: none;
+      line-height: 1.2;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+    form {
+      background-color: rgba(21, 67, 96, 0.85);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+      user-select: none;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      user-select: none;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="cpf"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .radio-group {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .radio-group label {
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn-salvar {
+      background-color: #4caf50;
+      padding: 14px 0;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+      border: none;
+      box-shadow: 0 5px 12px rgba(76, 175, 80, 0.7);
+      cursor: pointer;
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .btn-salvar:hover {
+      background-color: #388e3c;
+      box-shadow: 0 7px 18px rgba(56, 142, 60, 0.9);
+    }
+    .funcionario-lista {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 10px;
+      user-select: none;
+    }
+    .funcionario-card {
+      background-color: rgba(21, 67, 96, 0.85);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 15px;
+      box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .funcionario-nome {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .funcionario-info {
+      font-size: 0.9rem;
+      color: #ddd;
+      white-space: pre-line;
+    }
+    .btn-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+    }
+    button.btn-editar,
+    button.btn-excluir {
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+      flex: 1;
+      transition: background-color 0.2s ease;
+    }
+    button.btn-editar {
+      background-color: #2980b9;
+      color: white;
+      box-shadow: 0 4px 10px rgba(41,128,185,0.7);
+    }
+    button.btn-editar:hover {
+      background-color: #1f6396;
+      box-shadow: 0 6px 14px rgba(31, 99, 150, 0.9);
+    }
+    button.btn-excluir {
+      background-color: #c0392b;
+      color: white;
+      box-shadow: 0 4px 10px rgba(192,57,43,0.7);
+    }
+    button.btn-excluir:hover {
+      background-color: #8e261e;
+      box-shadow: 0 6px 14px rgba(142, 38, 30, 0.9);
+    }
+    /* Ocultar campo função quando "Outro" não selecionado */
+    #funcaoOutroGroup {
+      display: none;
+      margin-bottom: 15px;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(21, 67, 96, 0.9);
+      color: #ddd;
+      text-align: center;
+      font-size: 0.85rem;
+      padding: 8px 0;
+      user-select: none;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+      max-width: 100%;
+    }
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 2rem;
+      }
+      form {
+        padding: 18px 15px;
+      }
+      input[type="text"],
+      input[type="number"],
+      select {
+        font-size: 1rem;
+      }
+      .btn-salvar {
+        font-size: 1.1rem;
+        padding: 14px 0;
+      }
+      .funcionario-card {
+        padding: 14px 16px;
+      }
+      .funcionario-nome {
+        font-size: 1rem;
+      }
+      button.btn-editar,
+      button.btn-excluir {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -26,7 +245,7 @@
       <label><input type="radio" name="tipo" value="diarista"> Diarista</label>
     </div>
 
-    <!-- Função -->
+    <!-- Função visível para ambos -->
     <label for="funcao">Função</label>
     <select id="funcao" required>
       <option value="" disabled selected>Selecione a função</option>
@@ -100,6 +319,7 @@
     let editandoId = null;
 
     function formatarCPF(cpf) {
+      // Formata CPF no formato NNN.NNN.NNN-NN
       return cpf
         .replace(/\D/g, '')
         .replace(/(\d{3})(\d)/, '$1.$2')
@@ -109,14 +329,17 @@
 
     function mostrarCamposPorTipo() {
       const tipoSelecionado = [...tipoRadios].find(r => r.checked).value;
+
       if (tipoSelecionado === 'funcionario') {
         funcionarioCampos.style.display = 'block';
         diaristaCampos.style.display = 'none';
+        // A obra fica no campo "obra"
         form.obra.required = true;
         form.obraDiarista.required = false;
       } else {
         funcionarioCampos.style.display = 'none';
         diaristaCampos.style.display = 'block';
+        // A obra fica no campo "obraDiarista"
         form.obra.required = false;
         form.obraDiarista.required = true;
       }
@@ -155,6 +378,7 @@
           return;
         }
       }
+
       dadosFuncionario.funcao = funcao;
 
       if (tipo === 'funcionario') {
@@ -165,6 +389,7 @@
         }
         dadosFuncionario.obra = obra;
       } else {
+        // diarista
         const cpf = form.cpf.value.trim();
         const tipoPix = form.tipoPix.value.trim();
         const chavePix = form.chavePix.value.trim();
@@ -222,6 +447,8 @@
 
     function montarLista() {
       listaFuncionarios.innerHTML = '';
+
+      // Ordena o array de funcionários pelo nome (ordem alfabética)
       const funcionariosOrdenados = Object.entries(funcionarios)
         .sort(([, a], [, b]) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
 
@@ -247,6 +474,7 @@
         listaFuncionarios.appendChild(card);
       }
 
+      // Adiciona eventos aos botões
       listaFuncionarios.querySelectorAll('.btn-editar').forEach(btn => {
         btn.addEventListener('click', () => {
           editarFuncionario(btn.dataset.id);
@@ -265,14 +493,17 @@
 
       editandoId = id;
       form.nome.value = f.nome;
+      // (removido) form.tipo.value = f.tipo;
 
       if (f.tipo.toLowerCase() === 'funcionario') {
         funcionarioCampos.style.display = 'block';
         diaristaCampos.style.display = 'none';
+
         form.obra.value = f.obra || '';
       } else {
         funcionarioCampos.style.display = 'none';
         diaristaCampos.style.display = 'block';
+
         form.cpf.value = f.cpf || '';
         form.tipoPix.value = f.tipoPix || '';
         form.chavePix.value = f.chavePix || '';
@@ -281,6 +512,7 @@
         form.obraDiarista.value = f.obra || '';
       }
 
+      // Preenche função e mostra campo outro se necessário
       if (f.funcao) {
         const opcoes = Array.from(funcaoSelect.options).map(opt => opt.value);
         if (opcoes.includes(f.funcao)) {
@@ -301,6 +533,7 @@
         funcaoOutroInput.required = false;
       }
 
+      // Ajusta radio do tipo corretamente
       tipoRadios.forEach(radio => {
         radio.checked = radio.value === f.tipo;
       });

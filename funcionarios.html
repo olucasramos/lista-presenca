@@ -304,7 +304,7 @@
   </footer>
 
   <script type="module">
-    import { db, ref, set, get, update, remove, push } from "./firebase.js";
+    import { db, ref, set, get, update, remove } from "./firebase.js";
 
     const form = document.getElementById('formFuncionario');
     const tipoRadios = document.getElementsByName('tipo');
@@ -317,6 +317,11 @@
 
     let funcionarios = {};
     let editandoId = null;
+
+    // Gera ID único para novos funcionários (evita colisão sem depender de push)
+    function gerarId() {
+      return 'f_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    }
 
     function formatarCPF(cpf) {
       // Formata CPF no formato NNN.NNN.NNN-NN
@@ -416,8 +421,8 @@
           alert('Funcionário atualizado com sucesso!');
           editandoId = null;
         } else {
-          const novoRef = push(ref(db, 'funcionarios'));
-          await set(novoRef, dadosFuncionario);
+          const idNovo = gerarId();
+          await set(ref(db, `funcionarios/${idNovo}`), dadosFuncionario);
           alert('Funcionário cadastrado com sucesso!');
         }
         form.reset();

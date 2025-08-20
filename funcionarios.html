@@ -1,256 +1,378 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerenciar Funcionários</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Funcionários</title>
   <style>
+    * { box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f9f9f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #2980b9, #6dd5fa);
+      color: #fff;
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px 15px 60px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    h1, h2 {
-      color: #333;
+    header { width: 100%; max-width: 400px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: flex-start; user-select: none; }
+    a.btn-voltar {
+      cursor: pointer;
+      background-color: #154360;
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+    }
+    a.btn-voltar:hover {
+      background-color: #0e2a48;
+      box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
+    }
+    h1 {
+      font-size: 2.4rem;
+      margin: 0 0 20px 0;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      user-select: none;
+      line-height: 1.2;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
     }
     form {
-      background: #fff;
+      background-color: rgba(21, 67, 96, 0.85);
+      border-radius: 12px;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select, button {
-      margin-top: 5px;
-      padding: 8px;
       width: 100%;
-      box-sizing: border-box;
+      max-width: 400px;
+      box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+      user-select: none;
     }
-    button {
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .lista-funcionarios {
-      background: #fff;
-      padding: 20px;
+    label { display: block; margin-bottom: 6px; font-weight: 600; user-select: none; }
+    input[type="text"], input[type="number"], input[type="cpf"], input[type="tel"], select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border: none;
+      font-size: 1rem;
+      font-family: inherit;
     }
-    .item-funcionario {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-    }
-    .item-funcionario:last-child {
-      border-bottom: none;
-    }
-    .botoes {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .radio-group { margin-bottom: 15px; display: flex; gap: 15px; flex-wrap: wrap; }
+    .radio-group label { font-weight: 500; cursor: pointer; user-select: none; }
+    .btn-salvar {
+      background-color: #4caf50;
+      padding: 14px 0;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+      border: none;
+      box-shadow: 0 5px 12px rgba(76, 175, 80, 0.7);
+      cursor: pointer;
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+      width: 100%;
       margin-top: 10px;
     }
-    .botoes button {
-      width: auto;
-      margin-right: 10px;
-      padding: 6px 12px;
+    .btn-salvar:hover { background-color: #388e3c; box-shadow: 0 7px 18px rgba(56, 142, 60, 0.9); }
+    .funcionario-lista { width: 100%; max-width: 400px; margin-top: 10px; user-select: none; }
+    .funcionario-card {
+      background-color: rgba(21, 67, 96, 0.85);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 15px;
+      box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
-    .hidden {
-      display: none;
+    .funcionario-nome { font-weight: 700; font-size: 1.1rem; }
+    .funcionario-info { font-size: 0.9rem; color: #ddd; white-space: pre-line; }
+    .btn-actions { margin-top: 8px; display: flex; gap: 8px; }
+    button.btn-editar, button.btn-excluir {
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+      flex: 1;
+      transition: background-color 0.2s ease;
+    }
+    button.btn-editar { background-color: #2980b9; color: white; box-shadow: 0 4px 10px rgba(41,128,185,0.7); }
+    button.btn-editar:hover { background-color: #1f6396; box-shadow: 0 6px 14px rgba(31, 99, 150, 0.9); }
+    button.btn-excluir { background-color: #c0392b; color: white; box-shadow: 0 4px 10px rgba(192,57,43,0.7); }
+    button.btn-excluir:hover { background-color: #8e261e; box-shadow: 0 6px 14px rgba(142, 38, 30, 0.9); }
+    #funcaoOutroGroup { display: none; margin-bottom: 15px; }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(21, 67, 96, 0.9);
+      color: #ddd;
+      text-align: center;
+      font-size: 0.85rem;
+      padding: 8px 0;
+      user-select: none;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+      max-width: 100%;
+    }
+    @media (max-width: 420px) {
+      h1 { font-size: 2rem; }
+      form { padding: 18px 15px; }
+      input[type="text"], input[type="number"], select { font-size: 1rem; }
+      .btn-salvar { font-size: 1.1rem; padding: 14px 0; }
+      .funcionario-card { padding: 14px 16px; }
+      .funcionario-nome { font-size: 1rem; }
+      button.btn-editar, button.btn-excluir { font-size: 0.85rem; padding: 6px 12px; }
     }
   </style>
 </head>
 <body>
-  <h1>Gerenciar Funcionários</h1>
 
-  <form id="form-funcionario">
-    <label>Nome:
-      <input type="text" id="nome" name="nome" required>
-    </label>
+  <header>
+    <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+  </header>
 
-    <label>Tipo:</label>
-    <label><input type="radio" name="tipo" value="Funcionario" required> Funcionário</label>
-    <label><input type="radio" name="tipo" value="Diarista" required> Diarista</label>
+  <h1>Funcionários</h1>
 
-    <div id="funcionario-campos" class="hidden">
-      <label>Obra:
-        <input type="text" id="obra" name="obra">
-      </label>
+  <form id="formFuncionario" autocomplete="off">
+    <label for="nome">Nome</label>
+    <input type="text" id="nome" required />
+
+    <label>Tipo</label>
+    <div class="radio-group">
+      <label><input type="radio" name="tipo" value="funcionario" checked> Funcionário</label>
+      <label><input type="radio" name="tipo" value="diarista"> Diarista</label>
     </div>
 
-    <div id="diarista-campos" class="hidden">
-      <label>CPF:
-        <input type="text" id="cpf" name="cpf">
-      </label>
-      <label>Tipo Pix:
-        <input type="text" id="tipoPix" name="tipoPix">
-      </label>
-      <label>Chave Pix:
-        <input type="text" id="chavePix" name="chavePix">
-      </label>
-      <label>Banco:
-        <input type="text" id="banco" name="banco">
-      </label>
-      <label>Valor da Diária:
-        <input type="number" id="valorDiaria" name="valorDiaria">
-      </label>
-      <label>Obra:
-        <input type="text" id="obraDiarista" name="obraDiarista">
-      </label>
+    <label for="funcao">Função</label>
+    <select id="funcao" required>
+      <option value="" disabled selected>Selecione a função</option>
+      <option value="Ajudante Prático">Ajudante Prático</option>
+      <option value="Oficial">Oficial</option>
+      <option value="Oficial Pleno">Oficial Pleno</option>
+      <option value="Oficial Polivalente">Oficial Polivalente</option>
+      <option value="Encarregado">Encarregado</option>
+      <option value="Outro">Outro</option>
+    </select>
+
+    <div id="funcaoOutroGroup">
+      <label for="funcaoOutro">Especifique a função</label>
+      <input type="text" id="funcaoOutro" placeholder="Digite a função" />
     </div>
 
-    <label>Função:
-      <select id="funcaoSelect" name="funcao">
-        <option value="">Selecione...</option>
-        <option value="Pedreiro">Pedreiro</option>
-        <option value="Servente">Servente</option>
-        <option value="Outro">Outro</option>
+    <div id="funcionarioCampos">
+      <label for="obra">Obra</label>
+      <input type="text" id="obra" />
+    </div>
+
+    <div id="diaristaCampos" style="display:none;">
+      <label for="cpf">CPF</label>
+      <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" />
+
+      <label for="tipoPix">Tipo de Chave PIX</label>
+      <select id="tipoPix">
+        <option value="" disabled selected>Selecione o tipo de chave PIX</option>
+        <option value="CPF">CPF</option>
+        <option value="CNPJ">CNPJ</option>
+        <option value="Email">Email</option>
+        <option value="Telefone">Telefone</option>
+        <option value="Aleatória">Chave Aleatória</option>
       </select>
-    </label>
-    <div id="funcaoOutroGroup" class="hidden">
-      <label>Outra Função:
-        <input type="text" id="funcaoOutro" name="funcaoOutro">
-      </label>
+
+      <label for="chavePix">Chave PIX</label>
+      <input type="text" id="chavePix" />
+
+      <label for="banco">Banco</label>
+      <input type="text" id="banco" />
+
+      <label for="valorDiaria">Valor da diária (R$)</label>
+      <input type="number" id="valorDiaria" min="0" step="1" />
+
+      <label for="obraDiarista">Obra</label>
+      <input type="text" id="obraDiarista" />
     </div>
 
-    <button type="submit" id="btnSalvar">Salvar Funcionário</button>
+    <button type="submit" class="btn-salvar">Salvar Funcionário</button>
   </form>
 
-  <div class="lista-funcionarios">
-    <h2>Lista de Funcionários</h2>
-    <div id="lista"></div>
-  </div>
+  <div class="funcionario-lista" id="listaFuncionarios"></div>
+
+  <footer>
+    Desenvolvido por Lucas Ramos Aragão
+  </footer>
 
   <script type="module">
     import { db, ref, set, get, update, remove } from "./firebase.js";
 
-    const form = document.getElementById('form-funcionario');
-    const lista = document.getElementById('lista');
-    const tipoRadios = form.querySelectorAll('input[name="tipo"]');
-    const funcionarioCampos = document.getElementById('funcionario-campos');
-    const diaristaCampos = document.getElementById('diarista-campos');
-    const funcaoSelect = document.getElementById('funcaoSelect');
+    const form = document.getElementById('formFuncionario');
+    const tipoRadios = document.getElementsByName('tipo');
+    const funcionarioCampos = document.getElementById('funcionarioCampos');
+    const diaristaCampos = document.getElementById('diaristaCampos');
+    const funcaoSelect = document.getElementById('funcao');
     const funcaoOutroGroup = document.getElementById('funcaoOutroGroup');
     const funcaoOutroInput = document.getElementById('funcaoOutro');
-    const btnSalvar = document.getElementById('btnSalvar');
+    const listaFuncionarios = document.getElementById('listaFuncionarios');
 
+    let funcionarios = {};
     let editandoId = null;
 
-    function gerarId() {
-      return 'f_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    function formatarCPF(cpf) {
+      return cpf.replace(/\D/g, '')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     }
 
-    // Mostrar/esconder campos conforme o tipo
-    tipoRadios.forEach(radio => {
-      radio.addEventListener('change', () => {
-        if (radio.value === 'Funcionario') {
-          funcionarioCampos.classList.remove('hidden');
-          diaristaCampos.classList.add('hidden');
-        } else {
-          funcionarioCampos.classList.add('hidden');
-          diaristaCampos.classList.remove('hidden');
-        }
-      });
-    });
+    function mostrarCamposPorTipo() {
+      const tipoSelecionado = [...tipoRadios].find(r => r.checked).value;
+      if (tipoSelecionado === 'funcionario') {
+        funcionarioCampos.style.display = 'block';
+        diaristaCampos.style.display = 'none';
+        form.obra.required = true;
+        form.obraDiarista.required = false;
+      } else {
+        funcionarioCampos.style.display = 'none';
+        diaristaCampos.style.display = 'block';
+        form.obra.required = false;
+        form.obraDiarista.required = true;
+      }
+    }
 
     funcaoSelect.addEventListener('change', () => {
       if (funcaoSelect.value === 'Outro') {
-        funcaoOutroGroup.classList.remove('hidden');
+        funcaoOutroGroup.style.display = 'block';
         funcaoOutroInput.required = true;
       } else {
-        funcaoOutroGroup.classList.add('hidden');
+        funcaoOutroGroup.style.display = 'none';
         funcaoOutroInput.required = false;
       }
     });
 
-    form.addEventListener('submit', async (e) => {
+    tipoRadios.forEach(radio => { radio.addEventListener('change', mostrarCamposPorTipo); });
+
+    diaristaCampos.querySelector('#cpf').addEventListener('input', e => { e.target.value = formatarCPF(e.target.value); });
+
+    form.addEventListener('submit', async e => {
       e.preventDefault();
+      const nome = form.nome.value.trim();
+      const tipo = [...tipoRadios].find(r => r.checked).value;
+      let dadosFuncionario = { nome, tipo };
 
-      const nome = form.nome.value;
-      const tipo = form.tipo.value;
-      const funcao = funcaoSelect.value === 'Outro' ? funcaoOutroInput.value : funcaoSelect.value;
+      let funcao = funcaoSelect.value;
+      if (funcao === 'Outro') {
+        funcao = funcaoOutroInput.value.trim();
+        if (!funcao) { alert('Por favor, especifique a função.'); return; }
+      }
+      dadosFuncionario.funcao = funcao;
 
-      let dadosFuncionario = { nome, tipo, funcao };
+      if (tipo === 'funcionario') {
+        const obra = form.obra.value.trim();
+        if (!nome || !funcao || !obra) { alert('Por favor, preencha todos os campos obrigatórios.'); return; }
+        dadosFuncionario.obra = obra;
+      } else {
+        const cpf = form.cpf.value.trim();
+        const tipoPix = form.tipoPix.value.trim();
+        const chavePix = form.chavePix.value.trim();
+        const banco = form.banco.value.trim();
+        const valorDiaria = form.valorDiaria.value.trim();
+        const obraDiarista = form.obraDiarista.value.trim();
+        if (!nome || !cpf || !valorDiaria || !obraDiarista) { alert('Por favor, preencha os campos obrigatórios do diarista.'); return; }
 
-      if (tipo === 'Funcionario') {
-        dadosFuncionario.obra = form.obra.value;
-      } else if (tipo === 'Diarista') {
-        dadosFuncionario.cpf = form.cpf.value;
-        dadosFuncionario.tipoPix = form.tipoPix.value;
-        dadosFuncionario.chavePix = form.chavePix.value;
-        dadosFuncionario.banco = form.banco.value;
-        dadosFuncionario.valorDiaria = form.valorDiaria.value;
-        dadosFuncionario.obra = form.obraDiarista.value;
+        dadosFuncionario.cpf = cpf;
+        dadosFuncionario.tipoPix = tipoPix;
+        dadosFuncionario.chavePix = chavePix;
+        dadosFuncionario.banco = banco;
+        dadosFuncionario.valorDiaria = parseInt(valorDiaria, 10);
+        dadosFuncionario.obra = obraDiarista;
       }
 
       try {
         if (editandoId) {
           await update(ref(db, `funcionarios/${editandoId}`), dadosFuncionario);
           alert('Funcionário atualizado com sucesso!');
+          editandoId = null;
         } else {
-          const idNovo = gerarId();
+          const novoRef = ref(db, 'funcionarios');
+          const snapshot = await get(novoRef);
+          const idNovo = snapshot.exists() ? Object.keys(snapshot.val()).length + 1 : 1;
           await set(ref(db, `funcionarios/${idNovo}`), dadosFuncionario);
           alert('Funcionário cadastrado com sucesso!');
         }
         form.reset();
-        funcionarioCampos.classList.add('hidden');
-        diaristaCampos.classList.add('hidden');
-        funcaoOutroGroup.classList.add('hidden');
-        editandoId = null;
-        btnSalvar.textContent = "Salvar Funcionário";
+        funcaoOutroGroup.style.display = 'none';
+        mostrarCamposPorTipo();
         carregarFuncionarios();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (error) {
-        console.error("Erro ao salvar funcionário:", error);
+        console.error('Erro ao salvar funcionário:', error);
+        alert('Erro ao salvar funcionário. Veja o console para detalhes.');
       }
     });
 
     async function carregarFuncionarios() {
-      lista.innerHTML = '';
-      const snapshot = await get(ref(db, 'funcionarios'));
-      if (snapshot.exists()) {
-        const funcionarios = snapshot.val();
-        Object.entries(funcionarios).forEach(([id, f]) => {
-          const div = document.createElement('div');
-          div.className = 'item-funcionario';
-          div.innerHTML = `<strong>${f.nome}</strong> - ${f.tipo} - ${f.funcao}
-            <div class="botoes">
-              <button onclick="editarFuncionario('${id}')">Editar</button>
-              <button onclick="excluirFuncionario('${id}')">Excluir</button>
-            </div>`;
-          lista.appendChild(div);
-        });
-      } else {
-        lista.innerHTML = '<p>Nenhum funcionário cadastrado.</p>';
+      try {
+        const snapshot = await get(ref(db, 'funcionarios'));
+        if (snapshot.exists()) {
+          funcionarios = snapshot.val();
+          montarLista();
+        } else {
+          listaFuncionarios.innerHTML = '<p>Nenhum funcionário encontrado.</p>';
+        }
+      } catch (error) {
+        console.error('Erro ao carregar funcionários:', error);
+        listaFuncionarios.innerHTML = '<p>Erro ao carregar funcionários.</p>';
       }
     }
 
-    window.editarFuncionario = async function(id) {
-      const snapshot = await get(ref(db, `funcionarios/${id}`));
-      if (!snapshot.exists()) return;
-      const f = snapshot.val();
+    function montarLista() {
+      listaFuncionarios.innerHTML = '';
+      const funcionariosOrdenados = Object.entries(funcionarios)
+        .sort(([, a], [, b]) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+      for (const [id, f] of funcionariosOrdenados) {
+        let info = `Tipo: ${capitalize(f.tipo)}\n`;
+        if (f.tipo.toLowerCase() === 'funcionario') info += `Função: ${f.funcao}\nObra: ${f.obra}`;
+        else if (f.tipo.toLowerCase() === 'diarista') info += `CPF: ${f.cpf}\nChave PIX: ${f.chavePix}\nTipo PIX: ${f.tipoPix}\nBanco: ${f.banco}\nValor da diária: R$ ${Number(f.valorDiaria).toFixed(2)}\nObra: ${f.obra}`;
+        const card = document.createElement('div');
+        card.className = 'funcionario-card';
+        card.innerHTML = `
+          <div class="funcionario-nome">${f.nome}</div>
+          <div class="funcionario-info">${info.replace(/\n/g, '<br>')}</div>
+          <div class="btn-actions">
+            <button class="btn-editar" data-id="${id}">Editar</button>
+            <button class="btn-excluir" data-id="${id}">Excluir</button>
+          </div>
+        `;
+        listaFuncionarios.appendChild(card);
+      }
+      listaFuncionarios.querySelectorAll('.btn-editar').forEach(btn => { btn.addEventListener('click', () => editarFuncionario(btn.dataset.id)); });
+      listaFuncionarios.querySelectorAll('.btn-excluir').forEach(btn => { btn.addEventListener('click', () => excluirFuncionario(btn.dataset.id)); });
+    }
 
+    function editarFuncionario(id) {
+      const f = funcionarios[id];
+      if (!f) return;
       editandoId = id;
-      form.nome.value = f.nome || '';
+      form.nome.value = f.nome;
 
-      // Marca tipo corretamente e exibe campos
-      tipoRadios.forEach(radio => {
-        radio.checked = radio.value === f.tipo;
-      });
+      tipoRadios.forEach(radio => { radio.checked = radio.value === f.tipo; });
+      mostrarCamposPorTipo();
 
-      if (f.tipo === 'Funcionario') {
-        funcionarioCampos.classList.remove('hidden');
-        diaristaCampos.classList.add('hidden');
+      if (f.tipo.toLowerCase() === 'funcionario') {
         form.obra.value = f.obra || '';
-      } else if (f.tipo === 'Diarista') {
-        funcionarioCampos.classList.add('hidden');
-        diaristaCampos.classList.remove('hidden');
+      } else {
         form.cpf.value = f.cpf || '';
         form.tipoPix.value = f.tipoPix || '';
         form.chavePix.value = f.chavePix || '';
@@ -261,31 +383,31 @@
 
       if (f.funcao) {
         const opcoes = Array.from(funcaoSelect.options).map(opt => opt.value);
-        if (opcoes.includes(f.funcao)) {
-          funcaoSelect.value = f.funcao;
-          funcaoOutroGroup.classList.add('hidden');
-          funcaoOutroInput.value = '';
-          funcaoOutroInput.required = false;
-        } else {
-          funcaoSelect.value = 'Outro';
-          funcaoOutroGroup.classList.remove('hidden');
-          funcaoOutroInput.value = f.funcao;
-          funcaoOutroInput.required = true;
-        }
-      }
+        if (opcoes.includes(f.funcao)) { funcaoSelect.value = f.funcao; funcaoOutroGroup.style.display = 'none'; funcaoOutroInput.value = ''; funcaoOutroInput.required = false; }
+        else { funcaoSelect.value = 'Outro'; funcaoOutroGroup.style.display = 'block'; funcaoOutroInput.value = f.funcao; funcaoOutroInput.required = true; }
+      } else { funcaoSelect.value = ''; funcaoOutroGroup.style.display = 'none'; funcaoOutroInput.value = ''; funcaoOutroInput.required = false; }
 
-      btnSalvar.textContent = "Atualizar Funcionário";
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    window.excluirFuncionario = async function(id) {
-      if (confirm("Tem certeza que deseja excluir este funcionário?")) {
-        await remove(ref(db, `funcionarios/${id}`));
-        carregarFuncionarios();
+    async function excluirFuncionario(id) {
+      if (confirm('Deseja realmente excluir este funcionário?')) {
+        try {
+          await remove(ref(db, `funcionarios/${id}`));
+          alert('Funcionário excluído com sucesso!');
+          carregarFuncionarios();
+        } catch (error) {
+          console.error('Erro ao excluir funcionário:', error);
+          alert('Erro ao excluir funcionário. Veja o console para detalhes.');
+        }
       }
     }
 
+    function capitalize(text) { if (!text) return ''; return text.charAt(0).toUpperCase() + text.slice(1); }
+
+    mostrarCamposPorTipo();
     carregarFuncionarios();
   </script>
+
 </body>
 </html>

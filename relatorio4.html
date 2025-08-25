@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relatórios</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2980b9, #6dd5fa);
+    color: #fff;
+    margin: 0;
+    min-height: 100vh;
+    padding: 20px 15px 60px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    width: 100%;
+    max-width: 840px;
+    margin: 0 auto 12px auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    user-select: none;
+  }
+  a.btn-voltar {
+    cursor: pointer;
+    background-color: #154360;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(21,67,96,0.7);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    user-select: none;
+  }
+  a.btn-voltar:hover {
+    background-color: #0e2a48;
+    box-shadow: 0 6px 14px rgba(14, 42, 72, 0.9);
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    margin: 0 0 20px 0;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    user-select: none;
+    text-align: center;
+    max-width: 840px;
+    width: 100%;
+  }
+
+  section {
+    background-color: rgba(21, 67, 96, 0.85);
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin-bottom: 18px;
+    width: 100%;
+    max-width: 840px;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+    user-select: none;
+  }
+
+  section h2 {
+    margin: 0 0 14px 0;
+    font-size: 1.3rem;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin: 10px 0 6px 0;
+  }
+
+  select, input[type="date"], input[type="password"] {
+    width: 100%;
+    max-width: 340px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #154360;
+  }
+
+  .linha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 18px;
+    align-items: flex-end;
+  }
+
+  button.btn-acao {
+    background-color: #154360;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    border: none;
+    box-shadow: 0 5px 12px rgba(21, 67, 96, 0.7);
+    cursor: pointer;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    margin-top: 4px;
+  }
+  button.btn-acao:hover {
+    background-color: #0e2a48;
+    box-shadow: 0 7px 18px rgba(14, 42, 72, 0.9);
+  }
+
+  pre#resultado {
+    background: rgba(255,255,255,0.92);
+    color: #0b2a3f;
+    width: 100%;
+    max-width: 840px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 14px rgba(21, 67, 96, 0.7);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-top: 6px;
+    min-height: 110px;
+  }
+
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(21, 67, 96, 0.9);
+    color: #ddd;
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 8px 0;
+    user-select: none;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+    max-width: 100%;
+  }
+
+  @media (max-width: 420px) {
+    h1 {
+      font-size: 2rem;
+    }
+    section {
+      padding: 16px 20px;
+    }
+    button.btn-acao {
+      min-width: 140px;
+      margin-bottom: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+</header>
+
+<h1>Relatórios</h1>
+
+<!-- FALTAS -->
+<section id="faltasSection">
+  <h2>📋 Relatório de Faltas</h2>
+  <div class="linha">
+    <div>
+      <label for="faltasTipo">Tipo</label>
+      <select id="faltasTipo">
+        <option value="todos">Todos</option>
+        <option value="funcionario">Funcionário</option>
+        <option value="diarista">Diarista</option>
+      </select>
+    </div>
+    <div>
+      <label for="faltasDataInicio">Data Início</label>
+      <input type="date" id="faltasDataInicio" />
+    </div>
+    <div>
+      <label for="faltasDataFim">Data Fim</label>
+      <input type="date" id="faltasDataFim" />
+    </div>
+    <button id="btnGerarFaltas" class="btn-acao">Gerar Relatório</button>
+  </div>
+</section>
+
+<!-- DADOS DO FUNCIONÁRIO -->
+<section id="dadosFuncionarioSection">
+  <h2>🧑 Dados do Funcionário</h2>
+  <div class="linha">
+    <div>
+      <label for="listaFuncionario">Funcionário</label>
+      <select id="listaFuncionario">
+        <option value="todos">Todos</option>
+      </select>
+    </div>
+    <button id="btnGerarLista" class="btn-acao">Gerar Relatório</button>
+  </div>
+</section>
+
+<!-- PAGAMENTO DIARISTA -->
+<section id="pagamentoDiaristaSection">
+  <h2>💰 Relatório de Pagamento Diarista</h2>
+  <div class="linha">
+    <div>
+      <label for="pagamentoDataInicio">Data Início</label>
+      <input type="date" id="pagamentoDataInicio" />
+    </div>
+    <div>
+      <label for="pagamentoDataFim">Data Fim</label>
+      <input type="date" id="pagamentoDataFim" />
+    </div>
+    <button id="btnGerarPagamento" class="btn-acao">Gerar Relatório</button>
+  </div>
+</section>
+
+<!-- HORA EXTRA -->
+<section id="horaExtraSection">
+  <h2>⏱️ Relatório de Hora Extra</h2>
+  <div class="linha">
+    <div>
+      <label for="horaExtraInicio">Data Início</label>
+      <input type="date" id="horaExtraInicio" />
+    </div>
+    <div>
+      <label for="horaExtraFim">Data Fim</label>
+      <input type="date" id="horaExtraFim" />
+    </div>
+    <button id="btnGerarHoraExtra" class="btn-acao">Gerar Relatório</button>
+  </div>
+</section>
+
+<!-- EXCLUIR RELATÓRIOS -->
+<section id="excluirSection">
+  <h2>❌ Excluir Relatórios</h2>
+  <div class="linha">
+    <div>
+      <label for="excluirTipo">Tipo de Registro</label>
+      <select id="excluirTipo">
+        <option value="chamadas">Chamada</option>
+        <option value="horaextra">Hora Extra</option>
+      </select>
+    </div>
+    <div>
+      <label for="excluirDataInicio">Data Início</label>
+      <input type="date" id="excluirDataInicio" />
+    </div>
+    <div>
+      <label for="excluirDataFim">Data Fim</label>
+      <input type="date" id="excluirDataFim" />
+    </div>
+    <div>
+      <label for="excluirSenha">Senha de Exclusão</label>
+      <input type="password" id="excluirSenha" placeholder="Digite a senha" />
+    </div>
+    <button id="btnExcluir" class="btn-acao" style="background-color:#c0392b;">Excluir</button>
+  </div>
+</section>
+
+<pre id="resultado" tabindex="0" aria-label="Resultado do relatório"></pre>
+
+<button id="btnEnviarWhats" class="btn-acao" style="background-color:#25D366; margin-bottom:40px;">📲 Enviar relatório por WhatsApp</button>
+
+<footer>Desenvolvido por Lucas Ramos Aragão</footer>
+
+<script type="module">
+  import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+  import { app } from "./firebase.js";
+
+  const db = getDatabase(app);
+
+  // ========= DOM =========
+  const faltasTipo = document.getElementById('faltasTipo');
+  const faltasDataInicio = document.getElementById('faltasDataInicio');
+  const faltasDataFim = document.getElementById('faltasDataFim');
+  const btnGerarFaltas = document.getElementById('btnGerarFaltas');
+
+  const listaFuncionario = document.getElementById('listaFuncionario');
+  const btnGerarLista = document.getElementById('btnGerarLista');
+
+  const pagamentoDataInicio = document.getElementById('pagamentoDataInicio');
+  const pagamentoDataFim = document.getElementById('pagamentoDataFim');
+  const btnGerarPagamento = document.getElementById('btnGerarPagamento');
+
+  const horaExtraInicio = document.getElementById('horaExtraInicio');
+  const horaExtraFim = document.getElementById('horaExtraFim');
+  const btnGerarHoraExtra = document.getElementById('btnGerarHoraExtra');
+
+  const excluirTipo = document.getElementById('excluirTipo');
+  const excluirDataInicio = document.getElementById('excluirDataInicio');
+  const excluirDataFim = document.getElementById('excluirDataFim');
+  const excluirSenha = document.getElementById('excluirSenha');
+  const btnExcluir = document.getElementById('btnExcluir');
+
+  const resultado = document.getElementById('resultado');
+  const btnEnviarWhats = document.getElementById('btnEnviarWhats');
+
+  // ========= CONFIG =========
+  const SENHA_EXCLUSAO = '1234'; // 🔐 Altere aqui se quiser outra senha
+
+  // ========= ESTADO =========
+  let funcionariosCache = {};
+  let textoRelatorioAtual = '';
+
+  // ========= HELPERS =========
+  function formatarDataDMY(dataISO) {
+    if (!dataISO) return '-';
+    const [ano, mes, dia] = dataISO.split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
+  function formatCPF(cpf) {
+    if (!cpf) return '-';
+    let v = String(cpf).replace(/\D/g, '').padStart(11,'0');
+    return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  }
+  function capitalize(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  function scrollParaResultado() {
+    resultado.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ========= CARREGAR FUNCIONÁRIOS =========
+  async function carregarFuncionarios() {
+    try {
+      const snapshot = await get(ref(db, 'funcionarios'));
+      if (snapshot.exists()) {
+        funcionariosCache = snapshot.val();
+        atualizarListaFuncionarios();
+      } else {
+        funcionariosCache = {};
+        listaFuncionario.innerHTML = '<option value="todos">Nenhum funcionário</option>';
+      }
+    } catch (error) {
+      console.error('Erro ao carregar funcionários:', error);
+      listaFuncionario.innerHTML = '<option value="todos">Erro ao carregar</option>';
+    }
+  }
+
+  function atualizarListaFuncionarios() {
+    listaFuncionario.innerHTML = '<option value="todos">Todos</option>';
+    Object.entries(funcionariosCache)
+      .sort(([,a],[,b]) => (a.nome||'').localeCompare(b.nome||'', 'pt-BR', {sensitivity:'base'}))
+      .forEach(([id, f]) => {
+        listaFuncionario.innerHTML += `<option value="${id}">${f.nome}</option>`;
+      });
+  }
+
+  // ========= RELATÓRIO DE FALTAS (apenas faltantes) =========
+  async function gerarRelatorioFaltas() {
+  const tipoFiltro = faltasTipo.value;
+  const inicio = faltasDataInicio.value;
+  const fim = faltasDataFim.value;
+
+  resultado.textContent = '';
+  if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+  if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+
+  try {
+    const chamadasSnap = await get(ref(db, 'chamadas'));
+    const funcionariosSnap = await get(ref(db, 'funcionarios'));
+    if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
+      resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+      return;
+    }
+    const chamadas = chamadasSnap.val();
+    const funcionarios = funcionariosSnap.val();
+
+    // Mapa id -> {nome, tipo, faltas: [{data, atestado}]}
+    const faltas = {};
+    for (const id in funcionarios) {
+      const f = funcionarios[id];
+      if (tipoFiltro !== 'todos' && f.tipo !== tipoFiltro) continue;
+      faltas[id] = { nome: f.nome, tipo: f.tipo, faltas: [] };
+    }
+
+    for (const dataChamada in chamadas) {
+      if (dataChamada < inicio || dataChamada > fim) continue;
+      const presencasDia = chamadas[dataChamada];
+      for (const id in faltas) {
+        const registro = presencasDia?.[id];
+        if (registro && registro.status === 'falta') {
+          faltas[id].faltas.push({
+            data: formatarDataDMY(dataChamada),
+            atestado: registro.atestado === true ? 'Sim' : 'Não'
+          });
+        }
+      }
+    }
+
+    let texto = `📋 *Relatório de Faltas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+    let encontrou = false;
+
+    Object.values(faltas)
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
+      .forEach(item => {
+        if (item.faltas.length > 0) {
+          encontrou = true;
+          const tipoLabel = item.tipo === 'funcionario' ? 'Funcionário' : 'Diarista';
+          texto += `👤 *${item.nome}* (${tipoLabel})\n` +
+                   `Faltas: *${item.faltas.length}*\n` +
+                   `Datas:\n` +
+                   item.faltas.map(f => `• ${f.data} (Atestado: ${f.atestado})`).join('\n') +
+                   `\n\n`;
+        }
+      });
+
+    if (!encontrou) {
+      texto = `📋 *Relatório de Faltas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\nNenhum funcionário com faltas no período.`;
+    }
+
+    resultado.textContent = texto.trim();
+    textoRelatorioAtual = texto.trim();
+    scrollParaResultado();
+  } catch (error) {
+    console.error('Erro ao gerar relatório de faltas:', error);
+    resultado.textContent = 'Erro ao gerar relatório de faltas.';
+  }
+}
+  // ========= DADOS DO FUNCIONÁRIO (com dados de pagamento quando houver) =========
+  function formatarFuncionario(f) {
+    const funcaoDisplay = f.funcao || '-';
+    const linhas = [
+      `👤 Nome: *${f.nome || '-'}*`,
+      `Tipo: *${capitalize(f.tipo) || '-'}*`,
+      `Função: *${funcaoDisplay}*`,
+      `Obra: *${f.obra || '-'}*`
+    ];
+
+    // Dados de pagamento (se existirem)
+    const pagamento = [];
+    if (f.cpf) pagamento.push(`CPF: *${formatCPF(f.cpf)}*`);
+    if (f.valorDiaria != null) pagamento.push(`Valor diária: *R$ ${parseFloat(f.valorDiaria).toFixed(2)}*`);
+    if (f.banco) pagamento.push(`Banco: *${f.banco}*`);
+    if (f.tipoPix || f.chavePix) pagamento.push(`PIX: *${f.tipoPix || '-'}* - *${f.chavePix || '-'}*`);
+
+    if (pagamento.length > 0) {
+      linhas.push('— Pagamento —');
+      linhas.push(...pagamento);
+    }
+    return linhas.join('\n');
+  }
+
+  async function gerarRelatorioDadosFuncionario() {
+    const funcionarioId = listaFuncionario.value;
+    resultado.textContent = '';
+
+    try {
+      const funcionariosSnap = await get(ref(db, 'funcionarios'));
+      if (!funcionariosSnap.exists()) {
+        resultado.textContent = 'Nenhum funcionário cadastrado.';
+        return;
+      }
+      const funcionarios = funcionariosSnap.val();
+
+      let texto = '';
+      if (funcionarioId === 'todos') {
+        texto = '🧑 *Lista completa de Funcionários:*\n\n';
+        Object.entries(funcionarios)
+          .sort(([,a],[,b]) => (a.nome||'').localeCompare(b.nome||'','pt-BR',{sensitivity:'base'}))
+          .forEach(([,f]) => { texto += formatarFuncionario(f) + '\n\n'; });
+      } else {
+        const f = funcionarios[funcionarioId];
+        if (!f) { resultado.textContent = 'Funcionário não encontrado.'; return; }
+        texto = '🧑 *Informações do Funcionário:*\n\n' + formatarFuncionario(f);
+      }
+
+      resultado.textContent = texto.trim();
+      textoRelatorioAtual = texto.trim();
+      scrollParaResultado();
+    } catch (error) {
+      console.error('Erro ao gerar lista de funcionários:', error);
+      resultado.textContent = 'Erro ao gerar lista de funcionários.';
+    }
+  }
+
+  // ========= PAGAMENTO DIARISTA =========
+  async function gerarRelatorioPagamentoDiarista() {
+    const inicio = pagamentoDataInicio.value;
+    const fim = pagamentoDataFim.value;
+
+    resultado.textContent = '';
+    if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+    if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+
+    try {
+      const chamadasSnap = await get(ref(db, 'chamadas'));
+      const funcionariosSnap = await get(ref(db, 'funcionarios'));
+      if (!chamadasSnap.exists() || !funcionariosSnap.exists()) {
+        resultado.textContent = 'Não há dados suficientes para gerar o relatório.';
+        return;
+      }
+      const chamadas = chamadasSnap.val();
+      const funcionarios = funcionariosSnap.val();
+
+      let texto = `💰 *Relatório de Pagamento Diaristas* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+
+      const diaristas = Object.entries(funcionarios).filter(([, f]) => f.tipo === 'diarista');
+      if (diaristas.length === 0) {
+        resultado.textContent = 'Nenhum diarista cadastrado.';
+        textoRelatorioAtual = '';
+        return;
+      }
+
+      diaristas
+        .sort(([,a],[,b]) => (a.nome||'').localeCompare(b.nome||'','pt-BR',{sensitivity:'base'}))
+        .forEach(([id, f]) => {
+          let diasPresentes = 0;
+          const datasPresentes = [];
+
+          for (const dataChamada in chamadas) {
+            if (dataChamada < inicio || dataChamada > fim) continue;
+            const presencasDia = chamadas[dataChamada];
+            if (presencasDia?.[id]?.status === 'presente') {
+              diasPresentes++;
+              datasPresentes.push(formatarDataDMY(dataChamada));
+            }
+          }
+
+          if (diasPresentes > 0) {
+            const valorDiaria = parseFloat(f.valorDiaria) || 0;
+            const total = valorDiaria * diasPresentes;
+            texto += `👤 *${f.nome}*\n` +
+                     `Dias trabalhados: *${diasPresentes}* (${datasPresentes.join(', ')})\n` +
+                     `Valor diária: *R$ ${valorDiaria.toFixed(2)}*\n` +
+                     `*Total a pagar: R$ ${total.toFixed(2)}*\n` +
+                     `Banco: ${f.banco || '-'}\n` +
+                     `Chave PIX: ${f.tipoPix || '-'} - ${f.chavePix || '-'}\n\n`;
+          }
+        });
+
+      resultado.textContent = texto.trim();
+      textoRelatorioAtual = texto.trim();
+      scrollParaResultado();
+    } catch (error) {
+      console.error('Erro ao gerar relatório de pagamento:', error);
+      resultado.textContent = 'Erro ao gerar relatório de pagamento.';
+    }
+  }
+
+  // ========= RELATÓRIO DE HORA EXTRA =========
+  async function gerarRelatorioHoraExtra() {
+    const inicio = horaExtraInicio.value;
+    const fim = horaExtraFim.value;
+
+    resultado.textContent = '';
+    if (!inicio || !fim) { alert('Selecione a data de início e fim'); return; }
+    if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+
+    try {
+      const horaExtraSnap = await get(ref(db, 'horaextra'));
+      const funcionariosSnap = await get(ref(db, 'funcionarios'));
+      if (!horaExtraSnap.exists() || !funcionariosSnap.exists()) {
+        resultado.textContent = 'Não há dados suficientes para gerar o relatório de hora extra.';
+        return;
+      }
+      const horaextra = horaExtraSnap.val();
+      const funcionarios = funcionariosSnap.val();
+
+      // Estrutura: por funcionário
+      const mapa = {};
+      Object.keys(funcionarios).forEach(id => {
+        mapa[id] = {
+          nome: funcionarios[id].nome,
+          totalHoras: 0,
+          horas100: 0,
+          horas50: 0,
+          datas: [] // todas as datas em que teve registro
+        };
+      });
+
+      for (const data in horaextra) {
+        if (data < inicio || data > fim) continue;
+        const porDia = horaextra[data];
+        for (const id in porDia) {
+          if (!mapa[id]) continue; // funcionário pode ter sido removido
+          const perc = parseInt(String(porDia[id].percentual || '0'), 10);
+          const qtd = parseInt(String(porDia[id].quantidadeHoras || '0'), 10);
+          if (!qtd) continue;
+
+          mapa[id].totalHoras += qtd;
+          if (perc === 100) mapa[id].horas100 += qtd;
+          else if (perc === 50) mapa[id].horas50 += qtd;
+
+          // registra data (evitar duplicadas por segurança)
+          if (!mapa[id].datas.includes(formatarDataDMY(data))) {
+            mapa[id].datas.push(formatarDataDMY(data));
+          }
+        }
+      }
+
+      let texto = `⏱️ *Relatório de Hora Extra* (${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)})\n\n`;
+      let houve = false;
+
+      Object.values(mapa)
+        .sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR',{sensitivity:'base'}))
+        .forEach(item => {
+          if (item.totalHoras > 0) {
+            houve = true;
+            texto += `👤 *${item.nome}*\n` +
+                     `Total: *${item.totalHoras}h*\n` +
+                     `— 100%: *${item.horas100}h*\n` +
+                     `— 50%: *${item.horas50}h*\n` +
+                     `Datas: ${item.datas.join(', ')}\n\n`;
+          }
+        });
+
+      if (!houve) {
+        texto += 'Nenhum registro de hora extra no período.';
+      }
+
+      resultado.textContent = texto.trim();
+      textoRelatorioAtual = texto.trim();
+      scrollParaResultado();
+    } catch (error) {
+      console.error('Erro ao gerar relatório de hora extra:', error);
+      resultado.textContent = 'Erro ao gerar relatório de hora extra.';
+    }
+  }
+
+  // ========= EXCLUIR RELATÓRIOS (Chamada ou Hora Extra) =========
+  async function excluirRelatorios() {
+    const tipo = excluirTipo.value; // 'chamadas' | 'horaextra'
+    const inicio = excluirDataInicio.value;
+    const fim = excluirDataFim.value;
+    const senha = excluirSenha.value.trim();
+
+    if (!inicio || !fim) { alert('Selecione a data de início e fim para excluir.'); return; }
+    if (fim < inicio) { alert('Data fim não pode ser menor que data início.'); return; }
+    if (!senha) { alert('Informe a senha.'); return; }
+    if (senha !== SENHA_EXCLUSAO) { alert('Senha incorreta.'); return; }
+
+    if (!confirm(`Tem certeza que deseja excluir *${tipo === 'chamadas' ? 'Chamadas' : 'Hora Extra'}* de ${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)}? Esta ação é irreversível.`)) {
+      return;
+    }
+
+    try {
+      const raiz = tipo === 'chamadas' ? 'chamadas' : 'horaextra';
+      const snap = await get(ref(db, raiz));
+      if (!snap.exists()) { alert('Nenhum registro encontrado para exclusão.'); return; }
+      const todos = snap.val();
+
+      const datas = Object.keys(todos).filter(d => d >= inicio && d <= fim);
+      if (datas.length === 0) { alert('Nenhum registro encontrado no intervalo informado.'); return; }
+
+      for (const d of datas) {
+        await remove(ref(db, `${raiz}/${d}`));
+      }
+
+      alert(`${tipo === 'chamadas' ? 'Chamadas' : 'Hora Extra'} de ${formatarDataDMY(inicio)} até ${formatarDataDMY(fim)} excluídas com sucesso.`);
+      resultado.textContent = '';
+      textoRelatorioAtual = '';
+      excluirSenha.value = '';
+    } catch (error) {
+      console.error('Erro ao excluir registros:', error);
+      alert('Erro ao excluir. Veja o console para detalhes.');
+    }
+  }
+
+  // ========= EVENTOS =========
+  btnGerarFaltas.addEventListener('click', gerarRelatorioFaltas);
+  btnGerarLista.addEventListener('click', gerarRelatorioDadosFuncionario);
+  btnGerarPagamento.addEventListener('click', gerarRelatorioPagamentoDiarista);
+  btnGerarHoraExtra.addEventListener('click', gerarRelatorioHoraExtra);
+  btnExcluir.addEventListener('click', excluirRelatorios);
+
+  btnEnviarWhats.addEventListener('click', () => {
+    if (!textoRelatorioAtual) { alert('Gere um relatório antes de enviar.'); return; }
+    const textoEncoded = encodeURIComponent(textoRelatorioAtual);
+    window.open(`https://wa.me/?text=${textoEncoded}`, '_blank');
+  });
+
+  // ========= BOOT =========
+  carregarFuncionarios();
+</script>
+
+</body>
+</html>
